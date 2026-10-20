@@ -12,13 +12,13 @@ export function AttentionPanel({ plugins }: { plugins: PluginRecord[] }): JSX.El
     <div className="min-w-0">
       <div className="flex items-center gap-2">
         <Radar size={16} className="text-content-secondary" aria-hidden="true" />
-        <h3 className="text-xl font-semibold tracking-title text-content-primary">值得关注</h3>
+        <h3 className="text-xl font-semibold tracking-title text-content-primary">关注事项</h3>
         <InfoHint text="这里汇总风险信号与数据缺口，不等同于质量差或安全结论。" />
         <Link
           to="/plugins?risk=high"
           className="ml-auto shrink-0 text-xs text-content-secondary underline-offset-4 transition-colors hover:text-brand-text hover:underline"
         >
-          查看高风险插件
+          查看优先核查
         </Link>
       </div>
       {items.length === 0 ? (

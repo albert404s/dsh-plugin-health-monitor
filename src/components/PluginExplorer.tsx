@@ -58,8 +58,8 @@ const MAINTENANCE_OPTIONS: Array<{ value: MaintenanceFilter; label: string }> = 
 ];
 
 const RISK_OPTIONS: Array<{ value: RiskFilter; label: string }> = [
-  { value: 'all', label: '全部风险' },
-  { value: 'high', label: '高风险信号' },
+  { value: 'all', label: '全部关注状态' },
+  { value: 'high', label: '优先核查' },
   { value: 'medium', label: '需要关注' },
   { value: 'unknown', label: '信息不完整' },
   { value: 'low', label: '未见公开风险' },
@@ -130,9 +130,13 @@ function FilterChip({
 export function PluginExplorer({
   plugins,
   lastSuccessAt,
+  comparedIds = [],
+  onToggleCompare,
 }: {
   plugins: PluginRecord[];
   lastSuccessAt?: string | null;
+  comparedIds?: string[];
+  onToggleCompare?: (id: string) => void;
 }): JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams();
   const [moreOpen, setMoreOpen] = useState(false);
@@ -160,11 +164,11 @@ export function PluginExplorer({
   function update(patch: Partial<typeof state>): void {
     const next = { ...state, ...patch };
     if (!('page' in patch)) next.page = 1;
-    setSearchParams(stateToSearchParams(next), { replace: true });
+    setSearchParams(stateToSearchParams(next), { replace: 'query' in patch });
   }
 
   function reset(): void {
-    setSearchParams(new URLSearchParams(), { replace: true });
+    setSearchParams(new URLSearchParams());
     setQueryInput('');
     window.requestAnimationFrame(() => searchRef.current?.focus());
   }
@@ -492,7 +496,7 @@ export function PluginExplorer({
                         active={state.sort === 'popularity'}
                         onClick={() => update({ sort: 'popularity' })}
                       >
-                        人气
+                        关注度
                       </SortButton>
                     </th>
                     <th
@@ -508,7 +512,7 @@ export function PluginExplorer({
                       </SortButton>
                     </th>
                     <th scope="col" className="h-10 px-2 py-2 text-2xs font-medium text-content-secondary">
-                      风险
+                      关注事项
                     </th>
                     <th
                       scope="col"
@@ -548,9 +552,7 @@ export function PluginExplorer({
                     >
                       <td className="px-4 py-3 md:px-5">
                         <div className="flex min-w-0 items-center gap-2.5">
-                          <span className="w-5 shrink-0 font-mono text-2xs text-content-muted">
-                            {String((page.page - 1) * PAGE_SIZE + index + 1).padStart(2, '0')}
-                          </span>
+                          {onToggleCompare ? <label className="orbit-library-check min-h-10 shrink-0"><input type="checkbox" checked={comparedIds.includes(plugin.id)} disabled={!comparedIds.includes(plugin.id) && comparedIds.length >= 2} onChange={() => onToggleCompare(plugin.id)} aria-label={`选择 ${plugin.name} 加入对比`} /></label> : <span className="w-5 shrink-0 font-mono text-2xs text-content-muted">{String((page.page - 1) * PAGE_SIZE + index + 1).padStart(2, '0')}</span>}
                           <PluginMonogram plugin={plugin} size="sm" />
                           <div className="min-w-0">
                             <Link
@@ -595,7 +597,7 @@ export function PluginExplorer({
                       </td>
                       <td className="px-2 py-3">
                         {plugin.scores.risk.level === 'low' ? (
-                          <span className="text-2xs text-content-muted">未见风险</span>
+                          <span className="text-2xs text-content-muted">未见公开风险</span>
                         ) : (
                           <RiskBadge level={plugin.scores.risk.level} compact />
                         )}
@@ -635,8 +637,7 @@ export function PluginExplorer({
               {page.items.map((plugin) => {
                 const lowCoverage = plugin.scores.completeness.score < 85;
                 return (
-                  <Link
-                    key={plugin.id}
+                  <div key={plugin.id} className="min-w-0 bg-surface"><Link
                     to={`/plugins/${encodeURIComponent(plugin.id)}`}
                     data-testid="plugin-card"
                     className="block min-w-0 bg-surface px-4 py-4 transition-colors hover:bg-surface-subtle active:bg-surface-subtle"
@@ -657,7 +658,7 @@ export function PluginExplorer({
                             </p>
                           </div>
                           {plugin.scores.risk.level === 'low' ? (
-                            <span className="shrink-0 text-2xs text-content-muted">未见风险</span>
+                            <span className="shrink-0 text-2xs text-content-muted">未见公开风险</span>
                           ) : (
                             <RiskBadge level={plugin.scores.risk.level} compact className="shrink-0" />
                           )}
@@ -682,7 +683,7 @@ export function PluginExplorer({
                         <div className="mt-3 grid grid-cols-2 gap-3">
                           <div>
                             <div className="flex items-baseline justify-between text-2xs">
-                              <span className="text-content-muted">人气</span>
+                              <span className="text-content-muted">关注度</span>
                               <span className="tnum font-mono text-content-primary">
                                 {formatScore(plugin.scores.popularity.score)}
                               </span>
@@ -713,6 +714,8 @@ export function PluginExplorer({
                       </div>
                     </div>
                   </Link>
+                  {onToggleCompare ? <label className="orbit-library-check min-h-11 border-t border-line-hairline px-4"><input type="checkbox" checked={comparedIds.includes(plugin.id)} disabled={!comparedIds.includes(plugin.id) && comparedIds.length >= 2} onChange={() => onToggleCompare(plugin.id)} aria-label={`选择 ${plugin.name} 加入对比`} />{comparedIds.includes(plugin.id) ? '已加入对比' : '加入对比'}</label> : null}
+                  </div>
                 );
               })}
             </div>

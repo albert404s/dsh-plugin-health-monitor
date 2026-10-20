@@ -1,9 +1,9 @@
 /** ECharts consumes the same CSS colour tokens as the workbench. */
 function token(name: string, alpha = 1): string {
   const value = typeof document === 'undefined' ? '' : getComputedStyle(document.documentElement).getPropertyValue('--' + name).trim();
-  return 'rgb(' + (value || '135 155 181') + ' / ' + alpha + ')';
+  return 'rgba(' + (value || '135 155 181').split(/\s+/).join(',') + ',' + alpha + ')';
 }
-export const chartTheme = {
+function readChartTheme() { return {
   fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif',
   monoFamily: 'ui-monospace,"Cascadia Code",Consolas,monospace',
   fontSize: 12, axisFontSize: 12,
@@ -18,7 +18,9 @@ export const chartTheme = {
   quadrant: { 'hot-healthy': token('series-maintenance', .045), 'niche-active': token('series-popularity', .025), 'hot-watch': token('risk-medium', .025), quiet: token('fg-tertiary', .015) },
   series: { popularity: token('series-popularity'), maintenance: token('series-maintenance'), bar: token('series-bar'), barHover: token('series-bar-hover') },
   area: token('series-maintenance', .08), select: { border: token('brand'), width: 3 },
-} as const;
+} as const; }
+// Resolve after Vite has attached styles; ECharts needs comma-form rgba.
+export const chartTheme = new Proxy({} as ReturnType<typeof readChartTheme>, { get: (_target, key: keyof ReturnType<typeof readChartTheme>) => readChartTheme()[key] });
 export const riskColor = (level: keyof typeof chartTheme.risk): string => chartTheme.risk[level];
 export const riskFill = (level: keyof typeof chartTheme.riskFill): string => chartTheme.riskFill[level];
 export const quadrantFill = (key: keyof typeof chartTheme.quadrant): string => chartTheme.quadrant[key];

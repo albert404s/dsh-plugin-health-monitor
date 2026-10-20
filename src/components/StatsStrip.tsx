@@ -72,17 +72,17 @@ export function StatsStrip({ data }: { data: LatestData }): JSX.Element {
           <Link
             to="/plugins?risk=high"
             className="group col-span-1 min-h-[96px] bg-surface transition-colors hover:bg-surface-subtle md:col-span-3 md:min-h-[112px] lg:col-span-1 lg:min-h-[128px]"
-            aria-label={`查看 ${stats.highRiskCount} 个高风险插件`}
+            aria-label={`查看 ${stats.highRiskCount} 个需优先核查的插件`}
           >
             <StatCell
-              label="高风险"
+              label="优先核查"
               value={
                 <span className={stats.highRiskCount > 0 ? 'text-risk-high' : 'text-content-primary'}>
                   {stats.highRiskCount}
                 </span>
               }
               detail={
-                stats.highRiskCount > 0 ? '归档 / 积压 / OSV 组合规则' : '当前未命中高风险规则'
+                stats.highRiskCount > 0 ? '维护与公开漏洞规则，详见依据' : '当前未命中优先核查规则'
               }
               icon={<ShieldAlert size={13} />}
             />
