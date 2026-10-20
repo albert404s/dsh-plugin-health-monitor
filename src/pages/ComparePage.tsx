@@ -23,6 +23,7 @@ import {
   SectionHeading,
 } from '../components/ui';
 import { cn } from '../lib/cn';
+import { ScoreHint } from '../components/score-hint';
 import { comparisonText } from '../lib/comparison';
 import { QuietHint } from '../components/quiet-hint';
 
@@ -45,15 +46,13 @@ function scoreValue(plugin: PluginRecord, kind: 'popularity' | 'maintenance'): J
   }
   return (
     <div>
-      <div className="flex items-baseline gap-1.5">
-        <span className="tnum font-mono text-base font-medium text-content-primary">{formatScore(score.score)}</span>
-        <span className="text-xs text-content-muted">/100</span>
-      </div>
+      <ScoreHint score={score}>
+        <span className="flex items-baseline gap-1.5">
+          <span className="tnum font-mono text-base font-medium text-content-primary">{formatScore(score.score)}</span>
+          <span className="text-xs text-content-muted">/100</span>
+        </span>
+      </ScoreHint>
       <ScoreBar value={score.score} className="mt-1.5 w-24" />
-      <p className="mt-1 text-2xs text-content-muted">
-        {score.confidence === 'high' ? '依据较充分' : score.confidence === 'medium' ? '依据一般' : '依据较少'} · 评分依据覆盖{' '}
-        {Math.round(score.coverage * 100)}%
-      </p>
     </div>
   );
 }
@@ -454,7 +453,7 @@ export function ComparePage(): JSX.Element {
         </div>
 
         <div className="panel mt-4 overflow-clip">
-          <div className="hidden lg:block">
+          <div className="hidden lg:block" data-testid="compare-desktop-matrix">
             <table className="w-full table-fixed text-left">
               <colgroup>
                 <col className="w-[26%]" />
@@ -482,8 +481,7 @@ export function ComparePage(): JSX.Element {
                 {rows.map((row) => (
                   <tr key={row.label} className="align-top transition hover:bg-surface-subtle">
                     <th scope="row" className="px-4 py-3.5 md:px-5">
-                      <p className="text-sm font-semibold text-content-primary">{row.label}</p>
-                      <p className="mt-1 text-2xs leading-4 text-content-muted">{row.hint}</p>
+                      <p className="text-sm font-semibold text-content-primary"><QuietHint text={row.hint}>{row.label}</QuietHint></p>
                     </th>
                     <td className="px-3 py-3.5 text-sm text-content-primary">{row.a}</td>
                     <td className="px-3 py-3.5 text-sm text-content-primary">{row.b}</td>
@@ -494,7 +492,7 @@ export function ComparePage(): JSX.Element {
             </table>
           </div>
 
-          <div className="lg:hidden">
+          <div className="lg:hidden" data-testid="compare-mobile-matrix">
             {/* Short A/B labels only; the full names stay available to screen readers. */}
             <div className="flex items-center justify-between gap-2 border-b border-line bg-surface-subtle px-4 py-2.5 text-2xs text-content-secondary">
               <span className="font-mono font-medium text-content-primary">
@@ -509,8 +507,7 @@ export function ComparePage(): JSX.Element {
                 <div key={row.label} className="px-4 py-3.5">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-sm font-semibold text-content-primary">{row.label}</p>
-                      <p className="mt-0.5 text-2xs leading-4 text-content-muted">{row.hint}</p>
+                      <p className="text-sm font-semibold text-content-primary"><QuietHint text={row.hint}>{row.label}</QuietHint></p>
                     </div>
                     <span className="max-w-[55%] break-words text-right text-xs text-content-secondary">{row.diff}</span>
                   </div>
@@ -532,10 +529,9 @@ export function ComparePage(): JSX.Element {
       </section>
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-line py-4">
-        <p className="max-w-2xl text-xs leading-5 text-content-secondary">
-          对比只呈现指标。一个插件可能因样本小、无 Release 或没有 npm 包而看起来不同；请结合详情页的样本量、口径和原始链接阅读。
-          也不会用单一指标断言谁“更好”。
-        </p>
+        <QuietHint text="样本量、Release 和 npm 数据覆盖可能不同，请结合详情中的原始证据判断。">
+          <span className="text-xs text-content-secondary">对比说明</span>
+        </QuietHint>
         <ButtonLink to="/method" variant="ghost">
           阅读口径
         </ButtonLink>

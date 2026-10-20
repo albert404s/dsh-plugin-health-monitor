@@ -268,7 +268,7 @@ export function QuadrantPage(): JSX.Element {
               />
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-line px-4 py-2.5 text-2xs text-content-muted md:px-5">
-              <QuietHint text="点击气泡或右侧列表选择插件，再从摘要进入详情。鼠标靠近时暂停光晕。">图表交互</QuietHint>
+              <QuietHint text="点击气泡或右侧列表选择插件，再从摘要进入详情。">图表交互</QuietHint>
             </div>
           </div>
 

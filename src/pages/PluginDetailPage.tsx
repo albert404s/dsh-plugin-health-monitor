@@ -50,7 +50,9 @@ import {
   SectionHeading,
 } from '../components/ui';
 import { cn } from '../lib/cn';
+import { ScoreHint } from '../components/score-hint';
 import { AttentionSummary } from '../components/AttentionSummary';
+import { QuietHint } from '../components/quiet-hint';
 
 const DETAIL_TOC = [
   { id: 'score-summary', label: '评分摘要' },
@@ -194,9 +196,9 @@ function RawMetric({
 }): JSX.Element {
   return (
     <div className="min-w-0 px-4 py-4 md:px-5">
-      <p className="text-2xs font-medium text-content-secondary">{label}</p>
+      <p className="text-2xs font-medium text-content-secondary"><QuietHint text={sub}>{label}</QuietHint></p>
       <p className="mt-1.5 break-words font-mono text-lg font-semibold leading-6 text-content-primary">{value}</p>
-      <p className="mt-1 text-2xs leading-4 text-content-muted">{sub}</p>
+      {value === '—' ? <p className="mt-1 text-2xs leading-4 text-content-muted">{sub}</p> : null}
       {link ? (
         <ExternalTextLink href={link.href} className="mt-1.5 text-2xs">
           {link.label}
@@ -565,23 +567,15 @@ export function PluginDetailPage(): JSX.Element {
               <Star size={13} /> 关注度
             </div>
             <div className="mt-2 flex flex-wrap items-baseline gap-x-1 gap-y-0.5">
-              <span className="readout text-[2.25rem] sm:text-4xl">
-                {formatScore(plugin.scores.popularity.score)}
-              </span>
+              <ScoreHint score={plugin.scores.popularity}>
+                <span className="readout text-[2.25rem] sm:text-4xl">
+                  {formatScore(plugin.scores.popularity.score)}
+                </span>
+              </ScoreHint>
               <span className="text-xs text-content-muted">/ 100</span>
             </div>
             <ScoreBar value={plugin.scores.popularity.score} className="mt-3 w-32" />
-            <p className="mt-2 text-xs leading-5 text-content-muted">
-              {popularityRank ? `本榜第 ${popularityRank.rank} / ${popularityRank.total} · ` : ''}
-              {plugin.scores.popularity.confidence === 'high'
-                ? '依据较充分'
-                : plugin.scores.popularity.confidence === 'medium'
-                  ? '依据一般'
-                  : '依据较少'}
-            </p>
-            <p className="mt-0.5 whitespace-nowrap text-2xs text-content-muted">
-              覆盖 {Math.round(plugin.scores.popularity.coverage * 100)}%
-            </p>
+            {popularityRank ? <p className="mt-2 text-xs leading-5 text-content-muted">本榜第 {popularityRank.rank} / {popularityRank.total}</p> : null}
             <a href="#explain-popularity" className="mt-2 inline-flex min-h-8 items-center gap-1 text-xs text-content-secondary underline-offset-4 hover:text-brand-text hover:underline">
               查看计算 <ArrowRight size={11} aria-hidden="true" />
             </a>
@@ -592,23 +586,15 @@ export function PluginDetailPage(): JSX.Element {
               <GitCommitHorizontal size={13} /> 维护活跃度
             </div>
             <div className="mt-2 flex flex-wrap items-baseline gap-x-1 gap-y-0.5">
-              <span className="readout text-[2.25rem] sm:text-4xl">
-                {formatScore(plugin.scores.maintenance.score)}
-              </span>
+              <ScoreHint score={plugin.scores.maintenance}>
+                <span className="readout text-[2.25rem] sm:text-4xl">
+                  {formatScore(plugin.scores.maintenance.score)}
+                </span>
+              </ScoreHint>
               <span className="text-xs text-content-muted">/ 100</span>
             </div>
             <ScoreBar value={plugin.scores.maintenance.score} className="mt-3 w-32" />
-            <p className="mt-2 text-xs leading-5 text-content-muted">
-              {maintenanceRank ? `本榜第 ${maintenanceRank.rank} / ${maintenanceRank.total} · ` : ''}
-              {plugin.scores.maintenance.confidence === 'high'
-                ? '依据较充分'
-                : plugin.scores.maintenance.confidence === 'medium'
-                  ? '依据一般'
-                  : '依据较少'}
-            </p>
-            <p className="mt-0.5 whitespace-nowrap text-2xs text-content-muted">
-              覆盖 {Math.round(plugin.scores.maintenance.coverage * 100)}%
-            </p>
+            {maintenanceRank ? <p className="mt-2 text-xs leading-5 text-content-muted">本榜第 {maintenanceRank.rank} / {maintenanceRank.total}</p> : null}
             <a href="#explain-maintenance" className="mt-2 inline-flex min-h-8 items-center gap-1 text-xs text-content-secondary underline-offset-4 hover:text-brand-text hover:underline">
               查看计算 <ArrowRight size={11} aria-hidden="true" />
             </a>

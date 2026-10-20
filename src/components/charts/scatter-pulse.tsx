@@ -16,8 +16,7 @@ export function ScatterPulse({ container, plugins, enabled }: {
   useEffect(() => {
     if (!enabled || !container.current) return;
     const element = container.current;
-    let resizeFrame = 0, pointerFrame = 0;
-    let pointer: { x: number; y: number } | null = null;
+    let resizeFrame = 0;
     const pause = (reason: string, active: boolean): void => {
       if (active) reasons.current.add(reason); else reasons.current.delete(reason);
       setPaused(reasons.current.size > 0);
@@ -37,42 +36,21 @@ export function ScatterPulse({ container, plugins, enabled }: {
       });
       setPlot({halos,x:x0,y:y0,width:x1-x0,height:y1-y0});
     };
-    const proximity = (): void => {
-      pointerFrame = 0;
-      if (!pointer) return;
-      const rect = element.getBoundingClientRect();
-      const distanceX = Math.max(rect.left-pointer.x,0,pointer.x-rect.right);
-      const distanceY = Math.max(rect.top-pointer.y,0,pointer.y-rect.bottom);
-      pause('pointer', Math.hypot(distanceX,distanceY) <= 56);
-    };
-    const move = (event: PointerEvent): void => {
-      pointer = {x:event.clientX,y:event.clientY};
-      if (!pointerFrame) pointerFrame = requestAnimationFrame(proximity);
-    };
-    const exit = (): void => { pointer=null; pause('pointer',false); };
-    const focus = (): void => { pause('focus',Boolean(element.closest('section')?.contains(document.activeElement))); };
     const visibility = (): void => pause('background',document.hidden);
     const observer = new ResizeObserver(() => {
       cancelAnimationFrame(resizeFrame);
-      resizeFrame = requestAnimationFrame(() => { position(); proximity(); });
+      resizeFrame = requestAnimationFrame(position);
     });
     observer.observe(element);
     const intersection = new IntersectionObserver(([entry])=>pause('offscreen',!entry.isIntersecting));
     intersection.observe(element);
-    document.addEventListener('pointermove',move,{passive:true});
-    document.addEventListener('pointerleave',exit);
-    document.addEventListener('focusin',focus);
-    document.addEventListener('focusout',focus);
     document.addEventListener('visibilitychange',visibility);
-    window.addEventListener('scroll',proximity,{passive:true});
-    visibility(); focus();
+    visibility();
     resizeFrame=requestAnimationFrame(position);
     return () => {
       observer.disconnect(); intersection.disconnect();
-      cancelAnimationFrame(resizeFrame);cancelAnimationFrame(pointerFrame);
-      document.removeEventListener('pointermove',move);document.removeEventListener('pointerleave',exit);
-      document.removeEventListener('focusin',focus);document.removeEventListener('focusout',focus);
-      document.removeEventListener('visibilitychange',visibility);window.removeEventListener('scroll',proximity);
+      cancelAnimationFrame(resizeFrame);
+      document.removeEventListener('visibilitychange',visibility);
       reasons.current.clear();
     };
   }, [container, plugins, enabled]);

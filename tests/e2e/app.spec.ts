@@ -240,18 +240,54 @@ test('quiet headings expose supporting text on hover and keyboard focus only',as
   await expect(page.locator('.page-enter')).toHaveCSS('animation-name','orbit-page-in');
 });
 
-test('scatter halos pause before the pointer reaches the chart and resume away from it',async({page})=>{
-  await page.setViewportSize({width:1440,height:900});await page.goto('/ecosystem');
-  await page.mouse.move(2,2);
-  const halo=page.locator('.orbit-scatter-pulse');await expect(halo).toHaveAttribute('data-state','running');
-  const chart=page.getByRole('img',{name:'可筛选的 DSH 插件生态分布散点图'});
-  const bounds=await chart.boundingBox();if(!bounds)throw new Error('missing chart bounds');
-  await page.mouse.move(bounds.x-30,bounds.y+bounds.height/2);
-  await expect(halo).toHaveAttribute('data-state','paused');
-  const ring=halo.locator('circle').first();
-  const frozen=await ring.evaluate(el=>getComputedStyle(el).transform);
-  await page.waitForTimeout(450);
-  expect(await ring.evaluate(el=>getComputedStyle(el).transform)).toBe(frozen);
-  await page.mouse.move(2,2);await expect(halo).toHaveAttribute('data-state','running');
-  await page.emulateMedia({reducedMotion:'reduce'});await expect(halo).toHaveCount(0);
+test('scatter halos keep moving near and inside both charts',async({page})=>{
+  await page.setViewportSize({width:1440,height:900});
+  for (const path of ['/', '/ecosystem']) {
+    await page.goto(path);await page.mouse.move(2,2);
+    const halo=page.locator('.orbit-scatter-pulse');
+    await expect(halo).toHaveAttribute('data-state','running');
+    const bounds=await halo.boundingBox();if(!bounds)throw new Error('missing chart bounds');
+    for (const x of [bounds.x-30, bounds.x+bounds.width/2]) {
+      await page.mouse.move(x,bounds.y+bounds.height/2);
+      await expect(halo).toHaveAttribute('data-state','running');
+      const ring=halo.locator('circle').first();
+      await expect(ring).toHaveCSS('animation-play-state','running');
+      const before=await ring.evaluate(el=>getComputedStyle(el).transform);
+      await expect.poll(()=>ring.evaluate(el=>getComputedStyle(el).transform)).not.toBe(before);
+    }
+  }
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await expect(page.locator('.orbit-scatter-pulse')).toHaveCount(0);
+});
+
+for (const width of [505,1440]) {
+  test('compare annotations stay hidden until hover or focus at '+width+'px',async({page})=>{
+    await page.setViewportSize({width,height:900});await page.goto(compare);
+    const matrix=page.getByTestId(width<1024?'compare-mobile-matrix':'compare-desktop-matrix');
+    const label=matrix.locator('.orbit-quiet-hint').filter({hasText:/^关注度$/});
+    await label.scrollIntoViewIfNeeded();await page.mouse.move(1,1);
+    await expect(page.getByText('Star 与 npm 下载的对数归一化合成',{exact:true})).toHaveCount(0);
+    await expect(matrix).not.toContainText('评分依据覆盖');
+    await label.hover();
+    await expect(page.getByRole('tooltip')).toHaveText('Star 与 npm 下载的对数归一化合成');
+    await page.keyboard.press('Escape');await expect(page.getByRole('tooltip')).toHaveCount(0);
+    await page.mouse.move(1,1);
+    const score=matrix.locator('.orbit-score-evidence').first();
+    await score.focus();
+    await expect(page.getByRole('tooltip')).toHaveText('依据较充分 · 评分依据覆盖 100%');
+    await page.keyboard.press('Escape');await expect(page.getByRole('tooltip')).toHaveCount(0);
+  });
+}
+
+test('detail supporting metric and score notes use the same quiet hints',async({page})=>{
+  await page.goto(detail);
+  const summary=page.getByLabel('评分摘要');
+  await expect(summary).not.toContainText('依据较充分');
+  await expect(summary).not.toContainText('覆盖');
+  await summary.locator('.orbit-score-evidence').first().focus();
+  await expect(page.getByRole('tooltip')).toContainText('评分依据覆盖');
+  await page.keyboard.press('Escape');
+  const label=page.locator('#raw-metrics .orbit-quiet-hint').filter({hasText:/^Stars$/});
+  await label.hover();
+  await expect(page.getByRole('tooltip')).toHaveText('GitHub 当前值');
 });
