@@ -7,6 +7,7 @@ import type {
 } from '../../src/lib/types';
 import type { JsonClient } from './http';
 import { HttpError } from './http';
+import { isCount } from '../../src/lib/data-quality';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const PAGE_SIZE = 100;
@@ -64,6 +65,12 @@ interface GithubReleaseResponse {
   html_url: string;
 }
 
+function windowTime(value: string, now: Date): number {
+  const time=Date.parse(value);
+  if(!Number.isFinite(time) || time > now.getTime()) throw new Error('GitHub 窗口记录时间异常：'+value);
+  return time;
+}
+
 function isoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
@@ -115,7 +122,7 @@ async function collectIssues90d(
     if (items.length === 0) break;
     for (const issue of items) {
       if (issue.pull_request) continue;
-      const created = new Date(issue.created_at).getTime();
+      const created = windowTime(issue.created_at, now);
       if (created < cutoff.getTime()) {
         shouldStop = true;
         continue;
@@ -164,7 +171,7 @@ async function countLongOpen(
       const items = Array.isArray(response.data) ? response.data : [];
       for (const issue of items) {
         if (issue.pull_request) continue;
-        if (new Date(issue.created_at).getTime() < cutoff) longOpen += 1;
+        if (windowTime(issue.created_at, now) < cutoff) longOpen += 1;
       }
       if (items.length < PAGE_SIZE) break;
       if (page === 10) truncated = true;
@@ -202,7 +209,7 @@ async function collectPullRequests90d(
       const items = Array.isArray(response.data) ? response.data : [];
       if (items.length === 0) break;
       for (const pull of items) {
-        const created = new Date(pull.created_at).getTime();
+        const created = windowTime(pull.created_at, now);
         if (created < cutoff.getTime()) {
           shouldStop = true;
           continue;
@@ -263,7 +270,7 @@ async function collectCommits(
       )}&per_page=${PAGE_SIZE}&page=${page}`,
     );
     const items = Array.isArray(response.data) ? response.data : [];
-    commits30d += items.filter((commit) => commit.parents.length <= 1).length;
+    commits30d += items.filter((commit) => { const date=commit.commit.committer?.date ?? commit.commit.author?.date; return commit.parents.length <= 1 && date !== null && date !== undefined && windowTime(date,now) >= Date.parse(since); }).length;
     if (items.length < PAGE_SIZE) break;
     if (page === MAX_PAGES) truncated = true;
   }
@@ -297,8 +304,9 @@ async function collectReleases(
   const cutoff = now.getTime() - 90 * DAY_MS;
   const releases90d = releases.filter((release) => {
     if (!release.published_at) return false;
-    return new Date(release.published_at).getTime() >= cutoff;
+    return windowTime(release.published_at, now) >= cutoff;
   }).length;
+  releases.sort((a,b)=>Date.parse(b.published_at ?? '')-Date.parse(a.published_at ?? ''));
   const latest = releases[0];
   return {
     latestRelease: latest
@@ -341,7 +349,7 @@ export async function collectGithub(
     `https://api.github.com/repos/${repo}`,
   );
   const meta = repoResponse.data;
-  if (!meta?.full_name) {
+  if (!meta?.full_name || !isCount(meta.stargazers_count) || !isCount(meta.forks_count) || !isCount(meta.open_issues_count) || typeof meta.archived !== 'boolean') {
     throw new HttpError('GitHub repository payload is incomplete', 500, repo);
   }
 
@@ -353,7 +361,8 @@ export async function collectGithub(
   ]);
 
   const longOpenResult = await countLongOpen(client, meta.full_name, now);
-  const openIssues = Math.max(0, meta.open_issues_count - openPr.count);
+  if(openPr.ok && openPr.count > meta.open_issues_count) throw new Error('GitHub 开放 PR 数超过开放条目总数');
+  const openIssues = meta.open_issues_count - (openPr.ok ? openPr.count : 0);
   const issues: IssueWindow = {
     ...issuesWindow,
     openNow: openIssues,

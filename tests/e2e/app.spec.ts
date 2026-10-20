@@ -213,3 +213,10 @@ test('unavailable WebGL keeps the static scene and the primary chart usable',asy
   await expect(page.locator('.orbit-brand-scene')).toHaveAttribute('data-mode','poster');
   await expect(page.getByRole('img',{name:/DSH 插件关注度/})).toBeVisible();
 });
+
+
+test('download missing days remain gaps instead of zero-valued chart averages',async({page})=>{
+  await page.goto('/plugins/dsh-market-dsh-market');
+  await expect(page.getByText('灰色/断点=疑似缺失，不按 0 计入均值')).toBeVisible();
+  await expect(page.getByText(/周下载窗口包含平台性缺数日/).first()).toBeVisible();
+});

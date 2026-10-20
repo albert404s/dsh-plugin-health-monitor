@@ -1,6 +1,8 @@
 import { mkdir, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { HistoryFile, HistoryPoint, LatestData, StatusFile } from '../../src/lib/types';
+import { latestSchema, historySchema, statusSchema, parseLatest, parseHistory, parseStatus } from '../../src/lib/contracts';
+import { computeStats } from '../../src/lib/scoring';
 import {
   HISTORY_SCHEMA_VERSION,
   LATEST_SCHEMA_VERSION,
@@ -68,44 +70,21 @@ export async function atomicWriteJson(filePath: string, value: unknown): Promise
 }
 
 export function assertLatestData(value: unknown): asserts value is LatestData {
-  if (!value || typeof value !== 'object') throw new Error('latest.json 不是有效对象');
-  const data = value as Partial<LatestData>;
-  if (data.schemaVersion !== LATEST_SCHEMA_VERSION) {
-    throw new Error(`latest.json schemaVersion 不兼容：${String(data.schemaVersion)}`);
-  }
-  if (!Array.isArray(data.plugins)) throw new Error('latest.json 缺少 plugins 数组');
-  if (typeof data.lastSuccessAt !== 'string') throw new Error('latest.json 缺少 lastSuccessAt');
-  for (const plugin of data.plugins) {
-    if (!plugin || typeof plugin !== 'object') throw new Error('插件记录不是对象');
-    if (typeof plugin.id !== 'string' || typeof plugin.repo !== 'string') {
-      throw new Error('插件记录缺少 id/repo');
-    }
-    if (!plugin.scores?.popularity || !plugin.scores?.maintenance) {
-      throw new Error(`插件 ${plugin.id} 缺少评分结果`);
-    }
+  const result=latestSchema.safeParse(value);
+  if(!result.success) throw new Error('latest.json 数据契约校验失败：' + result.error.issues.slice(0,2).map(issue=>issue.path.join('.')+': '+issue.message).join('；'));
+  const expected=computeStats(result.data.plugins);
+  if(Object.keys(expected).some(key=>expected[key as keyof typeof expected] !== result.data.stats[key as keyof typeof expected])) throw new Error('latest.json 汇总与插件记录不一致');
+  const ids = new Set<string>(), repos = new Set<string>();
+  for(const plugin of result.data.plugins) {
+    if(ids.has(plugin.id.toLowerCase()) || repos.has(plugin.repo.toLowerCase()))throw new Error('latest.json 重复插件身份');
+    ids.add(plugin.id.toLowerCase());repos.add(plugin.repo.toLowerCase());
   }
 }
-
 export function assertHistory(value: unknown): asserts value is HistoryFile {
-  if (!value || typeof value !== 'object') throw new Error('history.json 不是有效对象');
-  const history = value as Partial<HistoryFile>;
-  if (history.schemaVersion !== HISTORY_SCHEMA_VERSION) {
-    throw new Error(`history.json schemaVersion 不兼容：${String(history.schemaVersion)}`);
-  }
-  if (!history.plugins || typeof history.plugins !== 'object') {
-    throw new Error('history.json 缺少 plugins 对象');
-  }
+  if(!historySchema.safeParse(value).success) throw new Error('history.json 数据契约校验失败');
 }
-
 export function assertStatus(value: unknown): asserts value is StatusFile {
-  if (!value || typeof value !== 'object') throw new Error('status.json 不是有效对象');
-  const status = value as Partial<StatusFile>;
-  if (status.schemaVersion !== STATUS_SCHEMA_VERSION) {
-    throw new Error(`status.json schemaVersion 不兼容：${String(status.schemaVersion)}`);
-  }
-  if (!['success', 'partial', 'failed'].includes(status.outcome ?? '')) {
-    throw new Error('status.json outcome 非法');
-  }
+  if(!statusSchema.safeParse(value).success) throw new Error('status.json 数据契约校验失败');
 }
 
 export async function loadExisting(dataDir: string): Promise<{
@@ -114,22 +93,19 @@ export async function loadExisting(dataDir: string): Promise<{
   status: StatusFile | null;
 }> {
   const rawLatest = await readJson<unknown>(path.join(dataDir, 'latest.json'));
-  const rawHistory = await readJson<unknown>(path.join(dataDir, 'history.json'));
-  const rawStatus = await readJson<unknown>(path.join(dataDir, 'status.json'));
+  const rawHistory = await readJson<unknown>(path.join(dataDir, 'history.json')).catch(error=>{console.warn('[store] history unreadable:',String(error));return null;});
+  const rawStatus = await readJson<unknown>(path.join(dataDir, 'status.json')).catch(error=>{console.warn('[store] status unreadable:',String(error));return null;});
   let latest: LatestData | null = null;
   let history: HistoryFile | null = null;
   let status: StatusFile | null = null;
   if (rawLatest) {
-    assertLatestData(rawLatest);
-    latest = rawLatest;
+    const result=parseLatest(rawLatest); latest=result.data; result.warnings.forEach(warning=>console.warn('[store]',warning));
   }
   if (rawHistory) {
-    assertHistory(rawHistory);
-    history = rawHistory;
+    try { const result=parseHistory(rawHistory); history=result.data; result.warnings.forEach(warning=>console.warn('[store]',warning)); } catch(error) { console.warn('[store] history unavailable:',String(error)); }
   }
   if (rawStatus) {
-    assertStatus(rawStatus);
-    status = rawStatus;
+    try { status=parseStatus(rawStatus); } catch(error) { console.warn('[store] status unavailable:',String(error)); }
   }
   return { latest, history, status };
 }
@@ -145,6 +121,7 @@ export async function updateHistory(
   const plugins: Record<string, HistoryPoint[]> = { ...(previous?.plugins ?? {}) };
 
   for (const plugin of latest.plugins) {
+    if(plugin.dataStatus === 'stale') continue;
     const points = [...(plugins[plugin.id] ?? [])];
     const point: HistoryPoint = {
       t: latest.generatedAt,
@@ -189,8 +166,10 @@ export async function updateHistory(
     retentionDays,
     plugins,
   };
-  await atomicWriteJson(path.join(dataDir, 'history.json'), history);
-  return history;
+  const cleaned=parseHistory(history).data;
+  assertHistory(cleaned);
+  await atomicWriteJson(path.join(dataDir, 'history.json'), cleaned);
+  return cleaned;
 }
 
 export function snapshotFilename(iso: string): string {

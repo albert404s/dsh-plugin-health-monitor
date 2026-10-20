@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { HistoryFile, LatestData, PluginRecord, StatusFile } from './types';
 import { computeStats } from './scoring';
+import { normalizeGithubRepository } from './data-quality';
 
 const count = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
 const scoreNumber = z.number().min(0).max(100);
@@ -22,20 +23,25 @@ const issueWindow = z.object({ opened90d: count, closed90d: count, closureRate: 
 const prWindow = z.object({ available: z.boolean(), opened90d: count, merged90d: count, mergeRate: ratio.nullable(), lowSample: z.boolean(), truncated: z.boolean(), queryUrl: text });
 const release = z.object({ version: nullableText, tagName: text, publishedAt: optionalTime, url: text });
 export const dailyDownloadSchema = z.object({ date: z.iso.date(), downloads: count });
-export const pluginSchema = z.object({
+const pluginObjectSchema = z.object({
   id: text.min(1), repo: text.regex(/^[\w.-]+\/[\w.-]+$/), name: text.min(1), category: text.min(1), installCommand: text, curatorNote: text,
   repository: z.object({ fullName: text, url: z.url({protocol:/^https?$/}), description: nullableText, homepageUrl: nullableText, topics: z.array(text), language: nullableText, license: nullableText, createdAt: optionalTime, pushedAt: optionalTime, archived: z.boolean(), defaultBranch: text }),
   github: z.object({ stars: count, forks: count, openIssues: count, openPullRequests: count, commits30d: count, commits30dTruncated: z.boolean(), issues: issueWindow, pullRequests: prWindow, latestRelease: release.nullable(), releases90d: count, lastCommitAt: optionalTime, lastCommitUrl: nullableText, commitsUrl: text, issuesUrl: text, pullsUrl: text, releasesUrl: text }),
-  npm: z.object({ status: z.enum(['verified','unavailable','unverified','error']), packageName: nullableText, latestVersion: nullableText, publishedAt: optionalTime, downloads30d: count.nullable(), downloads7d: count.nullable(), previous7d: count.nullable(), weeklyChangePct: z.number().nullable(), daily: z.array(dailyDownloadSchema), repositoryUrl: nullableText, registryUrl: nullableText, mappingEvidence: nullableText, enginesNode: nullableText, dshPeerRange: nullableText, fetchedAt: optionalTime, reason: nullableText }),
+  npm: z.object({ status: z.enum(['verified','unavailable','unverified','error']), packageName: nullableText, latestVersion: nullableText, publishedAt: optionalTime, downloads30d: count.nullable(), downloads7d: count.nullable(), previous7d: count.nullable(), weeklyChangePct: z.number().nullable(), daily: z.array(dailyDownloadSchema).max(400), quality: z.object({rawDaily:z.array(z.unknown()).max(1000),conflictDates:z.array(z.iso.date()),invalidCount:count,notes:z.array(text),windowStart:z.iso.date().nullable(),windowEnd:z.iso.date().nullable()}).optional(), repositoryUrl: nullableText, registryUrl: nullableText, mappingEvidence: nullableText, enginesNode: nullableText, dshPeerRange: nullableText, fetchedAt: optionalTime, reason: nullableText }),
   security: z.object({ status: z.enum(['checked','unavailable','error']), exactMatch: z.boolean(), packageName: nullableText, version: nullableText, vulnerabilities: z.array(z.object({ id: text.min(1), summary: nullableText, severity: z.enum(['critical','high','medium','low','unknown']), aliases: z.array(text), modified: optionalTime, url: text })), checkedAt: optionalTime, reason: nullableText, queryUrl: nullableText }),
   compatibility: z.object({ nodeEngine: nullableText, dshPeerRange: nullableText, npmVersion: nullableText, evidenceUrl: nullableText, note: text }),
   scores: z.object({ popularity: scoreSchema, maintenance: scoreSchema, risk: z.object({ level: riskLevel, label: text, flags: z.array(z.object({ code: text, level: z.enum(['high','medium','info']), title: text, detail: text, evidenceUrl: nullableText })), limitations: z.array(text) }), completeness: z.object({ score: scoreNumber, available: count, total: count.positive(), level: confidence, missing: z.array(z.object({key:text,label:text,reason:text})) }) }),
   availability: z.object({ repository: z.boolean(), commits: z.boolean(), issues: z.boolean(), pullRequests: z.boolean(), releases: z.boolean(), npm: z.boolean(), security: z.boolean() }),
   dataStatus: z.enum(['complete','partial','stale']), warnings: z.array(text), lastUpdatedAt: utcTimestamp,
-}).superRefine((plugin, ctx) => {
+});
+export const pluginSeedSchema = pluginObjectSchema.omit({ scores: true });
+export const pluginSchema = pluginObjectSchema.superRefine((plugin, ctx) => {
   const issue = plugin.github.issues;
   if (issue.closed90d > issue.opened90d || plugin.github.pullRequests.merged90d > plugin.github.pullRequests.opened90d) ctx.addIssue({code:'custom',message:'关闭或合并数超过窗口样本数'});
   if (plugin.repository.fullName.toLowerCase() !== plugin.repo.toLowerCase()) ctx.addIssue({code:'custom',message:'仓库身份不一致'});
+  if (plugin.npm.status === 'verified' && normalizeGithubRepository(plugin.npm.repositoryUrl) !== normalizeGithubRepository(plugin.repo)) ctx.addIssue({code:'custom',message:'npm 仓库身份不一致'});
+  if (plugin.npm.status === 'verified' && (!plugin.npm.packageName || !plugin.npm.repositoryUrl)) ctx.addIssue({code:'custom',message:'npm 映射缺少身份依据'});
+  if (plugin.security.status === 'checked' && (!plugin.security.exactMatch || plugin.security.packageName !== plugin.npm.packageName || plugin.security.version !== plugin.npm.latestVersion)) ctx.addIssue({code:'custom',message:'漏洞查询缺少精确版本匹配'});
   if (plugin.scores.completeness.available > plugin.scores.completeness.total) ctx.addIssue({code:'custom',message:'数据域计数不一致'});
 });
 const statsSchema = z.object({ pluginCount: count, totalStars: count, totalDownloads: count.nullable(), maintainedCount: count, highRiskCount: count, scoredCount: count, fullyScoredCount: count, completeDataCount: count });
@@ -87,7 +93,9 @@ export function parseHistory(value: unknown): { data: HistoryFile; warnings: str
     for (const entry of raw) {
       const result = historyPointSchema.safeParse(entry);
       if (!result.success) { bad++; continue; }
-      const point = result.data; const key = new Date(point.t).toISOString() + ':' + point.methodVersion;
+      const point = {...result.data,t:new Date(result.data.t).toISOString()};
+      if(Date.parse(point.t) > Date.parse(envelope.data.updatedAt)) { bad++; continue; }
+      const key = new Date(point.t).toISOString() + ':' + point.methodVersion;
       if (byTime.has(key) && JSON.stringify(byTime.get(key)) !== JSON.stringify(point)) { conflicts.add(key); bad++; }
       else byTime.set(key, point);
     }

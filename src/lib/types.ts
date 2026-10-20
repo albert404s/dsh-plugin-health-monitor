@@ -95,6 +95,16 @@ export interface DailyDownload {
   downloads: number;
 }
 
+/** Optional provenance added compatibly to schema v1; raw observations remain evidence. */
+export interface NpmQuality {
+  rawDaily: unknown[];
+  conflictDates: string[];
+  invalidCount: number;
+  notes: string[];
+  windowStart: string | null;
+  windowEnd: string | null;
+}
+
 export interface NpmMetrics {
   status: NpmStatus;
   packageName: string | null;
@@ -105,6 +115,7 @@ export interface NpmMetrics {
   previous7d: number | null;
   weeklyChangePct: number | null;
   daily: DailyDownload[];
+  quality?: NpmQuality;
   repositoryUrl: string | null;
   registryUrl: string | null;
   mappingEvidence: string | null;

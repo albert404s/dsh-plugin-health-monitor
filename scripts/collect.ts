@@ -21,6 +21,8 @@ import {
   STATUS_SCHEMA_VERSION,
 } from '../src/lib/types';
 import { computeStats, scorePlugins } from '../src/lib/scoring';
+import { cleanSeedRecords, applyNpmGapGuard } from './lib/clean';
+import { normalizeGithubRepository } from '../src/lib/data-quality';
 import { JsonClient, createGithubClient, createNpmClient } from './lib/http';
 import { collectGithub } from './lib/github';
 import { collectNpm } from './lib/npm';
@@ -95,11 +97,12 @@ async function loadConfig(configPath: string): Promise<PluginConfig[]> {
   }
   const ids = new Set<string>();
   const repos = new Set<string>();
+  const packages = new Set<string>();
   for (const plugin of config.plugins) {
     if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(plugin.repo)) {
       throw new Error(`非法 GitHub 仓库地址：${plugin.repo}`);
     }
-    if (!plugin.id || ids.has(plugin.id)) throw new Error(`重复或缺失插件 id：${plugin.id}`);
+    if (!plugin.id || ids.has(plugin.id.toLowerCase())) throw new Error(`重复或缺失插件 id：${plugin.id}`);
     if (repos.has(plugin.repo.toLowerCase())) {
       throw new Error(`重复 GitHub 仓库：${plugin.repo}`);
     }
@@ -109,7 +112,11 @@ async function loadConfig(configPath: string): Promise<PluginConfig[]> {
     if (!plugin.installCommand || !plugin.category) {
       throw new Error(`插件 ${plugin.id} 缺少安装命令或分类`);
     }
-    ids.add(plugin.id);
+    if (plugin.npm) {
+      if (packages.has(plugin.npm.toLowerCase())) throw new Error('重复 npm 映射：' + plugin.npm);
+      packages.add(plugin.npm.toLowerCase());
+    }
+    ids.add(plugin.id.toLowerCase());
     repos.add(plugin.repo.toLowerCase());
   }
   return config.plugins;
@@ -145,48 +152,6 @@ function fallbackSecurity(
   };
 }
 
-/**
- * npm range data can contain platform-wide zero days (for example an npm
- * statistics outage). A package's 7-day window is not comparable when it
- * contains such a day, so suppress the derived weekly change instead of
- * presenting a false trend. The raw daily series is kept for display.
- */
-function applyNpmGapGuard(records: Array<Omit<PluginRecord, 'scores'>>): number {
-  const dateStats = new Map<string, { total: number; zero: number }>();
-  for (const record of records) {
-    if (record.npm.status !== 'verified') continue;
-    for (const day of record.npm.daily) {
-      const entry = dateStats.get(day.date) ?? { total: 0, zero: 0 };
-      entry.total += 1;
-      if (day.downloads === 0) entry.zero += 1;
-      dateStats.set(day.date, entry);
-    }
-  }
-
-  const gapDates = new Set(
-    [...dateStats.entries()]
-      .filter(([, stats]) => stats.total >= 5 && stats.zero / stats.total >= 0.8)
-      .map(([date]) => date),
-  );
-  if (gapDates.size === 0) return 0;
-
-  let affected = 0;
-  for (const record of records) {
-    if (record.npm.status !== 'verified') continue;
-    const recent = record.npm.daily.slice(-14);
-    if (!recent.some((day) => gapDates.has(day.date))) continue;
-    record.npm.downloads7d = null;
-    record.npm.previous7d = null;
-    record.npm.weeklyChangePct = null;
-    const reason = '周下载窗口包含平台性缺数日，周变化暂不可用。';
-    record.npm.reason = record.npm.reason ? `${record.npm.reason} ${reason}` : reason;
-    if (!record.warnings.includes(reason)) record.warnings.push(reason);
-    if (record.dataStatus === 'complete') record.dataStatus = 'partial';
-    affected += 1;
-  }
-  return affected;
-}
-
 async function main(): Promise<void> {
   const startedAt = new Date();
   const options = parseArgs(process.argv.slice(2));
@@ -216,7 +181,8 @@ async function main(): Promise<void> {
   let usedFallback = 0;
 
   for (const config of pluginsConfig) {
-    const previousPlugin = previousById.get(config.id);
+    const candidate = previousById.get(config.id);
+    const previousPlugin = candidate && normalizeGithubRepository(candidate.repo) === normalizeGithubRepository(config.repo) ? candidate : undefined;
     if (Date.now() > deadline) {
       const message = `全局采集时间预算（20 分钟）已耗尽，${config.id} 沿用上次快照。`;
       errors.push(message);
@@ -411,14 +377,16 @@ async function main(): Promise<void> {
     );
   }
 
-  const gapAffected = applyNpmGapGuard(records);
+  const cleaned = cleanSeedRecords(records, previous.latest?.plugins ?? [], startedAt);
+  errors.push(...cleaned.messages);
+  const gapAffected = applyNpmGapGuard(cleaned.records);
   if (gapAffected > 0) {
     console.warn(
       `[collect] suppressed weekly npm change for ${gapAffected} package(s) whose 7-day window contains platform-wide zero days`,
     );
   }
 
-  const scored = scorePlugins(records, startedAt);
+  const scored = scorePlugins(cleaned.records, startedAt);
   const stats = computeStats(scored);
   const githubSource: SourceSnapshot = {
     status:
@@ -459,7 +427,7 @@ async function main(): Promise<void> {
   // GitHub is the identity and activity backbone. If every repository request
   // fails, keep the last successful latest.json/history untouched even though we
   // still have stale records in memory. Partial success is allowed to publish.
-  const hardFailure = githubSuccess === 0;
+  const hardFailure = githubSuccess === 0 || scored.length === 0 || cleaned.fallbackCount === scored.length;
 
   if (hardFailure) {
     const status: StatusFile = {
@@ -490,7 +458,9 @@ async function main(): Promise<void> {
     npmUnavailable > 0 ||
     npmWithoutDownloads > 0 ||
     osvErrors > 0 ||
-    usedFallback > 0
+    usedFallback > 0 ||
+    cleaned.messages.length > 0 ||
+    gapAffected > 0
       ? 'partial'
       : 'success';
 

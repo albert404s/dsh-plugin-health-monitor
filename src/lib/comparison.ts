@@ -11,7 +11,7 @@ export function compareScores(a: MaintenanceScore, b: MaintenanceScore): Compari
   return { comparable: true, difference: b.score - a.score };
 }
 export function comparisonText(a: PluginRecord, b: PluginRecord, kind: 'popularity' | 'maintenance'): string {
-  if (a.dataStatus === 'stale' || b.dataStatus === 'stale' || a.lastUpdatedAt !== b.lastUpdatedAt) return '采集时间不同，不计算分差';
+  if (a.dataStatus === 'stale' || b.dataStatus === 'stale' || Date.parse(a.lastUpdatedAt) !== Date.parse(b.lastUpdatedAt)) return '采集时间不同，不计算分差';
   const result = compareScores(a.scores[kind], b.scores[kind]);
   if (!result.comparable) return result.reason;
   if (Math.abs(result.difference) < .05) return '相同';

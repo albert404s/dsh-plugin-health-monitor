@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, readdir, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -151,4 +151,27 @@ describe('data store', () => {
       }),
     ).not.toThrow();
   });
+});
+
+
+it('a corrupt incoming count cannot overwrite the previous good snapshot',async()=>{
+  const directory=await temporaryDirectory();
+  const good=makeLatest();await writeLatest(directory,good);
+  const bad=structuredClone(good);bad.plugins[0].github.stars=-1;
+  await expect(writeLatest(directory,bad)).rejects.toThrow('数据契约');
+  expect(JSON.parse(await readFile(path.join(directory,'latest.json'),'utf8')).plugins[0].github.stars).toBe(good.plugins[0].github.stars);
+});
+
+it('stale fallback records do not manufacture a fresh history point',async()=>{
+  const directory=await temporaryDirectory();const first=makeLatest();
+  const history=await updateHistory(directory,first,null,NOW);
+  const second=makeLatest(new Date(NOW.getTime()+3600000).toISOString());second.plugins[0].dataStatus='stale';
+  const updated=await updateHistory(directory,second,history,new Date(second.generatedAt));
+  expect(updated.plugins['plugin-a']).toHaveLength(1);
+});
+
+it('invalid history entries are isolated while valid stored latest remains readable',async()=>{
+  const directory=await temporaryDirectory();const good=makeLatest();await writeLatest(directory,good);
+  await writeFile(path.join(directory,'history.json'),JSON.stringify({schemaVersion:1,updatedAt:NOW.toISOString(),retentionDays:90,plugins:{bad:'broken'}}));
+  const loaded=await loadExisting(directory);expect(loaded.latest?.plugins).toHaveLength(1);expect(loaded.history?.plugins).toEqual({});
 });

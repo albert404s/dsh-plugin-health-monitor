@@ -1,4 +1,5 @@
 import type { DailyDownload, NpmStatus } from './types';
+import { isCount, isUtcDay, normalizeDaily, shiftUtcDay } from './data-quality';
 
 /**
  * npm download statistics occasionally return platform-wide zero days. The
@@ -21,7 +22,7 @@ export interface DailySeries {
 export interface DownloadPoint {
   date: string;
   downloads: number | null;
-  /** True only for a platform-wide gap date, never for a real zero. */
+  /** True for absent/conflicting days or suspicious platform zero points; real zero stays valid. */
   missing: boolean;
 }
 
@@ -35,7 +36,7 @@ export function platformGapStats(series: readonly DailySeries[]): Map<string, Pl
   const stats = new Map<string, PlatformGapStats>();
   for (const source of series) {
     if (source.status !== 'verified') continue;
-    for (const day of source.daily) {
+    for (const day of normalizeDaily(source.daily).daily) {
       const entry = stats.get(day.date) ?? { total: 0, zero: 0 };
       entry.total += 1;
       if (day.downloads === 0) entry.zero += 1;
@@ -59,16 +60,25 @@ export function findPlatformGapDates(series: readonly DailySeries[]): Set<string
   return dates;
 }
 
-/** Convert a plugin's daily series into chart points, nulling platform gaps. */
+/** Convert daily evidence into a calendar series; mask only suspicious zeros and missing days. */
 export function toDisplaySeries(
   daily: readonly DailyDownload[],
   gapDates: ReadonlySet<string>,
 ): DownloadPoint[] {
-  return daily.map((day) =>
-    gapDates.has(day.date)
-      ? { date: day.date, downloads: null, missing: true }
-      : { date: day.date, downloads: day.downloads, missing: false },
-  );
+  const clean = normalizeDaily(daily);
+  if (!clean.daily.length && !clean.conflictDates.length) return [];
+  const dates = [...clean.daily.map(day=>day.date),...clean.conflictDates].sort();
+  const start = dates[0], end = dates[dates.length-1];
+  const byDay = new Map(clean.daily.map(day=>[day.date,day.downloads]));
+  const points: DownloadPoint[] = [];
+  // The API contract is monthly; cap malformed spans so the display is bounded.
+  const first = Math.max(Date.parse(start), Date.parse(end)-399*86400000);
+  for(let time=first;time<=Date.parse(end);time+=86400000) {
+    const date=new Date(time).toISOString().slice(0,10), value=byDay.get(date);
+    const missing=value === undefined || (value === 0 && gapDates.has(date));
+    points.push({date,downloads:missing ? null : value!,missing});
+  }
+  return points;
 }
 
 /**
@@ -81,9 +91,9 @@ export function movingAverage(
   window = MOVING_AVERAGE_WINDOW,
 ): Array<number | null> {
   return points.map((_, index) => {
-    if (index < window - 1) return null;
+    if (!Number.isInteger(window) || window < 1 || index < window - 1) return null;
     const slice = points.slice(index - window + 1, index + 1);
-    if (slice.some((point) => point.missing || point.downloads === null)) return null;
+    if (slice.some((point, offset) => point.missing || !isCount(point.downloads) || !isUtcDay(point.date) || (offset > 0 && shiftUtcDay(slice[offset-1].date,1) !== point.date))) return null;
     const sum = slice.reduce((total, point) => total + (point.downloads ?? 0), 0);
     return Math.round(sum / window);
   });

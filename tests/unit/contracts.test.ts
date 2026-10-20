@@ -45,7 +45,7 @@ describe('runtime data contracts', () => {
   it('keeps valid history from other plugins and discards conflicting snapshots', () => {
     const input = latest(); const first = compactHistoryPoint(input.plugins[0], NOW.toISOString());
     const second = {...first,t:new Date(NOW.getTime()+3600000).toISOString()};
-    const result = parseHistory({schemaVersion:1,updatedAt:NOW.toISOString(),retentionDays:90,plugins:{a:[first,{...first,stars:first.stars+1},second],b:'bad',c:[first]}});
+    const result = parseHistory({schemaVersion:1,updatedAt:second.t,retentionDays:90,plugins:{a:[first,{...first,stars:first.stars+1},second],b:'bad',c:[first]}});
     expect(result.data.plugins.a).toEqual([second]);
     expect(result.data.plugins.c).toEqual([first]);
     expect(result.data.plugins.b).toBeUndefined();

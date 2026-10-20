@@ -28,7 +28,7 @@ function series(values: number[], status: DailySeries['status'] = 'verified'): D
 
 function points(values: Array<number | null>, missingIndexes: number[] = []): DownloadPoint[] {
   return values.map((value, index) => ({
-    date: DATES[index] ?? `2026-10-${17 + index}`,
+    date: new Date(Date.UTC(2026,9,10+index)).toISOString().slice(0,10),
     downloads: value,
     missing: missingIndexes.includes(index),
   }));

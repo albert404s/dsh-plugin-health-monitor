@@ -29,7 +29,7 @@ export function DownloadBars({ daily, height = 260, gapDates = EMPTY_GAP_DATES }
     const labels = points.map((point) => point.date.slice(5));
     const gapLabels = points.filter((point) => point.missing).map((point) => point.date.slice(5));
     const ariaDescription = hasMissingDays
-      ? 'npm 最近 30 天下载量柱状图与 7 日移动平均线；灰色区域为平台缺数日，不按 0 计入均值'
+      ? 'npm 最近 30 天下载量柱状图与 7 日移动平均线；灰色区域为数据缺失日，不按 0 计入均值'
       : 'npm 最近 30 天下载量柱状图与 7 日移动平均线';
 
     return {
@@ -70,7 +70,7 @@ export function DownloadBars({ daily, height = 260, gapDates = EMPTY_GAP_DATES }
             })
             .join('');
           const footer = point?.missing
-            ? `<div style="margin-top:8px;padding-top:6px;border-top:1px solid ${chartTheme.tooltip.border};color:${chartTheme.tooltip.muted};font-size:12px;line-height:18px">平台缺数日，不按 0 计入均值</div>`
+            ? `<div style="margin-top:8px;padding-top:6px;border-top:1px solid ${chartTheme.tooltip.border};color:${chartTheme.tooltip.muted};font-size:12px;line-height:18px">数据缺失日，不按 0 计入均值</div>`
             : '';
           return `<div style="min-width:170px;padding:10px 12px;font-family:${chartTheme.fontFamily}"><div style="color:${chartTheme.tooltip.title};font-size:13px;font-weight:600;margin-bottom:6px">${escapeHtml(params[0].axisValue)}</div>${rows}${footer}</div>`;
         },
@@ -154,7 +154,7 @@ export function DownloadBars({ daily, height = 260, gapDates = EMPTY_GAP_DATES }
           role="img"
           aria-label={
             hasMissingDays
-              ? 'npm 最近 30 天下载量趋势；灰色区域为平台缺数日，不按 0 计入均值'
+              ? 'npm 最近 30 天下载量趋势；灰色区域为数据缺失日，不按 0 计入均值'
               : 'npm 最近 30 天下载量趋势'
           }
         />
@@ -166,7 +166,7 @@ export function DownloadBars({ daily, height = 260, gapDates = EMPTY_GAP_DATES }
             style={{ backgroundColor: chartTheme.gapSwatch }}
             aria-hidden="true"
           />
-          灰色/断点=平台缺数，不按 0 计入均值
+          灰色/断点=疑似缺失，不按 0 计入均值
         </p>
       ) : null}
     </div>

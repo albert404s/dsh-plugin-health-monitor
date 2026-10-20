@@ -616,7 +616,7 @@ export function PluginDetailPage(): JSX.Element {
 
           <div className="min-w-0 px-4 py-5 md:px-5">
             <div className="flex items-center gap-1.5 text-2xs font-medium text-content-secondary">
-              <ShieldAlert size={13} /> 风险提示
+              <ShieldAlert size={13} /> 关注事项
             </div>
             <div className="mt-2 flex flex-wrap items-baseline gap-x-1 gap-y-0.5">
               <span
@@ -642,7 +642,7 @@ export function PluginDetailPage(): JSX.Element {
                 : '未命中归档、积压或公开漏洞规则；仍不等于安全审计。'}
             </p>
             <a href="#risk-evidence" className="mt-2 inline-flex min-h-8 items-center gap-1 text-xs text-content-secondary underline-offset-4 hover:text-brand-text hover:underline">
-              查看风险证据 <ArrowRight size={11} aria-hidden="true" />
+              查看关注事项 <ArrowRight size={11} aria-hidden="true" />
             </a>
           </div>
 

@@ -1,6 +1,7 @@
 import type { DailyDownload, NpmMetrics } from '../../src/lib/types';
 import type { JsonClient } from './http';
 import { HttpError } from './http';
+import { calendarWindowSum, isCount, isUtcDay, normalizeDaily, normalizeGithubRepository, shiftUtcDay } from '../../src/lib/data-quality';
 
 interface NpmRegistryVersion {
   version?: string;
@@ -27,21 +28,13 @@ interface DownloadPoint {
 
 interface DownloadRange {
   downloads?: Array<{ day?: string; downloads?: number }>;
+  start?: string;
+  end?: string;
 }
 
 export function normalizeRepositoryUrl(input: string | null | undefined): string | null {
-  if (!input) return null;
-  let value = input.trim().toLowerCase();
-  value = value.replace(/^git\+/, '');
-  value = value.replace(/^git@github\.com:/, 'github.com/');
-  value = value.replace(/^ssh:\/\/git@github\.com\//, 'github.com/');
-  value = value.replace(/^https?:\/\/(www\.)?github\.com\//, 'github.com/');
-  value = value.replace(/^git:\/\/github\.com\//, 'github.com/');
-  value = value.replace(/^github:/, 'github.com/');
-  value = value.replace(/#.*$/, '');
-  value = value.replace(/\.git\/?$/, '');
-  value = value.replace(/\/+$/, '');
-  return value;
+  const repo = normalizeGithubRepository(input);
+  return repo ? 'github.com/' + repo : null;
 }
 
 export function packageRepository(value: string | { url?: string } | null | undefined): string | null {
@@ -69,28 +62,6 @@ function emptyNpm(reason: string, status: NpmMetrics['status'] = 'unavailable'):
     fetchedAt: null,
     reason,
   };
-}
-
-function shiftDay(date: string, days: number): string {
-  const value = new Date(`${date.slice(0, 10)}T00:00:00.000Z`);
-  value.setUTCDate(value.getUTCDate() + days);
-  return value.toISOString().slice(0, 10);
-}
-
-/**
- * Sum a calendar window. Returns null when any day is absent so a seven-day
- * window is never silently computed from fewer than seven observations.
- */
-function windowSum(daily: DailyDownload[], endDate: string, days: number): number | null {
-  const values = new Map(daily.map((item) => [item.date.slice(0, 10), item.downloads]));
-  const startDate = shiftDay(endDate, -(days - 1));
-  let sum = 0;
-  for (let index = 0; index < days; index += 1) {
-    const value = values.get(shiftDay(startDate, index));
-    if (value === undefined) return null;
-    sum += value;
-  }
-  return sum;
 }
 
 /**
@@ -126,6 +97,7 @@ export async function collectNpm(
     );
   }
 
+  if (registry.name !== packageName) return emptyNpm('npm registry 包名与配置不一致。', 'unverified');
   const latestVersion = registry['dist-tags']?.latest ?? null;
   if (!latestVersion) {
     return emptyNpm('npm registry 响应缺少 dist-tags.latest。', 'unverified');
@@ -155,6 +127,7 @@ export async function collectNpm(
   let weeklyChangePct: number | null = null;
   let daily: DailyDownload[] = [];
   let downloadReason: string | null = null;
+  let quality: NpmMetrics['quality'];
 
   try {
     const [pointResponse, rangeResponse] = await Promise.all([
@@ -168,20 +141,25 @@ export async function collectNpm(
       ),
     ]);
     const downloads = pointResponse.data.downloads;
-    downloads30d = typeof downloads === 'number' && Number.isFinite(downloads) ? downloads : null;
-    daily = (Array.isArray(rangeResponse.data.downloads) ? rangeResponse.data.downloads : [])
-      .filter(
-        (item): item is { day: string; downloads: number } =>
-          typeof item.day === 'string' &&
-          typeof item.downloads === 'number' &&
-          Number.isFinite(item.downloads),
-      )
-      .map((item) => ({ date: item.day, downloads: item.downloads }))
-      .sort((left, right) => left.date.localeCompare(right.date));
-    const lastDay = daily.at(-1)?.date;
+    downloads30d = isCount(downloads) ? downloads : null;
+    const rawDaily = Array.isArray(rangeResponse.data.downloads) ? rangeResponse.data.downloads : [];
+    const start = isUtcDay(rangeResponse.data.start) ? rangeResponse.data.start : isUtcDay(pointResponse.data.start) ? pointResponse.data.start : null;
+    const apiEnd = rangeResponse.data.end ?? pointResponse.data.end;
+    const today = now.toISOString().slice(0,10);
+    const windowInvalid = (apiEnd !== undefined && (!isUtcDay(apiEnd) || apiEnd > today)) || Boolean(start && isUtcDay(apiEnd) && start > apiEnd);
+    const end = isUtcDay(apiEnd) && apiEnd <= today ? apiEnd : today;
+    const clean = normalizeDaily(rawDaily,{ start:start ?? undefined,end });
+    daily = clean.daily;
+    const notes = [...clean.notes];
+    const completeSum = start ? calendarWindowSum(daily,end,Math.round((Date.parse(end)-Date.parse(start))/86400000)+1) : null;
+    if (completeSum !== null && downloads30d !== null && completeSum !== downloads30d) notes.push('npm 汇总与同一完整日窗口之和不一致，保留两份原始证据。');
+    if (windowInvalid) { notes.push('npm 下载窗口时间异常，汇总不可用。'); downloads30d=null; }
+    quality = {rawDaily,conflictDates:clean.conflictDates,invalidCount:clean.invalidCount,notes,windowStart:start,windowEnd:isUtcDay(apiEnd) && !windowInvalid ? apiEnd : daily.at(-1)?.date ?? null};
+    if(notes.length) downloadReason=notes.join(' ');
+    const lastDay = quality.windowEnd ?? daily.at(-1)?.date;
     if (lastDay) {
-      downloads7d = windowSum(daily, lastDay, 7);
-      previous7d = windowSum(daily, shiftDay(lastDay, -7), 7);
+      downloads7d = calendarWindowSum(daily, lastDay, 7);
+      previous7d = calendarWindowSum(daily, shiftUtcDay(lastDay, -7), 7);
       weeklyChangePct =
         downloads7d !== null && previous7d !== null
           ? previous7d > 0
@@ -192,7 +170,7 @@ export async function collectNpm(
           : null;
     }
     if (downloads30d === null) {
-      downloadReason = 'npm 下载 API 未返回 downloads 字段。';
+      downloadReason = [downloadReason, 'npm 下载 API 未返回有效的非负整数汇总。'].filter(Boolean).join(' ');
     }
   } catch (error) {
     downloadReason = `npm 下载 API 请求失败，保留包信息但不展示下载量：${
@@ -216,6 +194,7 @@ export async function collectNpm(
     previous7d,
     weeklyChangePct,
     daily,
+    quality,
     repositoryUrl,
     registryUrl,
     mappingEvidence: `npm registry repository=${repositoryUrl} ↔ GitHub ${githubRepo}`,

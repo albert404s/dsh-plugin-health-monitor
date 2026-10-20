@@ -196,3 +196,22 @@ describe('GitHub collection', () => {
     expect(result.repository.archived).toBe(false);
   });
 });
+
+
+describe('npm input integrity',()=>{
+  it('keeps original conflicting observations and excludes that date from the derived window',async()=>{
+    const days=Array.from({length:14},(_,index)=>({day:new Date(NOW.getTime()-(14-index)*86400000).toISOString().slice(0,10),downloads:10}));
+    const conflicted=[...days,{...days[10],downloads:99}];
+    vi.stubGlobal('fetch',vi.fn(async(input:RequestInfo|URL)=>{
+      const url=String(input);
+      if(url.includes('registry.npmjs.org'))return jsonResponse({name:'pkg','dist-tags':{latest:'1.0.0'},repository:{url:'git+https://github.com/owner/repo.git'},versions:{'1.0.0':{version:'1.0.0'}},time:{'1.0.0':NOW.toISOString()}});
+      if(url.includes('/downloads/point/'))return jsonResponse({downloads:140,start:days[0].day,end:days[13].day});
+      if(url.includes('/downloads/range/'))return jsonResponse({downloads:conflicted,start:days[0].day,end:days[13].day});
+      throw new Error(url);
+    }));
+    const result=await collectNpm('pkg','owner/repo',new JsonClient(),NOW);
+    expect(result.quality?.rawDaily).toHaveLength(15);
+    expect(result.quality?.conflictDates).toEqual([days[10].day]);
+    expect(result.daily).toHaveLength(13);expect(result.downloads7d).toBeNull();expect(result.downloads30d).toBe(140);
+  });
+});
