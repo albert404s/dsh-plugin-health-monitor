@@ -315,6 +315,11 @@ function IssueAndPrPanel({ plugin }: { plugin: PluginRecord }): JSX.Element {
               样本仅 {issues.opened90d} 条，关闭率只作为参考，评分中已降低权重。
             </p>
           ) : null}
+          {issues.truncated ? (
+            <p className="mt-3 text-[10px] leading-4 text-amber/90">
+              分页达到上限，以下为下限样本；截断时关闭率不参与评分。
+            </p>
+          ) : null}
           {issues.opened90d === 0 ? (
             <p className="mt-3 text-[10px] leading-4 text-ink-500">
               没有新 Issue 不代表 Issue 处理能力差，因此该维度不参与维护评分。
@@ -366,6 +371,11 @@ function IssueAndPrPanel({ plugin }: { plugin: PluginRecord }): JSX.Element {
                   样本少于 3 条，合并率不作强判断。
                 </p>
               ) : null}
+              {pulls.truncated ? (
+                <p className="mt-3 text-[10px] leading-4 text-amber/90">
+                  分页达到上限，以下为下限样本；截断时合并率不参与评分。
+                </p>
+              ) : null}
             </>
           )}
         </div>
@@ -380,7 +390,7 @@ function DataSourcesPanel({ plugin }: { plugin: PluginRecord }): JSX.Element {
     {
       name: 'GitHub REST API',
       status: latest.latest.sources.github.status,
-      time: latest.latest.sources.github.fetchedAt,
+      time: plugin.lastUpdatedAt,
       link: plugin.repository.url,
       detail: '仓库、提交、Issue、PR、Release',
     },
@@ -486,7 +496,11 @@ export function PluginDetailPage(): JSX.Element {
     () => data.latest.plugins.find((item) => item.id === pluginId),
     [data.latest.plugins, pluginId],
   );
-  const historyPoints = plugin ? data.history.plugins[plugin.id] ?? [] : [];
+  const historyPoints = plugin
+    ? (data.history.plugins[plugin.id] ?? []).filter(
+        (point) => point.methodVersion === plugin.scores.maintenance.methodVersion,
+      )
+    : [];
   const historySpanHours =
     historyPoints.length >= 2
       ? (new Date(historyPoints[historyPoints.length - 1].t).getTime() -
@@ -604,6 +618,16 @@ export function PluginDetailPage(): JSX.Element {
             <span className="font-medium">数据缺口：</span>
             {plugin.scores.completeness.missing.map((item) => item.label).join('、')}。
             缺失项不会被当作真实零值，详见每项说明与来源。
+          </InlineNotice>
+        </div>
+      ) : null}
+
+      {plugin.warnings.length > 0 ? (
+        <div className="mt-3 max-w-3xl">
+          <InlineNotice tone="amber">
+            <span className="font-medium">采集提示：</span>
+            {plugin.warnings.slice(0, 4).join('；')}
+            {plugin.warnings.length > 4 ? `；另有 ${plugin.warnings.length - 4} 条提示。` : ''}
           </InlineNotice>
         </div>
       ) : null}

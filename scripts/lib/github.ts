@@ -10,6 +10,10 @@ import { HttpError } from './http';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const PAGE_SIZE = 100;
+// Keep this bounded for rate-limit safety, but high enough to cover 90-day
+// windows for repositories with hundreds of issues/PRs. At 20 pages a repo
+// can consume 2,000 list items before it is marked truncated.
+const MAX_PAGES = 20;
 
 interface GithubRepoResponse {
   full_name: string;
@@ -103,7 +107,7 @@ async function collectIssues90d(
   let truncated = false;
   let shouldStop = false;
 
-  while (page <= 5 && !shouldStop) {
+  while (page <= MAX_PAGES && !shouldStop) {
     const response = await client.get<GithubIssueResponse[]>(
       `https://api.github.com/repos/${repo}/issues?state=all&sort=created&direction=desc&per_page=${PAGE_SIZE}&page=${page}`,
     );
@@ -120,7 +124,7 @@ async function collectIssues90d(
       if (issue.state === 'closed') closed90d += 1;
     }
     if (items.length < PAGE_SIZE) shouldStop = true;
-    if (page === 5 && items.length === PAGE_SIZE) truncated = true;
+    if (page === MAX_PAGES && items.length === PAGE_SIZE) truncated = true;
     page += 1;
   }
 
@@ -152,7 +156,7 @@ async function countLongOpen(
   let truncated = false;
   let ok = true;
 
-  while (page <= 3) {
+  while (page <= 10) {
     try {
       const response = await client.get<GithubIssueResponse[]>(
         `https://api.github.com/repos/${repo}/issues?state=open&sort=created&direction=asc&per_page=${PAGE_SIZE}&page=${page}`,
@@ -163,7 +167,7 @@ async function countLongOpen(
         if (new Date(issue.created_at).getTime() < cutoff) longOpen += 1;
       }
       if (items.length < PAGE_SIZE) break;
-      if (page === 3) truncated = true;
+      if (page === 10) truncated = true;
       page += 1;
     } catch {
       ok = false;
@@ -191,7 +195,7 @@ async function collectPullRequests90d(
   let shouldStop = false;
 
   try {
-    while (page <= 5 && !shouldStop) {
+    while (page <= MAX_PAGES && !shouldStop) {
       const response = await client.get<GithubPullResponse[]>(
         `https://api.github.com/repos/${repo}/pulls?state=all&sort=created&direction=desc&per_page=${PAGE_SIZE}&page=${page}`,
       );
@@ -207,7 +211,7 @@ async function collectPullRequests90d(
         if (pull.merged_at) merged90d += 1;
       }
       if (items.length < PAGE_SIZE) shouldStop = true;
-      if (page === 5 && items.length === PAGE_SIZE) truncated = true;
+      if (page === MAX_PAGES && items.length === PAGE_SIZE) truncated = true;
       page += 1;
     }
   } catch (error) {
@@ -252,20 +256,20 @@ async function collectCommits(
   let commits30d = 0;
   let truncated = false;
 
-  for (let page = 1; page <= 5; page += 1) {
+  for (let page = 1; page <= MAX_PAGES; page += 1) {
     const response = await client.get<GithubCommitResponse[]>(
       `https://api.github.com/repos/${repo}/commits?since=${encodeURIComponent(
         since,
       )}&per_page=${PAGE_SIZE}&page=${page}`,
     );
     const items = Array.isArray(response.data) ? response.data : [];
-    commits30d += items.length;
+    commits30d += items.filter((commit) => commit.parents.length <= 1).length;
     if (items.length < PAGE_SIZE) break;
-    if (page === 5) truncated = true;
+    if (page === MAX_PAGES) truncated = true;
   }
 
   const recentResponse = await client.get<GithubCommitResponse[]>(
-    `https://api.github.com/repos/${repo}/commits?per_page=10`,
+    `https://api.github.com/repos/${repo}/commits?per_page=100`,
   );
   const recent = Array.isArray(recentResponse.data) ? recentResponse.data : [];
   const first = recent[0];
@@ -288,7 +292,7 @@ async function collectReleases(
     `https://api.github.com/repos/${repo}/releases?per_page=100`,
   );
   const releases = (Array.isArray(response.data) ? response.data : []).filter(
-    (release) => !release.draft,
+    (release) => !release.draft && !release.prerelease,
   );
   const cutoff = now.getTime() - 90 * DAY_MS;
   const releases90d = releases.filter((release) => {

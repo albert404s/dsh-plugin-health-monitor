@@ -112,6 +112,45 @@ describe('maintenance score', () => {
     expect(pr.included).toBe(false);
     expect(pr.rawLabel).toBe('PR 功能不可用');
   });
+
+  it('does not drop below 45% coverage because of floating point addition', () => {
+    const seed = makeSeed({
+      openIssues: 0,
+      issuesOpened90d: 0,
+      prsOpened90d: 0,
+      releaseDaysAgo: null,
+      lastCommitDaysAgo: 7,
+    });
+    const score = maintenanceScore(seed, NOW);
+    expect(score.coverage).toBe(0.45);
+    expect(score.status).toBe('scored');
+  });
+
+  it('uses the open/new issue ratio for the backlog component', () => {
+    const busy = makeSeed({ issuesOpened90d: 10, issuesClosed90d: 8, openIssues: 8 });
+    const quiet = makeSeed({ issuesOpened90d: 10, issuesClosed90d: 8, openIssues: 2 });
+    const busyBacklog = maintenanceScore(busy, NOW).components.find(
+      (component) => component.key === 'issueBacklog',
+    )!;
+    const quietBacklog = maintenanceScore(quiet, NOW).components.find(
+      (component) => component.key === 'issueBacklog',
+    )!;
+    expect(busyBacklog.normalized).toBe(20);
+    expect(quietBacklog.normalized).toBe(80);
+  });
+
+  it('keeps a truncated commit count as a scored lower bound', () => {
+    const seed = makeSeed({
+      commits30d: 500,
+      commits30dTruncated: true,
+      missingAvailability: ['commits'],
+    });
+    const score = maintenanceScore(seed, NOW);
+    const cadence = score.components.find((component) => component.key === 'commitCadence')!;
+    expect(cadence.included).toBe(true);
+    expect(cadence.normalized).toBe(100);
+    expect(cadence.rawLabel).toContain('+');
+  });
 });
 
 describe('risk assessment', () => {
@@ -137,6 +176,15 @@ describe('risk assessment', () => {
     expect(score.label).toBe('未见公开风险记录');
     expect(score.limitations.join(' ')).toContain('不构成安全审计');
   });
+
+  it('flags a large open-issue backlog even for a repository younger than 90 days', () => {
+    const score = riskAssessment(
+      makeSeed({ issuesOpened90d: 20, issuesClosed90d: 5, openIssues: 100 }),
+      NOW,
+    );
+    expect(score.level).toBe('high');
+    expect(score.flags.map((flag) => flag.code)).toContain('open-issues-high');
+  });
 });
 
 describe('completeness and quadrants', () => {
@@ -157,6 +205,14 @@ describe('completeness and quadrants', () => {
   it('does not force plugins without both axes into a quadrant', () => {
     const seed = makeSeed({ downloads30d: null });
     const [plugin] = scorePlugins([seed], NOW);
+    expect(hasQuadrantData(plugin)).toBe(false);
+  });
+
+  it('does not place a verified npm package with missing downloads into a quadrant', () => {
+    const seed = makeSeed({ npmStatus: 'verified', downloads30d: null });
+    const [plugin] = scorePlugins([seed], NOW);
+    expect(plugin.npm.status).toBe('verified');
+    expect(plugin.npm.downloads30d).toBeNull();
     expect(hasQuadrantData(plugin)).toBe(false);
   });
 

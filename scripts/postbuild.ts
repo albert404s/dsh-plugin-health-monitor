@@ -1,4 +1,4 @@
-import { access, copyFile, writeFile } from 'node:fs/promises';
+import { access, copyFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -12,7 +12,10 @@ async function main(): Promise<void> {
   await access(path.join(DIST, 'data', 'history.json'));
   await copyFile(path.join(DIST, 'index.html'), path.join(DIST, '404.html'));
   await writeFile(path.join(DIST, '.nojekyll'), '', 'utf8');
-  console.log('[postbuild] dist/404.html and dist/.nojekyll created');
+  // Snapshot copies are only needed on the data branch; the site never
+  // requests them. Keep the Pages artifact small.
+  await rm(path.join(DIST, 'data', 'snapshots'), { recursive: true, force: true });
+  console.log('[postbuild] dist/404.html and dist/.nojekyll created; unused snapshots removed');
 }
 
 main().catch((error) => {

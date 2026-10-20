@@ -15,6 +15,7 @@ interface OsvVulnerability {
   details?: string;
   aliases?: string[];
   modified?: string;
+  withdrawn?: string;
   database_specific?: { severity?: string };
   affected?: Array<{
     ecosystem_specific?: { severity?: string };
@@ -86,7 +87,33 @@ export async function collectOsv(
       },
       { timeoutMs: 30_000, retries: 3 },
     );
-    const found = response.data.results?.[0]?.vulns ?? [];
+    const results = response.data?.results;
+    if (!Array.isArray(results) || results.length === 0 || !results[0] || typeof results[0] !== 'object') {
+      return {
+        status: 'error',
+        exactMatch: false,
+        packageName,
+        version,
+        vulnerabilities: [],
+        checkedAt,
+        reason: 'OSV 响应缺少 results 数组，未完成漏洞检查。',
+        queryUrl,
+      };
+    }
+    const rawVulns = results[0].vulns;
+    if (rawVulns !== undefined && !Array.isArray(rawVulns)) {
+      return {
+        status: 'error',
+        exactMatch: false,
+        packageName,
+        version,
+        vulnerabilities: [],
+        checkedAt,
+        reason: 'OSV 响应的 vulns 字段不是数组，未完成漏洞检查。',
+        queryUrl,
+      };
+    }
+    const found = rawVulns ?? [];
     const unique = new Map<string, { id: string; modified?: string }>();
     for (const item of found) {
       if (item.id) unique.set(item.id, { id: item.id, modified: item.modified });
@@ -99,6 +126,7 @@ export async function collectOsv(
           `https://api.osv.dev/v1/vulns/${encodeURIComponent(item.id)}`,
           { timeoutMs: 20_000, retries: 2 },
         );
+        if (detail.data.withdrawn) continue;
         vulnerabilities.push(
           vulnerabilityFromOsv({ ...detail.data, id: detail.data.id ?? item.id }),
         );

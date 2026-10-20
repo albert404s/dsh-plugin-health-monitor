@@ -46,8 +46,10 @@ function numberLabel(value: number): string {
 }
 
 function confidenceFromCoverage(coverage: number): Confidence {
-  if (coverage >= 0.8) return 'high';
-  if (coverage >= 0.55) return 'medium';
+  // Add an epsilon so additive weights such as 0.3 + 0.15 + 0.1 do not
+  // fall just below a documented threshold because of binary floating point.
+  if (coverage + 1e-9 >= 0.8) return 'high';
+  if (coverage + 1e-9 >= 0.55) return 'medium';
   return 'low';
 }
 
@@ -201,13 +203,15 @@ function finalizeMaintenance(
     }
   }
   const score =
-    coverage >= 0.45 && included.length > 0
+    coverage + 1e-9 >= 0.45 && included.length > 0
       ? round(
           included.reduce((sum, item) => sum + (item.component.contribution ?? 0), 0),
           1,
         )
       : null;
-  const missing = included.length === 0 ? ['缺少可用于判断维护状态的近期数据'] : [];
+  const missing = components
+    .filter((item) => !item.component.included)
+    .map((item) => item.component.label);
   const confidence = confidenceFromCoverage(coverage);
   return {
     score,
@@ -260,6 +264,12 @@ export function maintenanceScore(plugin: PluginSeed, now: Date): MaintenanceScor
               : 12;
   const issueRate = pct(github.issues.closureRate);
   const prRate = pct(github.pullRequests.mergeRate);
+  const openIssueRatio =
+    github.issues.opened90d > 0
+      ? github.issues.openNow / github.issues.opened90d
+      : github.issues.openNow > 0
+        ? 1
+        : null;
   const releaseDays = daysSince(github.latestRelease?.publishedAt ?? null, now);
   const releaseScore =
     releaseDays === null
@@ -276,13 +286,13 @@ export function maintenanceScore(plugin: PluginSeed, now: Date): MaintenanceScor
                 ? 40
                 : 18;
   const backlogScore =
-    github.issues.openNow > 0
-      ? clamp(100 - (github.issues.longOpen / github.issues.openNow) * 100)
-      : null;
+    openIssueRatio === null ? null : clamp(100 - openIssueRatio * 100);
 
   const issueSampleScale = Math.min(1, github.issues.opened90d / 5);
   const prSampleScale = Math.min(1, github.pullRequests.opened90d / 3);
   const backlogSampleScale = Math.min(1, github.issues.openNow / 5);
+  const commitCadenceIncluded =
+    availability.commits || (github.commits30dTruncated && github.commits30d >= 12);
 
   const weighted: WeightedEvidence[] = [
     {
@@ -312,9 +322,9 @@ export function maintenanceScore(plugin: PluginSeed, now: Date): MaintenanceScor
         rawValue: github.commits30d,
         normalized: cadence,
         weight: 0.15,
-        included: availability.commits,
+        included: commitCadenceIncluded,
         explanation:
-          '近 30 天提交次数的分档映射。提交多只说明活动频繁，不代表代码质量更高。',
+          '近 30 天非合并提交次数的分档映射。达到分页上限时按已取得的提交数作下限计分；提交多只说明活动频繁，不代表代码质量更高。',
         evidenceUrl: github.commitsUrl,
       }),
     },
@@ -347,19 +357,19 @@ export function maintenanceScore(plugin: PluginSeed, now: Date): MaintenanceScor
       sampleScale: backlogSampleScale,
       component: buildComponent({
         key: 'issueBacklog',
-        label: '长期开放 Issue 占比',
+        label: '开放 Issue 积压',
         rawLabel:
           github.issues.openNow === 0
             ? '当前无开放 Issue'
-            : `${github.issues.longOpen}/${github.issues.openNow} 条超过 90 天`,
-        rawValue: backlogScore,
+            : `${github.issues.openNow} 条开放 / 90 天新开 ${github.issues.opened90d} 条`,
+        rawValue: openIssueRatio,
         normalized: backlogScore,
         weight: 0.1,
         included:
           availability.issues && !github.issues.openTruncated && backlogScore !== null,
-        sampleSize: github.issues.openNow,
+        sampleSize: github.issues.opened90d,
         explanation:
-          '当前开放 Issue 中创建超过 90 天的比例越低越好。当前没有开放 Issue 时该项不参与计分。',
+          '当前开放 Issue 数相对近 90 天新开 Issue 数的比例越低越好。该比例不依赖仓库是否已满 90 天；当前无开放 Issue 时不参与计分。',
         evidenceUrl: github.issuesUrl,
       }),
     },
@@ -463,6 +473,43 @@ export function riskAssessment(
       detail: 'GitHub 仓库处于 archived 状态，通常表示只读且不再接受常规维护。',
       evidenceUrl: plugin.repository.url,
     });
+  }
+
+  const openIssueRatio =
+    github.issues.opened90d > 0
+      ? github.issues.openNow / github.issues.opened90d
+      : null;
+  const hasLongOpenFlag = flags.some(
+    (flag) => flag.level !== 'info' && flag.code.startsWith('issue-backlog'),
+  );
+  if (!hasLongOpenFlag && github.issues.openNow > 0) {
+    const ratioText =
+      openIssueRatio === null
+        ? ''
+        : `，约为近 90 天新开 Issue 数的 ${Math.round(openIssueRatio * 100)}%`;
+    if (
+      github.issues.openNow >= 100 ||
+      (openIssueRatio !== null && openIssueRatio >= 0.75)
+    ) {
+      flags.push({
+        code: 'open-issues-high',
+        level: 'high',
+        title: '开放 Issue 积压',
+        detail: `当前有 ${github.issues.openNow} 条开放 Issue${ratioText}。这是需要阅读的维护信号，不等于代码质量差。`,
+        evidenceUrl: github.issuesUrl,
+      });
+    } else if (
+      github.issues.openNow >= 50 ||
+      (openIssueRatio !== null && openIssueRatio >= 0.5)
+    ) {
+      flags.push({
+        code: 'open-issues-medium',
+        level: 'medium',
+        title: '开放 Issue 偏多',
+        detail: `当前有 ${github.issues.openNow} 条开放 Issue${ratioText}。请结合问题内容和项目规模判断。`,
+        evidenceUrl: github.issuesUrl,
+      });
+    }
   }
 
   for (const vulnerability of security.vulnerabilities) {
@@ -659,6 +706,7 @@ export function hasQuadrantData(plugin: PluginRecord): boolean {
     plugin.scores.popularity.score !== null &&
     plugin.scores.maintenance.score !== null &&
     plugin.npm.status === 'verified' &&
+    plugin.npm.downloads30d !== null &&
     plugin.scores.maintenance.coverage >= 0.45
   );
 }

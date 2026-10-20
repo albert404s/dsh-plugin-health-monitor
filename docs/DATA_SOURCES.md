@@ -26,19 +26,19 @@
 
 | 字段 | API | 口径 |
 |---|---|---|
-| `lastCommitAt` | `GET /repos/{owner}/{repo}/commits?per_page=10` | 取最近一条非合并提交的 `commit.committer.date`；找不到非合并提交时取最新一条 |
-| `commits30d` | `GET /repos/{owner}/{repo}/commits?since=...&per_page=100` | 近 30 天当前默认分支提交数；分页上限 5 页，达到上限时标记 `commits30dTruncated` |
-| `issues.opened90d` | `GET /repos/{owner}/{repo}/issues?state=all&sort=created&direction=desc` | 近 90 天创建、且不是 Pull Request 的 Issue |
+| `lastCommitAt` | `GET /repos/{owner}/{repo}/commits?per_page=100` | 取最近一条非合并提交的 `commit.committer.date`；找不到非合并提交时取最新一条 |
+| `commits30d` | `GET /repos/{owner}/{repo}/commits?since=...&per_page=100` | 近 30 天当前默认分支的**非合并**提交数；分页上限 20 页，达到上限时标记 `commits30dTruncated` 并按已取得的下限计分 |
+| `issues.opened90d` | `GET /repos/{owner}/{repo}/issues?state=all&sort=created&direction=desc` | 近 90 天创建、且不是 Pull Request 的 Issue；最多 20 页 |
 | `issues.closed90d` | 同上 | 上述 Issue 中当前状态为 closed 的数量 |
 | `issues.closureRate` | 派生 | `closed90d / opened90d`；分母为 0 时为 `null` |
 | `issues.lowSample` | 派生 | 分母 < 5 |
-| `issues.longOpen` | `GET /repos/{owner}/{repo}/issues?state=open&sort=created&direction=asc` | 当前开放、创建超过 90 天且非 PR 的 Issue；分页上限 3 页 |
+| `issues.longOpen` | `GET /repos/{owner}/{repo}/issues?state=open&sort=created&direction=asc` | 当前开放、创建超过 90 天且非 PR 的 Issue；最多 10 页 |
 | `issues.openNow` | 仓库 `open_issues_count` − 开放 PR 数 | `open_issues_count` 包含 PR，因此先扣除开放 PR |
-| `pullRequests.opened90d` | `GET /repos/{owner}/{repo}/pulls?state=all&sort=created&direction=desc` | 近 90 天创建的 PR |
+| `pullRequests.opened90d` | `GET /repos/{owner}/{repo}/pulls?state=all&sort=created&direction=desc` | 近 90 天创建的 PR；最多 20 页 |
 | `pullRequests.merged90d` | 同上 | 上述 PR 中 `merged_at != null` 的数量 |
 | `pullRequests.available` | 派生 | 仓库禁用 PR 时 API 返回 404；此时为 `false`，不把 PR 数量记为 0 |
-| `latestRelease` | `GET /repos/{owner}/{repo}/releases?per_page=100` | 最新非 draft Release；没有时是 `null`，并记录 API 是否成功 |
-| `releases90d` | 同上 | 近 90 天发布的 Release 数 |
+| `latestRelease` | `GET /repos/{owner}/{repo}/releases?per_page=100` | 最新稳定 Release（排除 draft 与 prerelease）；没有时是 `null`，并记录 API 是否成功 |
+| `releases90d` | 同上 | 近 90 天发布的稳定 Release 数 |
 
 **Issue 与 PR 区分**：GitHub 的 Issues API 会同时返回 PR 条目，代码通过 `pull_request` 字段排除。
 
@@ -50,10 +50,10 @@
 
 | 字段 | API | 口径 |
 |---|---|---|
-| `downloads30d` | `downloads/point/last-month/{package}` | npm 最近一个完整月的点数（官方口径，不是本项目截取的 30 个自然日） |
-| `downloads7d` / `previous7d` | `downloads/range/last-month/{package}` | 基于日下载序列的最后 7 天和前 7 天 |
-| `weeklyChangePct` | 派生 | 前 7 天为 0 时无法计算，返回 `null` |
-| `daily` | 同上 | 日下载序列，用于详情页柱状图 |
+| `downloads30d` | `downloads/point/last-month/{package}` | npm 最近 30 天的点数（官方口径，不一定是自然月） |
+| `downloads7d` / `previous7d` | `downloads/range/last-month/{package}` | 按日期对齐的最后 7 天和前 7 天；任一天缺失时为 `null` |
+| `weeklyChangePct` | 派生 | 两个 7 天窗口都完整时计算；窗口包含平台性缺数日时置为 `null` |
+| `daily` | 同上 | 日下载序列，用于详情页柱状图；原始 0 值保留，不擅自补数 |
 | `latestVersion` | `registry.npmjs.org/{package}` 的 `dist-tags.latest` | 用于 OSV 精确版本查询 |
 | `enginesNode` | registry 版本元数据 | 展示 Node 声明 |
 | `dshPeerRange` | registry 版本元数据 | 读取 `peerDependencies["@deepseek-ai/dsh"]` 或 `@deepseek-ai/dsh-web-app` |
@@ -64,9 +64,9 @@
 
 - 请求：`POST https://api.osv.dev/v1/querybatch`，`package.ecosystem = "npm"`，`package.name = <npm 包>`，`version = <latest 精确版本>`。
 - 详情：`GET https://api.osv.dev/v1/vulns/{id}`。
-- 严重度优先读取 OSV 记录的 `database_specific.severity` / `ecosystem_specific.severity`；缺失时标为 `unknown`。
+- 严重度优先读取 OSV 记录的 `database_specific.severity` / `ecosystem_specific.severity`；缺失时标为 `unknown`。详情最多读取 20 条，超过时页面不会声称“完整”。
 - 查询成功且结果为空时，页面显示“OSV 未返回公开漏洞记录”，不显示“安全”或“零风险”。
-- 没有精确 npm 包/版本、映射未通过或 API 失败时，显示“未完成漏洞检查”。
+- 没有精确 npm 包/版本、映射未通过或 API 失败时，显示“未完成漏洞检查”。响应缺少 `results` 或 `vulns` 类型错误时按失败处理，不会当成“已检查、无漏洞”；已撤回记录会被过滤。
 
 ## 5. 错误、缓存与快照
 

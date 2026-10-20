@@ -16,6 +16,7 @@ import {
   filterPlugins,
   hasActiveFilters,
   paginate,
+  PAGE_SIZE,
   sortPlugins,
   stateFromSearchParams,
   stateToSearchParams,
@@ -353,7 +354,7 @@ export function PluginExplorer({ plugins }: { plugins: PluginRecord[] }): JSX.El
                     <td className="px-4 py-3 md:px-5">
                       <div className="flex min-w-0 items-center gap-2.5">
                         <span className="w-5 shrink-0 font-mono text-[9px] text-ink-500">
-                          {String((page.page - 1) * 8 + index + 1).padStart(2, '0')}
+                          {String((page.page - 1) * PAGE_SIZE + index + 1).padStart(2, '0')}
                         </span>
                         <PluginMonogram plugin={plugin} size="sm" />
                         <div className="min-w-0">
@@ -418,7 +419,10 @@ export function PluginExplorer({ plugins }: { plugins: PluginRecord[] }): JSX.El
                       <span className="text-[10px] text-ink-300" title={plugin.github.lastCommitAt ?? undefined}>
                         {formatRelative(plugin.github.lastCommitAt)}
                       </span>
-                      <p className="mt-0.5 text-[9px] text-ink-500">{plugin.github.commits30d} 次 / 30d</p>
+                      <p className="mt-0.5 text-[9px] text-ink-500">
+                        {plugin.github.commits30d}
+                        {plugin.github.commits30dTruncated ? '+' : ''} 次 / 30d
+                      </p>
                     </td>
                     <td className="px-2 py-3">
                       <Link

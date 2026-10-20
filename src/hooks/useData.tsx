@@ -30,17 +30,35 @@ interface DataContextValue {
 const DataContext = createContext<DataContextValue | null>(null);
 
 const DATA_BASE = `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}data/`;
+const FETCH_TIMEOUT_MS = 12_000;
 
 async function fetchJson<T>(file: string, signal: AbortSignal): Promise<T> {
   const response = await fetch(`${DATA_BASE}${file}`, {
     signal,
-    cache: 'no-store',
+    cache: 'no-cache',
     headers: { Accept: 'application/json' },
   });
   if (!response.ok) {
     throw new Error(`${file} 请求失败（HTTP ${response.status}）`);
   }
   return (await response.json()) as T;
+}
+
+function isPluginRecord(value: unknown): value is PluginRecord {
+  if (!value || typeof value !== 'object') return false;
+  const plugin = value as Partial<PluginRecord>;
+  return Boolean(
+    typeof plugin.id === 'string' &&
+      typeof plugin.repo === 'string' &&
+      plugin.scores?.popularity &&
+      plugin.scores?.maintenance &&
+      plugin.scores?.risk &&
+      plugin.scores?.completeness &&
+      plugin.github?.issues &&
+      plugin.github?.pullRequests &&
+      plugin.npm &&
+      plugin.security,
+  );
 }
 
 function isLatest(value: unknown): value is LatestData {
@@ -81,17 +99,29 @@ export function DataProvider({ children }: { children: ReactNode }): JSX.Element
 
   useEffect(() => {
     const controller = new AbortController();
+    let timedOut = false;
+    const timeout = window.setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, FETCH_TIMEOUT_MS);
     setLoading(true);
     setError(null);
     setWarnings([]);
 
     async function load(): Promise<void> {
+      const nextWarnings: string[] = [];
       try {
-        const rawLatest = await fetchJson<unknown>('latest.json', controller.signal);
-        if (!isLatest(rawLatest)) {
+        const loaded = await fetchJson<unknown>('latest.json', controller.signal);
+        if (!isLatest(loaded)) {
           throw new Error('latest.json 的 schemaVersion 或数据结构不兼容');
         }
-        const nextWarnings: string[] = [];
+        const validPlugins = loaded.plugins.filter(isPluginRecord);
+        if (validPlugins.length !== loaded.plugins.length) {
+          nextWarnings.push(
+            `有 ${loaded.plugins.length - validPlugins.length} 条插件记录字段不完整，已跳过。`,
+          );
+        }
+        const rawLatest: LatestData = { ...loaded, plugins: validPlugins };
 
         let history: HistoryFile;
         try {
@@ -100,12 +130,14 @@ export function DataProvider({ children }: { children: ReactNode }): JSX.Element
             !rawHistory ||
             typeof rawHistory !== 'object' ||
             (rawHistory as HistoryFile).schemaVersion !== HISTORY_SCHEMA_VERSION ||
+            !(rawHistory as HistoryFile).plugins ||
             typeof (rawHistory as HistoryFile).plugins !== 'object'
           ) {
             throw new Error('history.json 数据结构不兼容');
           }
           history = rawHistory as HistoryFile;
         } catch (historyError) {
+          if (controller.signal.aborted) throw historyError;
           nextWarnings.push(
             `趋势历史暂不可用：${historyError instanceof Error ? historyError.message : String(historyError)}`,
           );
@@ -129,6 +161,7 @@ export function DataProvider({ children }: { children: ReactNode }): JSX.Element
           }
           status = rawStatus as StatusFile;
         } catch (statusError) {
+          if (controller.signal.aborted) throw statusError;
           nextWarnings.push(
             `运行状态暂不可用：${statusError instanceof Error ? statusError.message : String(statusError)}`,
           );
@@ -139,15 +172,25 @@ export function DataProvider({ children }: { children: ReactNode }): JSX.Element
         setWarnings(nextWarnings);
         setRefreshedAt(new Date().toISOString());
       } catch (loadError) {
-        if (controller.signal.aborted) return;
-        setError(loadError instanceof Error ? loadError.message : String(loadError));
+        if (controller.signal.aborted && !timedOut) return;
+        setError(
+          timedOut
+            ? `请求超时（${Math.round(FETCH_TIMEOUT_MS / 1000)} 秒），请检查网络后重试。`
+            : loadError instanceof Error
+              ? loadError.message
+              : String(loadError),
+        );
       } finally {
-        if (!controller.signal.aborted) setLoading(false);
+        window.clearTimeout(timeout);
+        if (!controller.signal.aborted || timedOut) setLoading(false);
       }
     }
 
     void load();
-    return () => controller.abort();
+    return () => {
+      window.clearTimeout(timeout);
+      controller.abort();
+    };
   }, [requestVersion]);
 
   const stale = useMemo(() => {

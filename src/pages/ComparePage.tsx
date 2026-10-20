@@ -154,8 +154,8 @@ export function ComparePage(): JSX.Element {
       {
         label: '开发活跃度',
         hint: '近 30 天提交次数',
-        a: `${formatNumber(left.github.commits30d)} 次`,
-        b: `${formatNumber(right.github.commits30d)} 次`,
+        a: `${formatNumber(left.github.commits30d)}${left.github.commits30dTruncated ? '+' : ''} 次`,
+        b: `${formatNumber(right.github.commits30d)}${right.github.commits30dTruncated ? '+' : ''} 次`,
         diff: `${right.github.commits30d - left.github.commits30d > 0 ? '+' : ''}${right.github.commits30d - left.github.commits30d}`,
       },
       {

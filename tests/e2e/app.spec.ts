@@ -106,6 +106,35 @@ test('mobile layout has no horizontal overflow and exposes navigation', async ({
   await expect(page.getByText(/B · dsh-agency-agents/i).first()).toBeVisible();
 });
 
+test('quadrant page and tablet home do not overflow horizontally', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/quadrant');
+  await expect(page.locator('canvas')).toHaveCount(1);
+  const quadrantOverflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(quadrantOverflow).toBeLessThanOrEqual(1);
+
+  await page.setViewportSize({ width: 768, height: 1024 });
+  await page.goto('/');
+  await expect(page.locator('#all-plugins tbody tr').first()).toBeVisible();
+  const homeOverflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(homeOverflow).toBeLessThanOrEqual(1);
+});
+
+test('a failed refresh keeps the previous snapshot visible', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#all-plugins tbody tr').first()).toBeVisible();
+  await page.route('**/data/latest.json*', (route) =>
+    route.fulfill({ status: 500, contentType: 'text/plain', body: 'offline' }),
+  );
+  await page.getByRole('button', { name: '重新加载数据快照' }).click();
+  await expect(page.getByText('刷新失败，继续展示上次成功加载的快照。')).toBeVisible();
+  await expect(page.locator('#all-plugins tbody tr').first()).toBeVisible();
+});
+
 test('data fetch failure renders an error state with recovery help', async ({ page }) => {
   await page.route('**/data/latest.json*', (route) =>
     route.fulfill({ status: 500, contentType: 'text/plain', body: 'offline' }),

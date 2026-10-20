@@ -14,6 +14,7 @@ export interface SeedOptions {
   stars?: number;
   forks?: number;
   commits30d?: number;
+  commits30dTruncated?: boolean;
   lastCommitDaysAgo?: number;
   issuesOpened90d?: number;
   issuesClosed90d?: number;
@@ -95,7 +96,7 @@ export function makeSeed(options: SeedOptions = {}): PluginSeed {
       openIssues: options.openIssues ?? options.longOpen ?? 0,
       openPullRequests: 2,
       commits30d: options.commits30d ?? 8,
-      commits30dTruncated: false,
+      commits30dTruncated: options.commits30dTruncated ?? false,
       issues: {
         opened90d: issuesOpened,
         closed90d: issuesClosed,

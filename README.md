@@ -152,9 +152,10 @@ tests/e2e/     Playwright 浏览器验收
 
 - **插件发现**：不以名称含 DSH 作为判定依据；必须核验为可安装的 DSH Web 插件。
 - **最近代码提交**：使用 commits 中非合并提交的 `committer.date`，不用仓库 `updated_at` / `pushed_at`。
-- **Issue 与 PR**：Issues API 中包含 PR，统计时通过 `pull_request` 字段排除。
+- **近 30 天提交**：只统计非合并提交；分页达到上限时按已取得的下限计分。
+- **Issue 与 PR**：Issues API 中包含 PR，统计时通过 `pull_request` 字段排除；两者分页预算独立，最多 20 页，截断时页面标注“下限样本”。
 - **Issue / PR 窗口**：近 90 天创建；同时显示分母与样本量，小样本降权并提示。
-- **npm 下载**：只有 registry 的 `repository` 字段与 GitHub 仓库一致时才采信；不把 Star / Fork / Release 下载冒充 npm 下载。
+- **npm 下载**：只有 registry 的 `repository` 字段与 GitHub 仓库一致时才采信；不把 Star / Fork / Release 下载冒充 npm 下载。7 日/前 7 日窗口按日期对齐，遇到平台性缺数日时显示“不可用”，不把缺口当真实 0。
 - **OSV**：只有 npm 包名与精确版本匹配时才认为检查完成；空结果显示“未发现公开记录”，不显示“安全”。
 - **容错**：分页上限、404、PR 功能禁用、超时、429、5xx 均有明确降级路径；所有 GitHub 仓库失败时保留上一次成功快照。
 
@@ -163,8 +164,8 @@ tests/e2e/     Playwright 浏览器验收
 完整公式与局限见 [docs/SCORING.md](docs/SCORING.md)。
 
 - **人气**：`log10(1+x)` 后 min-max 归一化；Stars 45% + npm 下载 55%；缺下载时仅用 Star，覆盖降为 45%、置信度中。
-- **维护**：最近提交 30%、30 天提交 15%、Issue 关闭率 20%、长期 Issue 10%、PR 合并率 15%、Release 10%；缺失分项重新归一化，覆盖 < 45% 时输出“信息不足”。
-- **风险**：归档、长期开放 Issue、OSV 公开记录、数据缺口；风险信息不完整时不标“低风险”。
+- **维护**：最近提交 30%、近 30 天非合并提交 15%、Issue 关闭率 20%、开放 Issue 积压 10%（`openNow/opened90d`）、PR 合并率 15%、稳定 Release 10%；缺失分项重新归一化，覆盖 < 45% 时输出“信息不足”。
+- **风险**：归档、长期开放 Issue、开放 Issue 积压、OSV 公开记录、数据缺口；风险信息不完整时不标“低风险”。
 - **数据完整度**：7 个数据域中的可用比例，不是插件质量。
 - 四象限只纳入同时具备维护分与经核验下载量的插件。
 
@@ -173,8 +174,8 @@ tests/e2e/     Playwright 浏览器验收
 工作流：
 
 - `.github/workflows/ci.yml`：TypeScript、Vitest、生产构建、Token 扫描、Playwright
-- `.github/workflows/deploy.yml`：`main` 更新后从 `data` 分支取数据构建并部署 Pages
-- `.github/workflows/update-data.yml`：每 6 小时或手动采集，提交 `data` 分支，构建并部署 Pages
+- `.github/workflows/deploy.yml`：`main` 更新后先跑 TypeScript/单测，再从 `data` 分支取数据构建并部署 Pages
+- `.github/workflows/update-data.yml`：每 6 小时或手动采集，构建校验成功后才提交 `data` 分支并部署 Pages
 
 数据隔离原则：
 
@@ -183,7 +184,7 @@ tests/e2e/     Playwright 浏览器验收
 3. 采集全部 GitHub 失败时只更新 `status.json`，不覆盖 `latest.json` / `history.json`。
 4. 历史保留 90 天、单插件最多 400 个点，完整快照最多 120 份。
 5. 往 `data` 分支提交不会触发 `main` 部署，避免工作流循环。
-6. `update-data.yml` 将采集（只读 Token）与写数据（不安装依赖）拆成独立 job；`deploy.yml` 和 `update-data.yml` 使用最小权限与 `concurrency` 互斥部署。
+6. `update-data.yml` 将采集（只读 Token）与写数据（不安装依赖）拆成独立 job；`persist` 等构建校验成功后才推送；`deploy.yml` 和 `update-data.yml` 使用最小权限与 `concurrency` 互斥部署。
 7. 官方 Actions 固定到 commit SHA，并由 Dependabot 跟踪更新。
 
 ### 首次部署
@@ -198,12 +199,13 @@ tests/e2e/     Playwright 浏览器验收
 截至 2026-10-20，在本机真实数据快照上实际运行：
 
 - `npm run typecheck`：通过
-- `npm test`：4 个测试文件、31 个单元测试通过
-- `npm run test:e2e`：Chromium，8 个浏览器验收测试通过
+- `npm test`：4 个测试文件、**37 个单元测试**通过
+- `npm run test:e2e`：Chromium，**10 个浏览器验收测试**通过
 - `npm run build`：通过；构建产物包含 `404.html`、`.nojekyll` 与 `data/`
-- 连续两次真实采集：历史从 1 个点扩展到 2 个点，快照保留
+- 连续两次真实采集：历史点累计、快照保留；npm 周变化在平台性缺数日时显示为不可用
 - 全 GitHub 失败注入测试：`latest.json` 与 `history.json` 哈希不变，`status.outcome = failed`
 - `npm run check:dist`：生产产物未发现 Token 形态字符串
+- 移动端 390px `/quadrant` 与 768px 首页无整页横向溢出
 
 没有运行浏览器测试时不会在交付说明中写“已通过”。本 README 的结果可以在对应命令中复现。
 

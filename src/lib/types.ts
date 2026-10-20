@@ -8,7 +8,7 @@
 export const LATEST_SCHEMA_VERSION = 1 as const;
 export const HISTORY_SCHEMA_VERSION = 1 as const;
 export const STATUS_SCHEMA_VERSION = 1 as const;
-export const SCORE_METHOD_VERSION = '1.0.0';
+export const SCORE_METHOD_VERSION = '1.1.0';
 
 export type SourceState = 'ok' | 'partial' | 'failed' | 'skipped';
 export type DataStatus = 'complete' | 'partial' | 'stale';

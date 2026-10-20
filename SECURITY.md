@@ -17,7 +17,6 @@ Please do not include live tokens in an issue.
 
 ## Deployment boundary
 
-- The collection workflow runs third-party npm scripts with a read-only `GITHUB_TOKEN`.
-- A separate minimal job commits the generated JSON with `contents: write`; it does not install dependencies.
+- The collection workflow runs `npm ci` before any token is injected; only the data collection step receives a read-only `GITHUB_TOKEN`. The separate minimal persist job does not install dependencies.
 - Pages deployment uses only official Actions and a short-lived Pages token.
 - `npm run check:dist` scans the built site for known token patterns.

@@ -80,16 +80,20 @@ export function recentChanges(
     const pair = historyPair(history, plugin.id);
     if (pair) {
       const [previous, latest] = pair;
+      if (previous.methodVersion !== latest.methodVersion) continue;
       if (previous.riskLevel !== latest.riskLevel) {
+        const unknown =
+          latest.riskLevel === 'unknown' || previous.riskLevel === 'unknown';
         const worsened =
-          (latest.riskLevel === 'high' && previous.riskLevel !== 'high') ||
-          (latest.riskLevel === 'medium' && previous.riskLevel === 'low');
+          !unknown &&
+          ((latest.riskLevel === 'high' && previous.riskLevel !== 'high') ||
+            (latest.riskLevel === 'medium' && previous.riskLevel === 'low'));
         items.push({
           plugin,
-          title: '风险信号发生变化',
+          title: unknown ? '风险信息发生变化' : '风险信号发生变化',
           detail: `${previous.riskLevel} → ${latest.riskLevel}`,
-          tone: worsened ? 'down' : 'up',
-          magnitude: worsened ? 40 : 12,
+          tone: unknown ? 'neutral' : worsened ? 'down' : 'up',
+          magnitude: unknown ? 8 : worsened ? 40 : 12,
           since: latest.t,
         });
       }

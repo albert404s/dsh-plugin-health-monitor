@@ -83,7 +83,7 @@ function tooltipHtml(plugin: PluginRecord): string {
         <span>Stars <b style="color:#e7edf4;float:right">${formatCompact(plugin.github.stars)}</b></span>
         <span>30 天下载 <b style="color:#e7edf4;float:right">${escapeHtml(downloads)}</b></span>
         <span style="grid-column:1/3">风险 <b style="color:#e7edf4;float:right">${escapeHtml(risk)}</b></span>
-        <span style="grid-column:1/3">数据覆盖 <b style="color:#e7edf4;float:right">${plugin.scores.completeness.available}/${plugin.scores.completeness.total}</b></span>
+        <span style="grid-column:1/3">数据覆盖 <b style="color:#e7edf4;float:right">${escapeHtml(plugin.scores.completeness.available)}/${escapeHtml(plugin.scores.completeness.total)}</b></span>
       </div>
       <div style="border-top:1px solid #263449;margin-top:10px;padding-top:8px;color:#64748b;font-size:10px">
         最后采集 ${escapeHtml(formatDateTime(plugin.lastUpdatedAt))} · 点击查看体检详情
@@ -366,7 +366,7 @@ export function QuadrantChart({
                 <span className="text-ink-400">
                   {plugin.scores.maintenance.status === 'insufficient'
                     ? '维护证据不足'
-                    : plugin.npm.status !== 'verified'
+                    : plugin.npm.status !== 'verified' || plugin.npm.downloads30d === null
                       ? '无可靠 npm 下载数据'
                       : '维护样本不足'}
                 </span>
