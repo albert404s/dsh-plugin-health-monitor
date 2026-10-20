@@ -72,7 +72,7 @@ export function RankList({
                               ? `${formatCompact(plugin.npm.downloads30d)} downloads / 30d`
                               : '暂无可靠下载数据'
                           }`
-                        : `最近提交 ${formatRelative(plugin.github.lastCommitAt)} · ${plugin.github.commits30d} 次 / 30d`}
+                        : `最近提交 ${formatRelative(plugin.github.lastCommitAt)} · ${plugin.github.commits30d}${plugin.github.commits30dTruncated ? '+' : ''} 次 / 30d`}
                     </p>
                   </div>
                 </div>

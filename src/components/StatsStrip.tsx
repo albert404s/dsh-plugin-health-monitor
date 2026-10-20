@@ -31,12 +31,14 @@ export function StatsStrip({ data }: { data: LatestData }): JSX.Element {
           value={
             <>
               {stats.maintainedCount}
-              <span className="ml-1 text-xs font-normal text-ink-500">/ {stats.pluginCount}</span>
+              <span className="ml-1 text-xs font-normal text-ink-500">/ {stats.scoredCount}</span>
             </>
           }
           detail={
             <span className="inline-flex items-center gap-1">
-              维护分 ≥ 65 <InfoHint text="这是公开维护活动的相对指标，不代表代码质量。成熟稳定的小插件可能活动较少。" />
+              可评分插件中维护分 ≥ 65
+              {stats.pluginCount > stats.scoredCount ? `（另有 ${stats.pluginCount - stats.scoredCount} 个未知）` : ''}
+              <InfoHint text="这是公开维护活动的相对指标，不代表代码质量。成熟稳定的小插件可能活动较少。" />
             </span>
           }
           icon={<Wrench size={12} />}

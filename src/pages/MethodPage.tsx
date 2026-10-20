@@ -123,7 +123,7 @@ export function MethodPage(): JSX.Element {
                   <tr>
                     <td className="px-4 py-3 font-medium text-ink-200">GitHub REST API</td>
                     <td className="px-4 py-3 text-ink-300">
-                      Stars、Forks、归档状态、最近非合并提交、近 30 天提交、近 90 天 Issue/PR、长期开放 Issue、Release。
+                      Stars、Forks、归档状态、最近非合并提交、近 30 天非合并提交、近 90 天 Issue/PR、长期开放 Issue、Release。
                     </td>
                     <td className="px-4 py-3 text-ink-400">
                       使用分页与重试；分页上限触发时标记为下限。Issue 列表会过滤 PR；不使用 updated_at 代替最近代码提交。
@@ -218,11 +218,11 @@ export function MethodPage(): JSX.Element {
                 <tbody className="divide-y divide-ink-700/40 text-[11px] leading-5">
                   {[
                     ['最近代码提交', '30%', '距最近非合并提交：≤7d 100；≤14d 92；≤30d 82；≤60d 68；≤90d 55；≤180d 38；≤365d 20；更久 6。', '无提交日期时整项剔除。'],
-                    ['近 30 天提交频率', '15%', '0 次=12，1=38，2–3=55，4–7=72，8–11=88，≥12=100。', '分页达到上限时标记“下限”。'],
+                    ['近 30 天非合并提交频率', '15%', '0 次=12，1=38，2–3=55，4–7=72，8–11=88，≥12=100。', '分页达到上限时按已取得的提交数作下限计分。'],
                     ['近期 Issue 关闭率', '20%', '近 90 天创建的非 PR Issue 中当前已关闭比例 × 100。', '少于 5 条按 n/5 折减权重；0 条新 Issue 不参与，不扣分。'],
-                    ['长期开放 Issue 占比', '10%', '若当前有开放 Issue：100 − 长期开放占比 × 100。', '按开放样本缩放权重；无开放 Issue 时不参与。'],
+                    ['开放 Issue 积压', '10%', '若当前有开放 Issue：100 − (开放 Issue 数 / 近 90 天新开 Issue 数) × 100。', '按近 90 天新开样本缩放权重；无开放 Issue 时不参与。'],
                     ['近期 PR 合并率', '15%', '近 90 天创建 PR 中已合并比例 × 100。', '少于 3 条按 n/3 折减；PR 功能不可用时剔除，不记 0。'],
-                    ['最近版本发布', '10%', '≤30d 100；≤60d 92；≤90d 80；≤180d 62；≤365d 40；更久 18。', '没有 Release 时不参与评分，不直接惩罚。'],
+                    ['最近版本发布', '10%', '≤30d 100；≤60d 92；≤90d 80；≤180d 62；≤365d 40；更久 18。', '没有稳定 Release 时不参与评分，不直接惩罚。'],
                   ].map((row) => (
                     <tr key={row[0]}>
                       <td className="px-4 py-3 font-medium text-ink-200">{row[0]}</td>
@@ -262,6 +262,7 @@ export function MethodPage(): JSX.Element {
                 <ul className="mt-3 space-y-2 text-[11px] leading-5 text-ink-400">
                   <li>· 仓库 archived → 高风险信号。</li>
                   <li>· 长期开放 Issue ≥ 20 高风险；≥ 5 需关注。</li>
+                  <li>· 开放 Issue ≥ 100 或开放/近 90 天新开 ≥ 75% → 高风险；≥ 50 或 ≥ 50% → 需关注。</li>
                   <li>· OSV 返回 high/critical → 高风险信号；其他公开记录 → 需关注。</li>
                   <li>· 未完成漏洞检查、无可靠 npm 数据、数据超过 2 天未更新 → 信息缺口。</li>
                   <li>· 若 OSV 未完成且无其他高风险信号 → 等级为“风险信息不完整”，不是“低风险”。</li>
