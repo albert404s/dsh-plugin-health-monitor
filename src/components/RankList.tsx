@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
 import type { PluginRecord } from '../lib/types';
 import { formatCompact, formatRelative, formatScore, scoreLabel } from '../lib/format';
-import { categoryLabel } from '../lib/types';
+import { cn } from '../lib/cn';
 import { PluginMonogram, ScoreBar } from './ui';
 
 type Metric = 'popularity' | 'maintenance';
@@ -28,61 +28,62 @@ export function RankList({
     .slice(0, limit);
 
   return (
-    <section className="panel overflow-hidden">
-      <div className="flex items-end justify-between gap-4 border-b border-ink-700/60 px-4 py-4 md:px-5">
-        <div>
+    <section
+      className={cn(
+        'min-w-0 border-t-2 pt-4',
+        metric === 'popularity' ? 'border-accent' : 'border-teal',
+      )}
+    >
+      <div className="flex items-start justify-between gap-4 px-1">
+        <div className="min-w-0">
           <p className="eyebrow">{eyebrow}</p>
-          <h3 className="mt-1 text-base font-semibold text-ink-100">{title}</h3>
-          <p className="mt-1 text-[11px] leading-4 text-ink-400">{description}</p>
+          <h3 className="mt-1 text-lg font-semibold text-content-primary">{title}</h3>
+          <p className="mt-1 text-xs leading-5 text-content-secondary">{description}</p>
         </div>
         <Link
-          to={`/?sort=${metric}`}
-          className="inline-flex shrink-0 items-center gap-1 text-[10px] text-ink-400 transition hover:text-ink-100"
+          to={`/?sort=${metric}#all-plugins`}
+          className="inline-flex shrink-0 items-center gap-1 text-xs text-content-secondary transition hover:text-accent"
         >
-          完整榜单 <ArrowUpRight size={11} />
+          完整榜单 <ArrowUpRight size={12} />
         </Link>
       </div>
-      <ol className="divide-y divide-ink-700/50">
+      <ol className="mt-3 divide-y divide-line-hairline">
         {ranked.map((plugin, index) => {
           const score = plugin.scores[metric].score;
           return (
             <li key={plugin.id}>
               <Link
                 to={`/plugins/${encodeURIComponent(plugin.id)}`}
-                className="group grid grid-cols-[24px_1fr_auto] items-center gap-3 px-4 py-3 transition hover:bg-ink-800/40 md:px-5"
+                className="group grid grid-cols-[24px_minmax(0,1fr)_auto] items-center gap-3 px-1 py-3 transition hover:bg-surface-subtle"
               >
-                <span className="tnum font-mono text-[10px] text-ink-500">
+                <span className="tnum self-start pt-0.5 font-mono text-xs text-content-muted">
                   {String(index + 1).padStart(2, '0')}
                 </span>
-                <div className="flex min-w-0 items-center gap-2.5">
+                <div className="flex min-w-0 items-start gap-2.5">
                   <PluginMonogram plugin={plugin} size="sm" />
                   <div className="min-w-0">
-                    <div className="flex min-w-0 items-center gap-2">
-                      <span className="truncate text-xs font-medium text-ink-100 group-hover:text-white">
-                        {plugin.name}
-                      </span>
-                      <span className="hidden shrink-0 text-[9px] text-ink-500 sm:inline">
-                        {categoryLabel(plugin.category)}
-                      </span>
-                    </div>
-                    <p className="mt-0.5 truncate text-[10px] text-ink-400">
+                    <p className="break-words text-sm font-medium text-content-primary transition group-hover:text-accent">
+                      {plugin.name}
+                    </p>
+                    <p className="mt-0.5 line-clamp-1 text-xs text-content-secondary">{plugin.curatorNote}</p>
+                    <p className="mt-1 text-xs text-content-muted">
                       {metric === 'popularity'
                         ? `${formatCompact(plugin.github.stars)} stars · ${
                             plugin.npm.status === 'verified' && plugin.npm.downloads30d !== null
-                              ? `${formatCompact(plugin.npm.downloads30d)} downloads / 30d`
+                              ? `${formatCompact(plugin.npm.downloads30d)} 次/30d`
                               : '暂无可靠下载数据'
                           }`
-                        : `最近提交 ${formatRelative(plugin.github.lastCommitAt)} · ${plugin.github.commits30d}${plugin.github.commits30dTruncated ? '+' : ''} 次 / 30d`}
+                        : `最近提交 ${formatRelative(plugin.github.lastCommitAt)} · ${plugin.github.commits30d}${plugin.github.commits30dTruncated ? '+' : ''} 次/30d`}
                     </p>
                   </div>
                 </div>
-                <div className="w-[92px] text-right">
-                  <div className="tnum font-mono text-xs font-semibold text-ink-100">
+                <div className="min-w-[84px] text-right">
+                  <div className="tnum font-mono text-lg font-semibold leading-6 text-content-primary">
                     {formatScore(score)}
-                    <span className="ml-0.5 text-[9px] font-normal text-ink-500">/100</span>
+                    <span className="ml-0.5 font-sans text-2xs font-normal text-content-muted">/100</span>
                   </div>
                   <ScoreBar value={score} className="ml-auto mt-1.5 h-1 w-16" />
-                  <p className="mt-1 text-[9px] text-ink-500">
+                  <p className="mt-1 text-2xs text-content-muted">
                     {metric === 'maintenance' ? scoreLabel(plugin) : '相对人气'}
                   </p>
                 </div>

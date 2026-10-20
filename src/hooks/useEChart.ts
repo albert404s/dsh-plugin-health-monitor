@@ -5,7 +5,7 @@ import { echarts } from '../components/charts/echarts';
 type ChartInstance = ReturnType<typeof echarts.init>;
 
 export interface ChartEventHandlers {
-  click?: (params: unknown) => void;
+  click?: (params: unknown, chart: ChartInstance) => void;
 }
 
 export function useEChart(
@@ -23,7 +23,7 @@ export function useEChart(
     const chart = echarts.init(container, undefined, { renderer: 'canvas' });
     chartRef.current = chart;
     const handleClick = (params: unknown): void => {
-      handlersRef.current.click?.(params);
+      handlersRef.current.click?.(params, chart);
     };
     chart.on('click', handleClick);
 

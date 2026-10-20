@@ -12,7 +12,7 @@ function trackErrors(page: Page): string[] {
 test('homepage loads real data, chart and explorer', async ({ page }) => {
   const errors = trackErrors(page);
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('生命体征');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('健康度看板');
   await expect(page.locator('canvas')).toHaveCount(1);
   await expect(page.locator('#all-plugins tbody tr').first()).toBeVisible();
   await expect(page.getByText('全部插件').first()).toBeVisible();
@@ -75,6 +75,35 @@ test('compare page aligns two plugins and marks unavailable metrics', async ({ p
   expect(errors).toEqual([]);
 });
 
+test('compare matrix header stays sticky below the site header', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/compare?a=dsh-market-dsh-market&b=michengai-dsh-agency-agents');
+  const table = page.locator('table').first();
+  const headerCell = table.locator('thead th').first();
+  await expect(headerCell).toBeVisible();
+
+  const tableTop = await table.evaluate(
+    (element) => element.getBoundingClientRect().top + window.scrollY,
+  );
+  await page.evaluate((top) => window.scrollTo(0, top + 320), tableTop);
+  await expect
+    .poll(() => headerCell.evaluate((element) => getComputedStyle(element).position))
+    .toBe('sticky');
+  const stickyTop = await headerCell.evaluate(
+    (element) => element.getBoundingClientRect().top,
+  );
+  expect(stickyTop).toBeGreaterThanOrEqual(63);
+  expect(stickyTop).toBeLessThanOrEqual(66);
+  await expect(headerCell).toBeVisible();
+});
+
+test('detail download chart marks platform gap days without treating them as zero', async ({ page }) => {
+  await page.goto('/plugins/dsh-market-dsh-market');
+  await expect(page.getByText('灰色/断点=平台缺数，不按 0 计入均值')).toBeVisible();
+  await expect(page.getByText('周下载窗口包含平台性缺数日')).toBeVisible();
+  expect(await page.getByText('灰色/断点=平台缺数，不按 0 计入均值').evaluate((el) => getComputedStyle(el).fontSize)).toBe('12px');
+});
+
 test('quadrant filters points without changing the fixed axes', async ({ page }) => {
   await page.goto('/quadrant');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('四象限');
@@ -117,7 +146,7 @@ test('quadrant page and tablet home do not overflow horizontally', async ({ page
 
   await page.setViewportSize({ width: 768, height: 1024 });
   await page.goto('/');
-  await expect(page.locator('#all-plugins tbody tr').first()).toBeVisible();
+  await expect(page.locator('#all-plugins [data-testid="plugin-card"]').first()).toBeVisible();
   const homeOverflow = await page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
   );

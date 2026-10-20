@@ -1,9 +1,8 @@
-import { useState, type ReactNode } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
   AlertTriangle,
   ArrowLeft,
-  ArrowRight,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -19,8 +18,30 @@ import {
 } from 'lucide-react';
 import type { CompletenessResult, Confidence, PluginRecord, RiskLevel } from '../lib/types';
 import { cn } from '../lib/cn';
-import { categoryTone, dataStatusLabel, formatCompact, formatPercent, isExternalUrl, riskLabel, riskTone, scoreLabel, scoreTone } from '../lib/format';
+import {
+  dataStatusLabel,
+  formatCompact,
+  formatPercent,
+  isExternalUrl,
+  riskLabel,
+  riskTone,
+  scoreLabel,
+} from '../lib/format';
 import { categoryLabel } from '../lib/types';
+
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
+
+export function buttonClasses(variant: ButtonVariant = 'primary', className?: string): string {
+  return cn(
+    'inline-flex h-10 items-center justify-center gap-2 rounded-control px-4 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas disabled:cursor-not-allowed disabled:opacity-45 max-sm:h-11',
+    variant === 'primary'
+      ? 'bg-accent text-white hover:bg-accent-hover active:bg-accent-active'
+      : variant === 'secondary'
+        ? 'border border-line-strong bg-surface text-content-primary hover:border-content-muted hover:bg-surface-subtle'
+        : 'text-content-secondary hover:bg-surface-subtle hover:text-content-primary',
+    className,
+  );
+}
 
 export function Panel({
   children,
@@ -32,6 +53,16 @@ export function Panel({
   as?: 'section' | 'div' | 'article';
 }): JSX.Element {
   return <Tag className={cn('panel', className)}>{children}</Tag>;
+}
+
+export function DataBand({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}): JSX.Element {
+  return <div className={cn('data-band', className)}>{children}</div>;
 }
 
 export function SectionHeading({
@@ -51,11 +82,11 @@ export function SectionHeading({
     <div className={cn('flex flex-wrap items-end justify-between gap-4', className)}>
       <div className="min-w-0">
         {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
-        <h2 className="mt-1.5 text-xl font-semibold tracking-tight text-ink-100 md:text-2xl">
+        <h2 className="mt-1.5 text-2xl font-semibold leading-8 tracking-display text-content-primary">
           {title}
         </h2>
         {description ? (
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-300">{description}</p>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-content-secondary">{description}</p>
         ) : null}
       </div>
       {action ? <div className="shrink-0">{action}</div> : null}
@@ -75,12 +106,12 @@ export function MetricValue({
   className?: string;
 }): JSX.Element {
   if (value === null || value === undefined || value === '') {
-    return <span className={cn('text-ink-400', className)}>{emptyLabel}</span>;
+    return <span className={cn('text-content-muted', className)}>{emptyLabel}</span>;
   }
   return (
     <span className={cn('tnum', className)}>
       {value}
-      {suffix ? <span className="ml-1 text-xs font-normal text-ink-400">{suffix}</span> : null}
+      {suffix ? <span className="ml-1 text-xs font-normal text-content-muted">{suffix}</span> : null}
     </span>
   );
 }
@@ -96,18 +127,9 @@ export function ScoreBar({
 }): JSX.Element {
   const width = value === null ? 0 : Math.max(0, Math.min(100, value));
   return (
-    <div className={cn('h-1.5 w-full overflow-hidden rounded-full bg-ink-700', className)}>
+    <div className={cn('h-1 w-full overflow-hidden rounded-full bg-surface-sunken', className)}>
       <div
-        className={cn(
-          'h-full rounded-full transition-[width] duration-500',
-          muted
-            ? 'bg-ink-500'
-            : width >= 70
-              ? 'bg-mint'
-              : width >= 50
-                ? 'bg-amber'
-                : 'bg-rose',
-        )}
+        className={cn('h-full rounded-full', muted || value === null ? 'bg-content-disabled' : 'bg-accent')}
         style={{ width: `${width}%` }}
       />
     </div>
@@ -125,12 +147,7 @@ export function ConfidenceBadge({
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded border px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wide',
-        confidence === 'high'
-          ? 'border-mint/20 bg-mint/5 text-mint'
-          : confidence === 'medium'
-            ? 'border-ink-600 bg-ink-700/30 text-ink-200'
-            : 'border-amber/20 bg-amber/5 text-amber',
+        'inline-flex items-center rounded-chip border border-line bg-surface-subtle px-1.5 py-0.5 text-2xs text-content-secondary',
         className,
       )}
     >
@@ -138,6 +155,13 @@ export function ConfidenceBadge({
     </span>
   );
 }
+
+const RISK_SHORT: Record<RiskLevel, string> = {
+  high: '高风险',
+  medium: '需关注',
+  low: '未见风险',
+  unknown: '信息不完整',
+};
 
 export function RiskBadge({
   level,
@@ -150,11 +174,17 @@ export function RiskBadge({
 }): JSX.Element {
   const tone = riskTone(level);
   const Icon =
-    level === 'high' ? ShieldAlert : level === 'medium' ? AlertTriangle : level === 'low' ? ShieldCheck : ShieldQuestion;
+    level === 'high'
+      ? ShieldAlert
+      : level === 'medium'
+        ? AlertTriangle
+        : level === 'low'
+          ? ShieldCheck
+          : ShieldQuestion;
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded border px-2 py-1 text-[11px] font-medium',
+        'inline-flex items-center gap-1.5 rounded-chip border px-2 py-1 text-2xs font-medium',
         tone.border,
         tone.bg,
         tone.text,
@@ -163,7 +193,7 @@ export function RiskBadge({
       title={riskLabel(level)}
     >
       <Icon size={12} strokeWidth={2} aria-hidden="true" />
-      {compact ? riskLabel(level).replace('信号', '') : riskLabel(level)}
+      {compact ? RISK_SHORT[level] : riskLabel(level)}
     </span>
   );
 }
@@ -174,26 +204,24 @@ export function DataStatusBadge({
 }: {
   status: PluginRecord['dataStatus'];
   className?: string;
-}): JSX.Element {
+}): JSX.Element | null {
+  if (status === 'complete') return null;
+  const stale = status === 'stale';
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded border px-1.5 py-0.5 text-[10px]',
-        status === 'complete'
-          ? 'border-mint/20 bg-mint/5 text-mint'
-          : status === 'partial'
-            ? 'border-amber/20 bg-amber/5 text-amber'
-            : 'border-rose/20 bg-rose/5 text-rose',
+        'inline-flex items-center gap-1.5 rounded-chip border px-1.5 py-0.5 text-2xs',
+        stale
+          ? 'border-warning-line bg-warning-soft text-warning'
+          : 'border-line bg-surface-subtle text-content-secondary',
         className,
       )}
     >
       <span
-        className={cn(
-          'h-1 w-1 rounded-full',
-          status === 'complete' ? 'bg-mint' : status === 'partial' ? 'bg-amber' : 'bg-rose',
-        )}
+        className={cn('h-1 w-1 rounded-full', stale ? 'bg-warning' : 'bg-content-muted')}
+        aria-hidden="true"
       />
-      {dataStatusLabel(status)}
+      {stale ? '历史快照' : dataStatusLabel(status)}
     </span>
   );
 }
@@ -208,25 +236,48 @@ export function DataCoverage({
   className?: string;
 }): JSX.Element {
   return (
-    <div className={cn('flex items-center gap-2', className)}>
+    <div className={cn('flex flex-wrap items-center gap-2', className)}>
       {showSegments ? (
         <div className="flex gap-0.5" aria-hidden="true">
           {Array.from({ length: completeness.total }, (_, index) => (
             <span
               key={index}
               className={cn(
-                'h-2.5 w-1.5 rounded-[1px]',
-                index < completeness.available ? 'bg-signal/70' : 'bg-ink-700',
+                'h-2 w-1.5 rounded-[1px]',
+                index < completeness.available ? 'bg-accent/80' : 'bg-surface-sunken',
               )}
             />
           ))}
         </div>
       ) : null}
-      <span className="tnum font-mono text-[11px] text-ink-300">
+      <span className="tnum font-mono text-2xs text-content-secondary">
         {completeness.available}/{completeness.total}
-        <span className="ml-1 text-ink-400">域</span>
+        <span className="ml-1 font-sans text-content-muted">域</span>
       </span>
     </div>
+  );
+}
+
+export function CoverageChip({
+  completeness,
+  className,
+}: {
+  completeness: CompletenessResult;
+  className?: string;
+}): JSX.Element {
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-chip border border-line bg-surface-subtle px-2 py-1 text-2xs text-content-secondary',
+        className,
+      )}
+      title={`数据完整度 ${completeness.score}%：${completeness.available}/${completeness.total} 个数据域可用`}
+    >
+      <span className="tnum font-mono">
+        {completeness.available}/{completeness.total}
+      </span>
+      数据域
+    </span>
   );
 }
 
@@ -242,9 +293,8 @@ export function PluginMonogram({
     <span
       aria-hidden="true"
       className={cn(
-        'inline-flex shrink-0 items-center justify-center rounded-md border font-mono font-semibold tracking-tight',
-        categoryTone(plugin.category),
-        size === 'sm' ? 'h-7 w-7 text-[10px]' : size === 'lg' ? 'h-12 w-12 text-sm' : 'h-9 w-9 text-[11px]',
+        'inline-flex shrink-0 items-center justify-center rounded-control border border-line bg-surface-subtle font-mono font-semibold text-content-secondary',
+        size === 'sm' ? 'h-8 w-8 text-2xs' : size === 'lg' ? 'h-12 w-12 text-sm' : 'h-10 w-10 text-xs',
       )}
     >
       {initials}
@@ -254,7 +304,8 @@ export function PluginMonogram({
 
 export function CategoryTag({ category }: { category: string }): JSX.Element {
   return (
-    <span className={cn('inline-flex items-center rounded border px-1.5 py-0.5 text-[10px]', categoryTone(category))}>
+    <span className="inline-flex items-center gap-1.5 rounded-chip border border-line bg-surface-subtle px-1.5 py-0.5 text-2xs text-content-secondary">
+      <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
       {categoryLabel(category)}
     </span>
   );
@@ -271,13 +322,18 @@ export function CopyButton({
 }): JSX.Element {
   const [state, setState] = useState<'idle' | 'copied' | 'error'>('idle');
   return (
-    <div className={cn('flex items-stretch overflow-hidden rounded-md border border-ink-700 bg-ink-900/80', className)}>
-      <code className="min-w-0 flex-1 truncate px-3 py-2 font-mono text-[11px] leading-5 text-ink-200" title={value}>
+    <div
+      className={cn(
+        'flex flex-col overflow-hidden rounded-control border border-line-strong bg-surface sm:flex-row sm:items-stretch',
+        className,
+      )}
+    >
+      <code className="min-w-0 flex-1 break-all px-3 py-2.5 font-mono text-xs leading-5 text-content-primary">
         {value}
       </code>
       <button
         type="button"
-        className="inline-flex shrink-0 items-center gap-1.5 border-l border-ink-700 px-2.5 text-[11px] text-ink-300 transition hover:bg-ink-800 hover:text-ink-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-signal/70"
+        className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 border-t border-line px-3 text-2xs text-content-secondary transition hover:bg-surface-subtle hover:text-content-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent sm:h-auto sm:border-l sm:border-t-0"
         onClick={async () => {
           try {
             await navigator.clipboard.writeText(value);
@@ -292,13 +348,13 @@ export function CopyButton({
       >
         {state === 'copied' ? (
           <>
-            <Check size={13} /> 已复制
+            <Check size={14} /> 已复制
           </>
         ) : state === 'error' ? (
           <>复制失败</>
         ) : (
           <>
-            <Copy size={13} /> {label}
+            <Copy size={14} /> {label}
           </>
         )}
       </button>
@@ -318,7 +374,7 @@ export function ExternalTextLink({
   hideIcon?: boolean;
 }): JSX.Element {
   if (!isExternalUrl(href)) {
-    return <span className={cn('text-ink-400', className)}>{children}</span>;
+    return <span className={cn('text-content-muted', className)}>{children}</span>;
   }
   return (
     <a
@@ -326,12 +382,12 @@ export function ExternalTextLink({
       target="_blank"
       rel="noreferrer noopener"
       className={cn(
-        'inline-flex items-center gap-1 text-ink-300 underline-offset-4 transition hover:text-ink-100 hover:underline',
+        'inline-flex items-center gap-1 text-content-secondary underline-offset-4 transition hover:text-accent hover:underline',
         className,
       )}
     >
       {children}
-      {hideIcon ? null : <ExternalLink size={11} className="shrink-0 opacity-70" aria-hidden="true" />}
+      {hideIcon ? null : <ExternalLink size={12} className="shrink-0 opacity-70" aria-hidden="true" />}
     </a>
   );
 }
@@ -344,39 +400,67 @@ export function ButtonLink({
 }: {
   to: string;
   children: ReactNode;
-  variant?: 'primary' | 'secondary' | 'ghost';
+  variant?: ButtonVariant;
   className?: string;
 }): JSX.Element {
   return (
-    <Link
-      to={to}
-      className={cn(
-        'inline-flex items-center justify-center gap-2 rounded-md px-3.5 py-2 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-950',
-        variant === 'primary'
-          ? 'bg-signal text-white hover:bg-signal-strong'
-          : variant === 'secondary'
-            ? 'border border-ink-600 bg-ink-800/60 text-ink-100 hover:border-ink-500 hover:bg-ink-800'
-            : 'text-ink-300 hover:bg-ink-800/70 hover:text-ink-100',
-        className,
-      )}
-    >
+    <Link to={to} className={buttonClasses(variant, className)}>
       {children}
     </Link>
   );
 }
 
-export function InfoHint({ text }: { text: string }): JSX.Element {
+export function ButtonAnchor({
+  href,
+  children,
+  variant = 'primary',
+  className,
+}: {
+  href: string;
+  children: ReactNode;
+  variant?: ButtonVariant;
+  className?: string;
+}): JSX.Element {
   return (
-    <span className="group relative inline-flex align-middle">
-      <CircleHelp
-        size={13}
-        className="text-ink-400 transition group-hover:text-ink-200"
-        aria-hidden="true"
-      />
-      <span className="sr-only">{text}</span>
+    <a href={href} className={buttonClasses(variant, className)}>
+      {children}
+    </a>
+  );
+}
+
+export function InfoHint({
+  text,
+  align = 'center',
+}: {
+  text: string;
+  align?: 'center' | 'right';
+}): JSX.Element {
+  const [open, setOpen] = useState(false);
+  const id = useId();
+  return (
+    <span className="relative inline-flex align-middle">
+      <button
+        type="button"
+        className="relative inline-flex h-7 w-7 items-center justify-center rounded-full text-content-muted transition after:absolute after:-inset-2 after:content-[''] hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        aria-label={`查看说明：${text}`}
+        aria-expanded={open}
+        aria-describedby={open ? id : undefined}
+        onClick={() => setOpen((value) => !value)}
+        onBlur={() => setOpen(false)}
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') setOpen(false);
+        }}
+      >
+        <CircleHelp size={14} aria-hidden="true" />
+      </button>
       <span
+        id={id}
         role="tooltip"
-        className="pointer-events-none absolute bottom-[calc(100%+6px)] left-1/2 z-20 w-56 -translate-x-1/2 rounded-md border border-ink-600 bg-ink-800 px-2.5 py-2 text-[11px] font-normal leading-4 text-ink-200 opacity-0 shadow-xl transition group-focus-within:opacity-100 group-hover:opacity-100"
+        className={cn(
+          'absolute bottom-[calc(100%+6px)] z-30 w-60 max-w-[calc(100vw-2rem)] rounded-control border border-line bg-surface px-3 py-2 text-xs font-normal leading-5 text-content-secondary shadow-pop',
+          align === 'right' ? 'right-0' : 'left-0',
+          open ? 'block' : 'hidden',
+        )}
       >
         {text}
       </span>
@@ -398,15 +482,15 @@ export function StatCell({
   className?: string;
 }): JSX.Element {
   return (
-    <div className={cn('group relative min-w-0 px-5 py-4 transition hover:bg-ink-800/30 md:px-6', className)}>
-      <div className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.13em] text-ink-400">
-        {icon ? <span className="text-ink-500">{icon}</span> : null}
+    <div className={cn('min-w-0 px-4 py-5 md:px-5', className)}>
+      <div className="flex items-center gap-1.5 text-2xs font-medium text-content-secondary">
+        {icon ? <span className="text-content-muted">{icon}</span> : null}
         {label}
       </div>
-      <div className="mt-2 text-2xl font-semibold tracking-tight text-ink-100 tnum md:text-[28px]">
+      <div className="mt-2 tnum text-4xl font-semibold leading-none tracking-display text-content-primary">
         {value}
       </div>
-      {detail ? <div className="mt-1.5 text-[11px] leading-4 text-ink-400">{detail}</div> : null}
+      {detail ? <div className="mt-2 text-xs leading-5 text-content-muted">{detail}</div> : null}
     </div>
   );
 }
@@ -426,15 +510,15 @@ export function Pagination({
   const list = [...pages].filter((value) => value >= 1 && value <= totalPages).sort((a, b) => a - b);
   return (
     <nav className="flex flex-wrap items-center justify-between gap-3" aria-label="插件列表分页">
-      <p className="text-[11px] text-ink-400 tnum">
+      <p className="tnum text-xs text-content-muted">
         第 {page} / {totalPages} 页 · 共 {total} 个结果
       </p>
-      <div className="flex items-center gap-1">
+      <div className="flex flex-wrap items-center gap-1.5">
         <button
           type="button"
           onClick={() => onPageChange(page - 1)}
           disabled={page <= 1}
-          className="inline-flex h-8 items-center gap-1 rounded-md border border-ink-700 px-2.5 text-[11px] text-ink-300 transition hover:border-ink-500 hover:text-ink-100 disabled:cursor-not-allowed disabled:opacity-35"
+          className="inline-flex h-10 min-w-10 items-center justify-center gap-1 rounded-control border border-line-strong px-2.5 text-xs text-content-secondary transition hover:border-content-muted hover:text-content-primary disabled:cursor-not-allowed disabled:opacity-35 max-sm:h-11"
           aria-label="上一页"
         >
           <ChevronLeft size={14} /> 上一页
@@ -442,17 +526,17 @@ export function Pagination({
         {list.map((value, index) => (
           <span key={value} className="flex items-center">
             {index > 0 && value - list[index - 1] > 1 ? (
-              <span className="px-1 text-ink-500">…</span>
+              <span className="px-1 text-content-muted">…</span>
             ) : null}
             <button
               type="button"
               onClick={() => onPageChange(value)}
               aria-current={value === page ? 'page' : undefined}
               className={cn(
-                'h-8 min-w-8 rounded-md px-2 text-[11px] transition',
+                'h-10 min-w-10 rounded-control px-2 text-xs transition max-sm:h-11 max-sm:min-w-11',
                 value === page
-                  ? 'bg-signal text-white'
-                  : 'text-ink-300 hover:bg-ink-800 hover:text-ink-100',
+                  ? 'bg-accent text-white'
+                  : 'text-content-secondary hover:bg-surface-subtle hover:text-content-primary',
               )}
             >
               {value}
@@ -463,7 +547,7 @@ export function Pagination({
           type="button"
           onClick={() => onPageChange(page + 1)}
           disabled={page >= totalPages}
-          className="inline-flex h-8 items-center gap-1 rounded-md border border-ink-700 px-2.5 text-[11px] text-ink-300 transition hover:border-ink-500 hover:text-ink-100 disabled:cursor-not-allowed disabled:opacity-35"
+          className="inline-flex h-10 min-w-10 items-center justify-center gap-1 rounded-control border border-line-strong px-2.5 text-xs text-content-secondary transition hover:border-content-muted hover:text-content-primary disabled:cursor-not-allowed disabled:opacity-35 max-sm:h-11"
           aria-label="下一页"
         >
           下一页 <ChevronRight size={14} />
@@ -486,11 +570,11 @@ export function EmptyState({
 }): JSX.Element {
   return (
     <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-      <div className="flex h-11 w-11 items-center justify-center rounded-md border border-ink-700 bg-ink-800/60 text-ink-300">
+      <div className="flex h-12 w-12 items-center justify-center rounded-control border border-line bg-surface-subtle text-content-secondary">
         {icon ?? <SearchX size={20} strokeWidth={1.6} />}
       </div>
-      <h3 className="mt-4 text-sm font-semibold text-ink-100">{title}</h3>
-      <p className="mt-1.5 max-w-md text-xs leading-5 text-ink-400">{description}</p>
+      <h3 className="mt-4 text-base font-semibold text-content-primary">{title}</h3>
+      <p className="mt-1.5 max-w-md text-sm leading-6 text-content-secondary">{description}</p>
       {action ? <div className="mt-5">{action}</div> : null}
     </div>
   );
@@ -499,14 +583,11 @@ export function EmptyState({
 export function LoadingState({ label = '正在读取本地数据快照' }: { label?: string }): JSX.Element {
   return (
     <div className="flex min-h-[55vh] flex-col items-center justify-center gap-4" role="status" aria-live="polite">
-      <Loader2 size={22} className="animate-spin text-signal" />
-      <p className="text-xs text-ink-400">{label}</p>
-      <div className="mt-2 grid w-full max-w-2xl grid-cols-2 gap-2 md:grid-cols-4">
+      <Loader2 size={22} className="animate-spin text-accent" aria-hidden="true" />
+      <p className="text-sm text-content-secondary">{label}</p>
+      <div className="mt-2 grid w-full max-w-2xl grid-cols-2 gap-2 md:grid-cols-4" aria-hidden="true">
         {Array.from({ length: 4 }, (_, index) => (
-          <div
-            key={index}
-            className="h-20 animate-pulse rounded-md border border-ink-700/60 bg-ink-850/60"
-          />
+          <div key={index} className="h-20 rounded-panel border border-line bg-surface-sunken" />
         ))}
       </div>
     </div>
@@ -521,24 +602,22 @@ export function ErrorState({
   onRetry?: () => void;
 }): JSX.Element {
   return (
-    <div className="mx-auto flex min-h-[60vh] max-w-2xl flex-col justify-center px-5 py-20" role="alert">
-      <div className="panel p-7 md:p-9">
+    <div className="mx-auto flex min-h-[60vh] max-w-2xl flex-col justify-center px-4 py-20" role="alert">
+      <div className="panel p-6 md:p-9">
         <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-md border border-rose/20 bg-rose/5 text-rose">
+          <span className="flex h-11 w-11 items-center justify-center rounded-control border border-danger-line bg-danger-soft text-danger">
             <ServerOff size={20} strokeWidth={1.7} />
           </span>
           <div>
-            <p className="eyebrow text-rose/80">Data unavailable</p>
-            <h1 className="mt-1 text-lg font-semibold text-ink-100">数据快照无法加载</h1>
+            <p className="text-2xs font-medium text-danger">数据不可用</p>
+            <h1 className="mt-1 text-2xl font-semibold text-content-primary">数据快照无法加载</h1>
           </div>
         </div>
-        <p className="mt-5 text-sm leading-6 text-ink-300">
-          {message}
-        </p>
+        <p className="mt-5 text-base leading-6 text-content">{message}</p>
         {import.meta.env.DEV ? (
-          <div className="mt-6 rounded-md border border-ink-700 bg-ink-900/70 p-4">
-            <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-ink-400">本地开发</p>
-            <pre className="mt-2 overflow-x-auto font-mono text-[11px] leading-6 text-ink-200">
+          <div className="mt-6 rounded-control border border-line bg-surface-subtle p-4">
+            <p className="text-2xs font-medium text-content-secondary">本地开发</p>
+            <pre className="mt-2 overflow-x-auto font-mono text-xs leading-6 text-content">
 {`npm run data:pull
 # 或配置 GITHUB_TOKEN 后
 npm run collect
@@ -552,106 +631,15 @@ npm run dev`}
         )}
         <div className="mt-6 flex flex-wrap items-center gap-3">
           {onRetry ? (
-            <button
-              type="button"
-              onClick={onRetry}
-              className="inline-flex items-center gap-2 rounded-md bg-signal px-3.5 py-2 text-xs font-medium text-white transition hover:bg-signal-strong"
-            >
-              <ArrowLeft size={13} className="rotate-180" /> 重新加载
+            <button type="button" onClick={onRetry} className={buttonClasses('primary')}>
+              <ArrowLeft size={14} className="rotate-180" /> 重新加载
             </button>
           ) : null}
-          <Link to="/method" className="text-xs text-ink-300 underline-offset-4 hover:text-ink-100 hover:underline">
+          <Link to="/method" className="text-sm text-content-secondary underline-offset-4 hover:text-accent hover:underline">
             查看数据方法与更新机制
           </Link>
         </div>
       </div>
-    </div>
-  );
-}
-
-export function ScoreHero({
-  title,
-  subtitle,
-  score,
-  statusLabel,
-  confidence,
-  coverageText,
-  icon,
-  tone = 'signal',
-  children,
-}: {
-  title: string;
-  subtitle: string;
-  score: number | null;
-  statusLabel: string;
-  confidence?: Confidence;
-  coverageText?: string;
-  icon: ReactNode;
-  tone?: 'signal' | 'mint' | 'amber';
-  children?: ReactNode;
-}): JSX.Element {
-  const toneClass =
-    tone === 'mint'
-      ? 'text-mint border-mint/20 bg-mint/5'
-      : tone === 'amber'
-        ? 'text-amber border-amber/20 bg-amber/5'
-        : 'text-signal-strong border-signal/20 bg-signal/5';
-  return (
-    <div className="panel overflow-hidden">
-      <div className="flex items-start justify-between gap-3 border-b border-ink-700/70 px-4 py-3.5">
-        <div className="flex items-center gap-2.5">
-          <span className={cn('flex h-7 w-7 items-center justify-center rounded border', toneClass)}>
-            {icon}
-          </span>
-          <div>
-            <p className="text-[11px] font-medium text-ink-200">{title}</p>
-            <p className="mt-0.5 text-[10px] text-ink-400">{subtitle}</p>
-          </div>
-        </div>
-        {confidence ? <ConfidenceBadge confidence={confidence} /> : null}
-      </div>
-      <div className="px-4 pb-4 pt-4">
-        <div className="flex items-baseline gap-2">
-          <span className={cn('tnum text-4xl font-semibold tracking-tight', scoreTone(score))}>
-            {score === null ? '—' : score.toFixed(1)}
-          </span>
-          <span className="text-[10px] uppercase tracking-[0.14em] text-ink-500">/ 100</span>
-          <span className="ml-auto text-[11px] text-ink-300">{statusLabel}</span>
-        </div>
-        {score === null ? null : <ScoreBar value={score} className="mt-3" />}
-        {coverageText ? <p className="mt-2 text-[10px] text-ink-400">{coverageText}</p> : null}
-        {children}
-      </div>
-    </div>
-  );
-}
-
-export function MiniMetric({
-  label,
-  value,
-  sub,
-  link,
-}: {
-  label: string;
-  value: ReactNode;
-  sub?: ReactNode;
-  link?: { href: string; label: string };
-}): JSX.Element {
-  return (
-    <div className="min-w-0 border-t border-ink-700/60 px-0 py-4 first:border-t-0 md:border-l md:border-t-0 md:px-5 md:first:border-l-0">
-      <p className="text-[10px] uppercase tracking-[0.1em] text-ink-400">{label}</p>
-      <div className="mt-1.5 text-lg font-medium text-ink-100 tnum">{value}</div>
-      {sub ? <div className="mt-1 text-[11px] leading-4 text-ink-400">{sub}</div> : null}
-      {link ? (
-        <a
-          href={link.href}
-          target="_blank"
-          rel="noreferrer noopener"
-          className="mt-1.5 inline-flex items-center gap-1 text-[10px] text-ink-400 hover:text-ink-200"
-        >
-          {link.label} <ExternalLink size={9} />
-        </a>
-      ) : null}
     </div>
   );
 }
@@ -668,19 +656,25 @@ export function InlineNotice({
   return (
     <div
       className={cn(
-        'flex items-start gap-2.5 rounded-md border px-3 py-2.5 text-[11px] leading-5',
+        'flex items-start gap-2.5 rounded-control border px-3 py-2.5 text-xs leading-5',
         tone === 'amber'
-          ? 'border-amber/20 bg-amber/5 text-amber/90'
+          ? 'border-warning-line bg-warning-soft text-warning'
           : tone === 'rose'
-            ? 'border-rose/20 bg-rose/5 text-rose/90'
+            ? 'border-danger-line bg-danger-soft text-danger'
             : tone === 'mint'
-              ? 'border-mint/20 bg-mint/5 text-mint/90'
-              : 'border-ink-700 bg-ink-850/60 text-ink-300',
+              ? 'border-line bg-surface-subtle text-content-secondary'
+              : 'border-line bg-surface-subtle text-content-secondary',
         className,
       )}
     >
-      <span className="mt-0.5 shrink-0">
-        {tone === 'rose' ? <ShieldAlert size={13} /> : tone === 'mint' ? <ShieldCheck size={13} /> : <CircleHelp size={13} />}
+      <span className="mt-0.5 shrink-0" aria-hidden="true">
+        {tone === 'rose' ? (
+          <ShieldAlert size={14} />
+        ) : tone === 'mint' ? (
+          <ShieldCheck size={14} />
+        ) : (
+          <AlertTriangle size={14} />
+        )}
       </span>
       <div className="min-w-0">{children}</div>
     </div>
@@ -690,15 +684,15 @@ export function InlineNotice({
 export function DividerLabel({ children }: { children: ReactNode }): JSX.Element {
   return (
     <div className="flex items-center gap-3">
-      <span className="h-px flex-1 bg-ink-700/70" />
-      <span className="text-[10px] uppercase tracking-[0.14em] text-ink-500">{children}</span>
-      <span className="h-px flex-1 bg-ink-700/70" />
+      <span className="h-px flex-1 bg-line-hairline" />
+      <span className="text-2xs font-medium text-content-muted">{children}</span>
+      <span className="h-px flex-1 bg-line-hairline" />
     </div>
   );
 }
 
 export function RelativeTime({ iso }: { iso: string | null | undefined }): JSX.Element {
-  if (!iso) return <span className="text-ink-500">未知</span>;
+  if (!iso) return <span className="text-content-muted">未知</span>;
   return (
     <time dateTime={iso} title={iso}>
       {new Intl.RelativeTimeFormat('zh-CN', { numeric: 'auto' }).format(

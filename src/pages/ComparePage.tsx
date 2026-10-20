@@ -1,24 +1,22 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeftRight, ArrowUpRight, Info, Scale } from 'lucide-react';
 import { useLoadedData } from '../hooks/useData';
 import type { PluginRecord } from '../lib/types';
 import {
   formatCompact,
-  formatDate,
   formatNumber,
   formatPercent,
   formatRelative,
   formatScore,
-  riskLabel,
 } from '../lib/format';
 import {
   ButtonLink,
   CategoryTag,
+  CoverageChip,
   DataCoverage,
-  DataStatusBadge,
   EmptyState,
-  ExternalTextLink,
+  InlineNotice,
   PluginMonogram,
   RiskBadge,
   ScoreBar,
@@ -35,7 +33,7 @@ interface CompareRow {
 }
 
 function unavailable(reason: string): JSX.Element {
-  return <span className="text-[10px] leading-4 text-ink-500">{reason}</span>;
+  return <span className="text-xs leading-5 text-content-muted">{reason}</span>;
 }
 
 function scoreValue(plugin: PluginRecord, kind: 'popularity' | 'maintenance'): JSX.Element {
@@ -46,12 +44,13 @@ function scoreValue(plugin: PluginRecord, kind: 'popularity' | 'maintenance'): J
   return (
     <div>
       <div className="flex items-baseline gap-1.5">
-        <span className="tnum font-mono text-lg font-medium text-ink-100">{formatScore(score.score)}</span>
-        <span className="text-[9px] text-ink-500">/100</span>
+        <span className="tnum font-mono text-base font-medium text-content-primary">{formatScore(score.score)}</span>
+        <span className="text-xs text-content-muted">/100</span>
       </div>
       <ScoreBar value={score.score} className="mt-1.5 w-24" />
-      <p className="mt-1 text-[9px] text-ink-500">
-        置信 {score.confidence} · 覆盖 {Math.round(score.coverage * 100)}%
+      <p className="mt-1 text-2xs text-content-muted">
+        {score.confidence === 'high' ? '高置信' : score.confidence === 'medium' ? '中置信' : '低置信'} · 覆盖{' '}
+        {Math.round(score.coverage * 100)}%
       </p>
     </div>
   );
@@ -62,28 +61,59 @@ function scoreDiff(a: PluginRecord, b: PluginRecord, kind: 'popularity' | 'maint
   const right = b.scores[kind].score;
   if (left === null || right === null) return '不可比';
   const difference = right - left;
-  return `${difference > 0 ? '+' : ''}${difference.toFixed(1)}`;
+  if (Math.abs(difference) < 0.05) return '相同';
+  return `B ${difference > 0 ? '高' : '低'} ${Math.abs(difference).toFixed(1)}`;
+}
+
+function numericDiff(left: number | null, right: number | null, unit = ''): string {
+  if (left === null || right === null) return '不可比';
+  const difference = right - left;
+  if (difference === 0) return '相同';
+  return `B ${difference > 0 ? '高' : '低'} ${formatNumber(Math.abs(difference))}${unit}`;
+}
+
+function compareSideLabel(side: 'A' | 'B', plugin: PluginRecord): string {
+  return `${side} · ${plugin.name}`;
 }
 
 export function ComparePage(): JSX.Element {
   const { latest } = useLoadedData();
   const [searchParams, setSearchParams] = useSearchParams();
-  const fallbackB = latest.plugins[1]?.id ?? '';
-  const leftId = searchParams.get('a') || latest.plugins[0]?.id || '';
-  const rightId = searchParams.get('b') || fallbackB;
-  const left = latest.plugins.find((plugin) => plugin.id === leftId) ?? latest.plugins[0];
-  const right = latest.plugins.find((plugin) => plugin.id === rightId && plugin.id !== left?.id) ?? latest.plugins.find((plugin) => plugin.id !== left?.id);
+  const [resetNotice, setResetNotice] = useState(false);
+  const plugins = latest.plugins;
+  const fallbackA = plugins[0];
+  const fallbackB = plugins[1] ?? plugins[0];
+  const rawA = searchParams.get('a');
+  const rawB = searchParams.get('b');
+  const aInvalid = Boolean(rawA && !plugins.some((plugin) => plugin.id === rawA));
+  const bInvalid = Boolean(rawB && !plugins.some((plugin) => plugin.id === rawB));
+  const sameSelection = Boolean(rawA && rawB && rawA === rawB);
+
+  let left = (rawA ? plugins.find((plugin) => plugin.id === rawA) : fallbackA) ?? fallbackA;
+  let right = (rawB ? plugins.find((plugin) => plugin.id === rawB) : fallbackB) ?? fallbackB;
+  if (left && right && left.id === right.id) {
+    right = plugins.find((plugin) => plugin.id !== left.id) ?? right;
+  }
+
+  useEffect(() => {
+    if (!left || !right || !(aInvalid || bInvalid || sameSelection)) return;
+    setResetNotice(true);
+    const next = new URLSearchParams(searchParams);
+    next.set('a', left.id);
+    next.set('b', right.id);
+    setSearchParams(next, { replace: true });
+  }, [aInvalid, bInvalid, sameSelection, left, right, searchParams, setSearchParams]);
 
   function select(side: 'a' | 'b', value: string): void {
+    setResetNotice(false);
     const next = new URLSearchParams(searchParams);
-    if (side === 'a') next.set('a', value);
-    else next.set('b', value);
-    next.delete('page');
+    next.set(side, value);
     setSearchParams(next, { replace: true });
   }
 
   function swap(): void {
     if (!left || !right) return;
+    setResetNotice(false);
     const next = new URLSearchParams(searchParams);
     next.set('a', right.id);
     next.set('b', left.id);
@@ -130,7 +160,7 @@ export function ComparePage(): JSX.Element {
         hint: 'GitHub 当前值，不衡量用户质量',
         a: formatNumber(left.github.stars),
         b: formatNumber(right.github.stars),
-        diff: `${right.github.stars - left.github.stars > 0 ? '+' : ''}${formatNumber(right.github.stars - left.github.stars)}`,
+        diff: numericDiff(left.github.stars, right.github.stars),
       },
       {
         label: 'npm 30 天下载',
@@ -143,20 +173,17 @@ export function ComparePage(): JSX.Element {
           right.npm.status === 'verified' && right.npm.downloads30d !== null
             ? formatNumber(right.npm.downloads30d)
             : unavailable('暂无可靠下载数据'),
-        diff:
-          left.npm.status === 'verified' &&
-          right.npm.status === 'verified' &&
-          left.npm.downloads30d !== null &&
-          right.npm.downloads30d !== null
-            ? formatNumber(right.npm.downloads30d - left.npm.downloads30d)
-            : '不可比',
+        diff: numericDiff(
+          left.npm.status === 'verified' ? left.npm.downloads30d : null,
+          right.npm.status === 'verified' ? right.npm.downloads30d : null,
+        ),
       },
       {
         label: '开发活跃度',
         hint: '近 30 天提交次数',
         a: `${formatNumber(left.github.commits30d)}${left.github.commits30dTruncated ? '+' : ''} 次`,
         b: `${formatNumber(right.github.commits30d)}${right.github.commits30dTruncated ? '+' : ''} 次`,
-        diff: `${right.github.commits30d - left.github.commits30d > 0 ? '+' : ''}${right.github.commits30d - left.github.commits30d}`,
+        diff: numericDiff(left.github.commits30d, right.github.commits30d, ' 次'),
       },
       {
         label: 'Issue 处理',
@@ -172,7 +199,9 @@ export function ComparePage(): JSX.Element {
         diff:
           aIssueRate === null || bIssueRate === null
             ? '不可比'
-            : `${(bIssueRate - aIssueRate > 0 ? '+' : '')}${(bIssueRate - aIssueRate).toFixed(1)} pp`,
+            : `${(bIssueRate - aIssueRate > 0 ? 'B 高 ' : bIssueRate - aIssueRate < 0 ? 'B 低 ' : '')}${
+                bIssueRate === aIssueRate ? '相同' : `${Math.abs(bIssueRate - aIssueRate).toFixed(1)} pp`
+              }`,
       },
       {
         label: 'PR 处理',
@@ -190,7 +219,9 @@ export function ComparePage(): JSX.Element {
         diff:
           !aPulls.available || !bPulls.available || aPrRate === null || bPrRate === null
             ? '不可比'
-            : `${(bPrRate - aPrRate > 0 ? '+' : '')}${(bPrRate - aPrRate).toFixed(1)} pp`,
+            : `${(bPrRate - aPrRate > 0 ? 'B 高 ' : bPrRate - aPrRate < 0 ? 'B 低 ' : '')}${
+                bPrRate === aPrRate ? '相同' : `${Math.abs(bPrRate - aPrRate).toFixed(1)} pp`
+              }`,
       },
       {
         label: '版本更新',
@@ -208,24 +239,24 @@ export function ComparePage(): JSX.Element {
         hint: '7 个数据域中可用项；不是插件质量',
         a: (
           <div>
-            <span className="tnum font-mono text-sm text-ink-100">{left.scores.completeness.score}%</span>
+            <span className="tnum font-mono text-sm text-content-primary">{left.scores.completeness.score}%</span>
             <DataCoverage completeness={left.scores.completeness} className="mt-1" />
           </div>
         ),
         b: (
           <div>
-            <span className="tnum font-mono text-sm text-ink-100">{right.scores.completeness.score}%</span>
+            <span className="tnum font-mono text-sm text-content-primary">{right.scores.completeness.score}%</span>
             <DataCoverage completeness={right.scores.completeness} className="mt-1" />
           </div>
         ),
-        diff: `${right.scores.completeness.score - left.scores.completeness.score > 0 ? '+' : ''}${right.scores.completeness.score - left.scores.completeness.score} pp`,
+        diff: numericDiff(left.scores.completeness.score, right.scores.completeness.score, ' pp'),
       },
       {
         label: '公开风险',
         hint: '归档、长期 Issue、OSV 与数据缺口',
         a: <RiskBadge level={left.scores.risk.level} compact />,
         b: <RiskBadge level={right.scores.risk.level} compact />,
-        diff: `A ${left.scores.risk.flags.length} 条信号 · B ${right.scores.risk.flags.length} 条信号`,
+        diff: `A ${left.scores.risk.flags.length} · B ${right.scores.risk.flags.length} 条信号`,
       },
       {
         label: 'OSV 漏洞检查',
@@ -246,7 +277,7 @@ export function ComparePage(): JSX.Element {
     ];
   }, [left, right]);
 
-  if (latest.plugins.length < 2) {
+  if (plugins.length < 2) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-20">
         <EmptyState title="至少需要两个插件才能比较" description="当前快照中的插件数量不足。" />
@@ -254,233 +285,260 @@ export function ComparePage(): JSX.Element {
     );
   }
 
+  if (!left || !right) {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-20">
+        <EmptyState title="请选择两个不同插件" description="当前选择可能相同或不在快照中。" />
+      </div>
+    );
+  }
+
+  const summary = [
+    { label: '人气', value: scoreDiff(left, right, 'popularity') },
+    { label: '维护', value: scoreDiff(left, right, 'maintenance') },
+    { label: '覆盖', value: numericDiff(left.scores.completeness.score, right.scores.completeness.score, ' pp') },
+  ];
+
   return (
     <div className="page-enter mx-auto max-w-shell px-4 pb-12 pt-8 md:px-6 md:pt-10">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="eyebrow">Side-by-side</p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-ink-100 md:text-4xl">
-            并排比较
-            <span className="text-ink-400">两个插件</span>
+          <p className="eyebrow">并排查看</p>
+          <h1 className="mt-2 text-4xl font-semibold leading-tight tracking-display text-content-primary md:text-5xl">
+            并排比较两个插件
           </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-ink-300">
+          <p className="mt-3 max-w-2xl text-base leading-7 text-content-secondary">
             对齐相同的统计窗口和数据来源，展示可核对的差异。比较结果不是质量排名，也不会基于单一指标替你选“更好”的插件。
           </p>
         </div>
-        <div className="flex items-center gap-2 text-[10px] text-ink-500">
-          <Scale size={13} /> {latest.plugins.length} 个可比较对象
+        <div className="flex items-center gap-2 text-xs text-content-muted">
+          <Scale size={14} /> {plugins.length} 个可比较对象
         </div>
       </div>
 
-      {!left || !right ? (
-        <div className="mt-8">
-          <EmptyState title="请选择两个不同插件" description="当前选择可能相同或不在快照中。" />
-        </div>
-      ) : (
-        <>
-          <section className="mt-6 grid gap-3 lg:grid-cols-[1fr_auto_1fr] lg:items-stretch" aria-label="选择对比插件">
-            {[
-              { plugin: left, side: 'a' as const, label: 'A' },
-              { plugin: right, side: 'b' as const, label: 'B' },
-            ].map(({ plugin, side, label }, index) => (
-              <div key={side} className={cn('contents', index === 1 && 'lg:contents')}>
-                {index === 1 ? (
-                  <div className="flex items-center justify-center lg:px-1">
-                    <button
-                      type="button"
-                      onClick={swap}
-                      className="inline-flex h-8 items-center gap-1.5 rounded-md border border-ink-700 bg-ink-900 px-2.5 text-[10px] text-ink-300 transition hover:border-ink-500 hover:text-ink-100"
-                      aria-label="交换两侧插件"
+      <div className="data-band mt-6">
+        <div className="grid lg:grid-cols-[minmax(0,1fr)_56px_minmax(0,1fr)]">
+          {[
+            { plugin: left, side: 'a' as const, label: 'A' as const },
+            { plugin: right, side: 'b' as const, label: 'B' as const },
+          ].map(({ plugin, side, label }, index) => (
+            <div
+              key={side}
+              className={cn(
+                'min-w-0',
+                index === 1 ? 'border-t border-line lg:order-3 lg:border-t-0' : 'lg:order-1',
+              )}
+            >
+              {index === 1 ? (
+                <div className="flex items-center justify-center border-t border-line px-4 py-2 lg:hidden">
+                  <button
+                    type="button"
+                    onClick={swap}
+                    className="inline-flex h-11 items-center gap-1.5 rounded-control border border-line-strong bg-surface px-4 text-sm text-content-secondary transition hover:border-content-muted hover:text-content-primary"
+                    aria-label="交换两侧插件"
+                  >
+                    <ArrowLeftRight size={15} /> 交换 A / B
+                  </button>
+                </div>
+              ) : null}
+              <div className={cn('px-4 py-4 md:px-5', index === 1 ? 'lg:pl-0' : 'lg:pr-0')}>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-xs text-content-secondary">
+                    <span className="mr-1.5 inline-flex h-5 w-5 items-center justify-center rounded-chip bg-accent-soft font-mono text-2xs text-accent-active">
+                      {label}
+                    </span>
+                    {compareSideLabel(label, plugin)}
+                  </span>
+                  <Link
+                    to={`/plugins/${encodeURIComponent(plugin.id)}`}
+                    className="inline-flex items-center gap-1 text-xs text-content-secondary hover:text-accent"
+                  >
+                    详情 <ArrowUpRight size={11} />
+                  </Link>
+                </div>
+                <label className="sr-only" htmlFor={`compare-${side}`}>
+                  选择插件 {label}
+                </label>
+                <select
+                  id={`compare-${side}`}
+                  value={plugin.id}
+                  onChange={(event) => select(side, event.target.value)}
+                  className="select-field mt-3 w-full"
+                >
+                  {plugins.map((option) => (
+                    <option
+                      key={option.id}
+                      value={option.id}
+                      disabled={side === 'a' ? option.id === right.id : option.id === left.id}
                     >
-                      <ArrowLeftRight size={12} /> 交换
-                    </button>
-                  </div>
-                ) : null}
-                <div className="panel overflow-hidden">
-                  <div className="flex items-center justify-between gap-3 border-b border-ink-700/60 px-4 py-2.5">
-                    <div className="flex items-center gap-2">
-                      <span className="flex h-5 w-5 items-center justify-center rounded border border-signal/25 bg-signal/10 font-mono text-[10px] text-signal-strong">
-                        {label}
-                      </span>
-                      <span className="text-[10px] text-ink-400">选择插件</span>
+                      {option.name} · {formatCompact(option.github.stars)} stars
+                    </option>
+                  ))}
+                </select>
+                <div className="mt-3 flex items-start gap-3">
+                  <PluginMonogram plugin={plugin} size="lg" />
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <Link
+                        to={`/plugins/${encodeURIComponent(plugin.id)}`}
+                        className="break-words text-lg font-semibold text-content-primary hover:text-accent"
+                      >
+                        {plugin.name}
+                      </Link>
+                      <CategoryTag category={plugin.category} />
+                      <CoverageChip completeness={plugin.scores.completeness} />
                     </div>
-                    <Link
-                      to={`/plugins/${encodeURIComponent(plugin.id)}`}
-                      className="inline-flex items-center gap-1 text-[10px] text-ink-400 hover:text-ink-100"
-                    >
-                      详情 <ArrowUpRight size={10} />
-                    </Link>
-                  </div>
-                  <div className="px-4 pb-4 pt-3">
-                    <label className="sr-only" htmlFor={`compare-${side}`}>
-                      选择插件 {label}
-                    </label>
-                    <select
-                      id={`compare-${side}`}
-                      value={plugin.id}
-                      onChange={(event) => select(side, event.target.value)}
-                      className="select-field w-full"
-                    >
-                      {latest.plugins.map((option) => (
-                        <option
-                          key={option.id}
-                          value={option.id}
-                          disabled={
-                            (side === 'a' ? option.id === right.id : option.id === left.id) || false
-                          }
-                        >
-                          {option.name} · {formatCompact(option.github.stars)} stars
-                        </option>
-                      ))}
-                    </select>
-                    <div className="mt-4 flex items-start gap-3">
-                      <PluginMonogram plugin={plugin} size="lg" />
-                      <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          <Link to={`/plugins/${encodeURIComponent(plugin.id)}`} className="text-lg font-semibold text-ink-100 hover:text-signal-strong">
-                            {plugin.name}
-                          </Link>
-                          <CategoryTag category={plugin.category} />
-                          <DataStatusBadge status={plugin.dataStatus} />
-                        </div>
-                        <p className="mt-1 line-clamp-2 text-[11px] leading-5 text-ink-400">
-                          {plugin.repository.description ?? '无简介'}
-                        </p>
-                        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-ink-400">
-                          <span>{formatNumber(plugin.github.stars)} stars</span>
-                          <span>{formatRelative(plugin.github.lastCommitAt)}提交</span>
-                          <span>{plugin.npm.downloads30d === null ? '暂无可靠下载' : `${formatCompact(plugin.npm.downloads30d)} / 30d`}</span>
-                        </div>
-                      </div>
+                    <p className="mt-1 line-clamp-2 text-xs leading-5 text-content-secondary">{plugin.curatorNote}</p>
+                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-2xs text-content-muted">
+                      <span>{formatNumber(plugin.github.stars)} stars</span>
+                      <span>{formatRelative(plugin.github.lastCommitAt)}更新</span>
+                      <span>
+                        {plugin.npm.downloads30d === null
+                          ? '暂无可靠下载'
+                          : `${formatCompact(plugin.npm.downloads30d)} / 30d`}
+                      </span>
                     </div>
                   </div>
                 </div>
               </div>
-            ))}
-          </section>
+            </div>
+          ))}
+          <div className="hidden items-center justify-center border-x border-line lg:order-2 lg:flex">
+            <button
+              type="button"
+              onClick={swap}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-control border border-line-strong bg-surface text-content-secondary transition hover:border-content-muted hover:text-content-primary"
+              aria-label="交换两侧插件"
+            >
+              <ArrowLeftRight size={16} />
+            </button>
+          </div>
+        </div>
+      </div>
 
-          <div className="mt-4 flex items-start gap-2.5 rounded-md border border-amber/20 bg-amber/5 px-3 py-2.5 text-[10px] leading-5 text-amber/90">
-            <Info size={12} className="mt-0.5 shrink-0" />
-            <span>
-              两侧数据完整度不同：{left.name} {left.scores.completeness.score}% / {right.name}{' '}
-              {right.scores.completeness.score}%。差异可能来自数据覆盖，而不是真实行为差异；缺失项显示“不可比”，不会被补 0。
-            </span>
+      {resetNotice ? (
+        <InlineNotice tone="amber" className="mt-4">
+          URL 中的插件不在当前快照，或两侧选择了同一个插件，已重置为可比较的示例；地址栏已同步。
+        </InlineNotice>
+      ) : rawA || rawB ? null : (
+        <p className="mt-3 text-xs text-content-muted">
+          当前显示示例对比（前两个插件）。可在上方更换，或从插件详情页加入对比。
+        </p>
+      )}
+
+      <div
+        className={cn(
+          'mt-4 flex items-start gap-2.5 border-l-2 px-3 py-2.5 text-xs leading-5',
+          left.scores.completeness.score === right.scores.completeness.score
+            ? 'border-line-strong bg-surface-subtle text-content-secondary'
+            : 'border-warning bg-warning-soft text-warning',
+        )}
+      >
+        <Info size={14} className="mt-0.5 shrink-0" aria-hidden="true" />
+        <span>
+          {left.scores.completeness.score === right.scores.completeness.score
+            ? `两侧数据完整度相同（${left.scores.completeness.score}% / ${right.scores.completeness.score}%）。缺失项显示“不可比”，不会被补 0。`
+            : `两侧数据完整度不同：${left.name} ${left.scores.completeness.score}% / ${right.name} ${right.scores.completeness.score}%。差异可能来自数据覆盖，而不是真实行为差异；缺失项显示“不可比”，不会被补 0。`}
+        </span>
+      </div>
+
+      <section className="mt-6" aria-labelledby="compare-matrix-title">
+        <SectionHeading
+          eyebrow="指标矩阵"
+          title={<span id="compare-matrix-title">指标对照</span>}
+          description="同一采集窗口；差异只描述方向与大小，不评价优劣。"
+        />
+        <p className="mt-2 break-words text-xs text-content-secondary">
+          B 相对 A：{summary.map((item) => `${item.label} ${item.value}`).join(' · ')}
+        </p>
+
+        <div className="panel mt-4 overflow-clip">
+          <div className="hidden lg:block">
+            <table className="w-full table-fixed text-left">
+              <colgroup>
+                <col className="w-[26%]" />
+                <col className="w-[27%]" />
+                <col className="w-[27%]" />
+                <col className="w-[20%]" />
+              </colgroup>
+              <thead>
+                <tr className="border-b border-line bg-surface-subtle">
+                  <th className="sticky top-16 z-20 border-b border-line bg-surface-subtle px-4 py-3 text-2xs font-medium text-content-secondary md:px-5">
+                    指标
+                  </th>
+                  <th className="sticky top-16 z-20 border-b border-line bg-surface-subtle px-3 py-3 text-2xs font-medium text-content-secondary">
+                    {compareSideLabel('A', left)}
+                  </th>
+                  <th className="sticky top-16 z-20 border-b border-line bg-surface-subtle px-3 py-3 text-2xs font-medium text-content-secondary">
+                    {compareSideLabel('B', right)}
+                  </th>
+                  <th className="sticky top-16 z-20 border-b border-line bg-surface-subtle px-3 py-3 text-2xs font-medium text-content-secondary">
+                    差异 B − A
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-line-hairline">
+                {rows.map((row) => (
+                  <tr key={row.label} className="align-top transition hover:bg-surface-subtle">
+                    <th scope="row" className="px-4 py-3.5 md:px-5">
+                      <p className="text-sm font-semibold text-content-primary">{row.label}</p>
+                      <p className="mt-1 text-2xs leading-4 text-content-muted">{row.hint}</p>
+                    </th>
+                    <td className="px-3 py-3.5 text-sm text-content-primary">{row.a}</td>
+                    <td className="px-3 py-3.5 text-sm text-content-primary">{row.b}</td>
+                    <td className="px-3 py-3.5 text-xs text-content-secondary">{row.diff}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
 
-          <section className="panel mt-4 overflow-hidden" aria-labelledby="compare-matrix-title">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-ink-700/60 px-4 py-3.5">
-              <div>
-                <p className="eyebrow">Metric matrix</p>
-                <h2 id="compare-matrix-title" className="mt-1 text-sm font-semibold text-ink-100">
-                  指标对照
-                </h2>
-              </div>
-              <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-ink-500">
-                同一采集窗口 · 相对数值不是绝对标准
+          <div className="lg:hidden">
+            {/* Short A/B labels only; the full names stay available to screen readers. */}
+            <div className="flex items-center justify-between gap-2 border-b border-line bg-surface-subtle px-4 py-2.5 text-2xs text-content-secondary">
+              <span className="font-mono font-medium text-content-primary">
+                A<span className="sr-only"> · {left.name}</span>
+              </span>
+              <span className="text-right font-mono font-medium text-content-primary">
+                B<span className="sr-only"> · {right.name}</span>
               </span>
             </div>
-            <div className="divide-y divide-ink-700/40 md:hidden">
+            <div className="divide-y divide-line-hairline">
               {rows.map((row) => (
                 <div key={row.label} className="px-4 py-3.5">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-[11px] font-medium text-ink-200">{row.label}</p>
-                      <p className="mt-0.5 text-[9px] leading-4 text-ink-500">{row.hint}</p>
+                      <p className="text-sm font-semibold text-content-primary">{row.label}</p>
+                      <p className="mt-0.5 text-2xs leading-4 text-content-muted">{row.hint}</p>
                     </div>
-                    <span className="shrink-0 text-right text-[9px] leading-4 text-ink-300">{row.diff}</span>
+                    <span className="max-w-[55%] break-words text-right text-xs text-content-secondary">{row.diff}</span>
                   </div>
-                  <div className="mt-2.5 grid grid-cols-2 gap-3 border-t border-ink-700/40 pt-2.5">
+                  <div className="mt-2.5 grid grid-cols-2 gap-3 border-t border-line-hairline pt-2.5">
                     <div className="min-w-0">
-                      <p className="mb-1 truncate font-mono text-[9px] uppercase tracking-[0.08em] text-ink-500">A · {left.name}</p>
-                      <div className="text-[11px] leading-5 text-ink-200">{row.a}</div>
+                      <p className="mb-1 text-2xs font-medium text-content-muted">A</p>
+                      <div className="text-sm leading-5 text-content-primary">{row.a}</div>
                     </div>
                     <div className="min-w-0">
-                      <p className="mb-1 truncate font-mono text-[9px] uppercase tracking-[0.08em] text-ink-500">B · {right.name}</p>
-                      <div className="text-[11px] leading-5 text-ink-200">{row.b}</div>
+                      <p className="mb-1 text-2xs font-medium text-content-muted">B</p>
+                      <div className="text-sm leading-5 text-content-primary">{row.b}</div>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="hidden overflow-x-auto md:block">
-              <table className="w-full min-w-[760px] text-left">
-                <thead>
-                  <tr className="border-b border-ink-700/60 bg-ink-900/30">
-                    <th className="w-[180px] px-4 py-2.5 text-[9px] font-medium uppercase tracking-[0.1em] text-ink-500">指标</th>
-                    <th className="w-[31%] px-4 py-2.5 text-[9px] font-medium uppercase tracking-[0.1em] text-ink-500">
-                      A · {left.name}
-                    </th>
-                    <th className="w-[31%] px-4 py-2.5 text-[9px] font-medium uppercase tracking-[0.1em] text-ink-500">
-                      B · {right.name}
-                    </th>
-                    <th className="px-4 py-2.5 text-[9px] font-medium uppercase tracking-[0.1em] text-ink-500">差异 B − A</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-ink-700/40">
-                  {rows.map((row) => (
-                    <tr key={row.label} className="align-top transition hover:bg-ink-800/25">
-                      <th scope="row" className="px-4 py-3.5">
-                        <p className="text-[11px] font-medium text-ink-200">{row.label}</p>
-                        <p className="mt-1 max-w-[150px] text-[9px] leading-4 text-ink-500">{row.hint}</p>
-                      </th>
-                      <td className="px-4 py-3.5 text-[11px] text-ink-200">{row.a}</td>
-                      <td className="px-4 py-3.5 text-[11px] text-ink-200">{row.b}</td>
-                      <td className="px-4 py-3.5 text-[10px] text-ink-300">
-                        {row.diff}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          <div className="mt-4 grid gap-4 lg:grid-cols-2">
-            {[left, right].map((plugin) => (
-              <section key={plugin.id} className="panel overflow-hidden" aria-label={`${plugin.name} 风险摘要`}>
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-ink-700/60 px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <PluginMonogram plugin={plugin} size="sm" />
-                    <span className="text-xs font-medium text-ink-100">{plugin.name}</span>
-                  </div>
-                  <RiskBadge level={plugin.scores.risk.level} compact />
-                </div>
-                <div className="px-4 py-3">
-                  <p className="text-[10px] leading-5 text-ink-400">
-                    风险：{riskLabel(plugin.scores.risk.level)}。数据覆盖{' '}
-                    {plugin.scores.completeness.available}/{plugin.scores.completeness.total} 个域。
-                  </p>
-                  {plugin.scores.risk.flags.length > 0 ? (
-                    <ul className="mt-2 space-y-1">
-                      {plugin.scores.risk.flags.slice(0, 3).map((flag) => (
-                        <li key={flag.code} className="text-[10px] leading-5 text-ink-300">
-                          · {flag.title}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="mt-2 text-[10px] leading-5 text-ink-500">
-                      未命中公开风险规则；这不等于安全或零风险。
-                    </p>
-                  )}
-                  <Link to={`/plugins/${encodeURIComponent(plugin.id)}`} className="mt-3 inline-flex items-center gap-1 text-[10px] text-ink-400 hover:text-ink-100">
-                    查看完整证据 <ArrowUpRight size={10} />
-                  </Link>
-                </div>
-              </section>
-            ))}
           </div>
+        </div>
+      </section>
 
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-ink-700/60 bg-ink-900/30 px-4 py-3 text-[10px] leading-5 text-ink-400">
-            <span className="max-w-2xl">
-              对比只呈现指标。一个插件可能因样本小、无 Release 或没有 npm 包而看起来不同；请结合详情页的样本量、口径和原始链接阅读。
-            </span>
-            <ButtonLink to="/method" variant="ghost">
-              阅读口径
-            </ButtonLink>
-          </div>
-        </>
-      )}
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-line py-4">
+        <p className="max-w-2xl text-xs leading-5 text-content-secondary">
+          对比只呈现指标。一个插件可能因样本小、无 Release 或没有 npm 包而看起来不同；请结合详情页的样本量、口径和原始链接阅读。
+          也不会用单一指标断言谁“更好”。
+        </p>
+        <ButtonLink to="/method" variant="ghost">
+          阅读口径
+        </ButtonLink>
+      </div>
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { cn } from '../../lib/cn';
 import { formatDateTime, formatRelative, isDataStale } from '../../lib/format';
 
 const NAV_ITEMS = [
-  { to: '/', label: '排行榜', end: true },
+  { to: '/', label: '总览', end: true },
   { to: '/quadrant', label: '四象限' },
   { to: '/compare', label: '插件对比' },
   { to: '/method', label: '方法' },
@@ -28,39 +28,45 @@ export function Header(): JSX.Element {
         : partial
           ? 'partial'
           : 'ok';
+  const relative = lastSuccessAt ? formatRelative(lastSuccessAt) : null;
   const statusLabel = loading
-    ? 'LOADING'
+    ? '加载中'
     : failed
-      ? 'UPDATE FAILED'
+      ? '更新失败'
       : stale
-        ? 'DATA STALE'
+        ? '数据已过期'
         : partial
-          ? lastSuccessAt
-            ? `${formatRelative(lastSuccessAt)} · PARTIAL`
-            : 'PARTIAL'
-          : lastSuccessAt
-            ? `${formatRelative(lastSuccessAt)} · DATA`
-            : 'NO DATA';
+          ? relative ?? '部分数据'
+          : relative ?? '暂无数据';
+  const statusDetail = loading
+    ? '正在读取数据快照'
+    : failed
+      ? '最近一次更新失败'
+      : lastSuccessAt
+        ? `数据更新于 ${relative}`
+        : '暂无成功数据';
 
   return (
-    <header className="sticky top-0 z-40 border-b border-ink-700/60 bg-ink-950/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-shell items-center gap-4 px-4 md:px-6">
-        <Link to="/" className="group flex min-w-0 items-center gap-2.5" aria-label="DSH 插件生命体征首页">
-          <span className="relative flex h-8 w-8 items-center justify-center rounded-md border border-signal/25 bg-signal/10 text-signal-strong transition group-hover:border-signal/40">
+    <header className="sticky top-0 z-40 border-b border-line bg-surface/95 backdrop-blur-sm">
+      <div className="mx-auto flex h-16 max-w-shell items-center gap-3 px-4 md:px-6">
+        <Link
+          to="/"
+          className="group flex min-w-0 items-center gap-2.5 max-sm:min-h-11"
+          aria-label="DSH 插件健康度看板首页"
+        >
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control border border-accent-line bg-accent-soft text-accent">
             <Activity size={17} strokeWidth={2.2} aria-hidden="true" />
-            <span className="absolute -right-0.5 -top-0.5 h-1.5 w-1.5 rounded-full bg-mint ring-2 ring-ink-950" />
           </span>
           <span className="min-w-0">
-            <span className="block truncate text-[13px] font-semibold tracking-tight text-ink-100">
-              DSH 插件生命体征
+            <span className="block truncate text-sm font-semibold tracking-display text-content-primary">
+              <span className="sm:hidden">DSH 健康看板</span>
+              <span className="hidden sm:inline">DSH 插件健康度看板</span>
             </span>
-            <span className="hidden font-mono text-[9px] uppercase tracking-[0.16em] text-ink-500 sm:block">
-              Plugin Health Monitor
-            </span>
+            <span className="hidden text-2xs text-content-muted sm:block">Plugin Health Monitor</span>
           </span>
         </Link>
 
-        <nav className="ml-5 hidden h-full items-center gap-0.5 md:flex" aria-label="主导航">
+        <nav className="ml-4 hidden h-full items-center gap-1 md:flex" aria-label="主导航">
           {NAV_ITEMS.map((item) => (
             <NavLink
               key={item.to}
@@ -68,8 +74,8 @@ export function Header(): JSX.Element {
               end={item.end}
               className={({ isActive }) =>
                 cn(
-                  'relative flex h-full items-center px-3 text-[12px] transition',
-                  isActive ? 'text-ink-100' : 'text-ink-400 hover:text-ink-200',
+                  'relative flex h-full items-center px-3 text-sm transition',
+                  isActive ? 'text-content-primary' : 'text-content-secondary hover:text-content-primary',
                 )
               }
             >
@@ -77,7 +83,7 @@ export function Header(): JSX.Element {
                 <>
                   {item.label}
                   {isActive ? (
-                    <span className="absolute bottom-0 left-3 right-3 h-px bg-signal" />
+                    <span className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-accent" />
                   ) : null}
                 </>
               )}
@@ -87,29 +93,31 @@ export function Header(): JSX.Element {
 
         <div className="ml-auto flex items-center gap-2">
           <div
-            className="hidden items-center gap-2 rounded-md border border-ink-700/70 bg-ink-900/50 px-2.5 py-1.5 lg:flex"
+            className="flex items-center gap-1.5 rounded-control border border-line bg-surface-subtle px-2 py-1.5"
             title={lastSuccessAt ? `最近成功更新：${formatDateTime(lastSuccessAt)}` : '暂无成功数据'}
           >
             <span
               className={cn(
-                'h-1.5 w-1.5 rounded-full',
+                'h-2 w-2 rounded-full',
                 statusTone === 'loading'
-                  ? 'animate-pulse bg-ink-400'
+                  ? 'bg-content-disabled'
                   : statusTone === 'ok'
-                    ? 'bg-mint'
+                    ? 'bg-success'
                     : statusTone === 'failed'
-                      ? 'bg-rose'
-                      : 'bg-amber',
+                      ? 'bg-danger'
+                      : 'bg-warning',
               )}
+              aria-hidden="true"
             />
             <span
               className={cn(
-                'font-mono text-[10px]',
+                'text-2xs',
                 statusTone === 'failed'
-                  ? 'text-rose'
+                  ? 'text-danger'
                   : statusTone === 'stale' || statusTone === 'partial'
-                    ? 'text-amber'
-                    : 'text-ink-300',
+                    ? 'text-warning'
+                    : 'text-content-secondary',
+                statusTone === 'loading' ? 'animate-pulse' : '',
               )}
             >
               {statusLabel}
@@ -118,36 +126,36 @@ export function Header(): JSX.Element {
           <button
             type="button"
             onClick={refresh}
-            className="hidden h-8 w-8 items-center justify-center rounded-md border border-ink-700 text-ink-400 transition hover:border-ink-500 hover:text-ink-100 sm:flex"
+            className="flex h-10 w-10 items-center justify-center rounded-control border border-line-strong text-content-secondary transition hover:border-content-muted hover:text-content-primary max-sm:h-11 max-sm:w-11"
             aria-label="重新加载数据快照"
-            title="重新加载数据快照"
+            title={statusDetail}
           >
-            <RefreshCw size={13} />
+            <RefreshCw size={15} />
           </button>
           <a
             href="https://github.com/albert404s/dsh-plugin-health-monitor"
             target="_blank"
             rel="noreferrer noopener"
-            className="hidden h-8 items-center gap-1.5 rounded-md border border-ink-700 px-2.5 font-mono text-[10px] text-ink-300 transition hover:border-ink-500 hover:text-ink-100 sm:flex"
+            className="hidden h-10 items-center gap-1.5 rounded-control border border-line-strong px-3 text-xs text-content-secondary transition hover:border-content-muted hover:text-content-primary lg:flex"
             aria-label="打开项目 GitHub 仓库"
           >
-            <Github size={13} /> SOURCE
+            <Github size={14} /> GitHub
           </a>
           <button
             type="button"
-            className="flex h-8 w-8 items-center justify-center rounded-md border border-ink-700 text-ink-300 md:hidden"
+            className="flex h-10 w-10 items-center justify-center rounded-control border border-line-strong text-content-secondary transition hover:border-content-muted hover:text-content-primary max-sm:h-11 max-sm:w-11 md:hidden"
             onClick={() => setMobileOpen((open) => !open)}
             aria-expanded={mobileOpen}
             aria-controls="mobile-nav"
             aria-label={mobileOpen ? '关闭导航菜单' : '打开导航菜单'}
           >
-            {mobileOpen ? <X size={16} /> : <Menu size={16} />}
+            {mobileOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
         </div>
       </div>
 
       {mobileOpen ? (
-        <nav id="mobile-nav" className="border-t border-ink-700/60 px-4 py-3 md:hidden" aria-label="移动端导航">
+        <nav id="mobile-nav" className="border-t border-line bg-surface px-4 py-4 md:hidden" aria-label="移动端导航">
           <div className="grid gap-1">
             {NAV_ITEMS.map((item) => (
               <NavLink
@@ -157,8 +165,10 @@ export function Header(): JSX.Element {
                 onClick={() => setMobileOpen(false)}
                 className={({ isActive }) =>
                   cn(
-                    'rounded-md px-3 py-2.5 text-sm transition',
-                    isActive ? 'bg-signal/10 text-ink-100' : 'text-ink-300 hover:bg-ink-800/60',
+                    'flex min-h-12 items-center rounded-control px-3 text-base transition',
+                    isActive
+                      ? 'bg-accent-soft text-accent-active'
+                      : 'text-content-secondary hover:bg-surface-subtle hover:text-content-primary',
                   )
                 }
               >
@@ -169,11 +179,16 @@ export function Header(): JSX.Element {
               href="https://github.com/albert404s/dsh-plugin-health-monitor"
               target="_blank"
               rel="noreferrer noopener"
-              className="mt-1 flex items-center gap-2 rounded-md px-3 py-2.5 text-sm text-ink-400 hover:bg-ink-800/60 hover:text-ink-200"
+              className="mt-1 flex min-h-12 items-center gap-2 rounded-control px-3 text-base text-content-secondary hover:bg-surface-subtle hover:text-content-primary"
             >
-              <Github size={14} /> GitHub 源码
+              <Github size={16} /> GitHub 源码
             </a>
           </div>
+          <p className="mt-3 border-t border-line-hairline pt-3 text-xs leading-5 text-content-muted">
+            {statusDetail}
+            {lastSuccessAt ? ` · ${formatDateTime(lastSuccessAt)}` : ''}
+            <span className="block">来源：GitHub REST API · npm Download API · OSV API</span>
+          </p>
         </nav>
       ) : null}
     </header>

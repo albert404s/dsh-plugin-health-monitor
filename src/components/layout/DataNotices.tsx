@@ -15,24 +15,22 @@ export function DataNotices(): JSX.Element | null {
 
   if (failed || stale) {
     return (
-      <div className="border-b border-rose/20 bg-rose/5">
-        <div className="mx-auto flex max-w-shell flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-2.5 text-[11px] text-rose/90 md:px-6">
-          <WifiOff size={13} className="shrink-0" />
-          <span className="font-medium">
-            {failed ? '最近一次更新失败' : '数据可能已过期'}
-          </span>
-          <span className="text-ink-300">
+      <div className="border-b border-danger-line bg-danger-soft">
+        <div className="mx-auto flex max-w-shell flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-2.5 text-xs text-danger md:px-6">
+          <WifiOff size={14} className="shrink-0" />
+          <span className="font-medium">{failed ? '最近一次更新失败' : '数据可能已过期'}</span>
+          <span className="text-content-secondary">
             当前展示 {formatDateTime(data.latest.lastSuccessAt)} 的快照（{formatRelative(data.latest.lastSuccessAt)}）。
           </span>
-          <Link to="/method" className="underline decoration-rose/30 underline-offset-4 hover:decoration-rose/70">
+          <Link to="/method" className="underline decoration-danger/30 underline-offset-4 hover:decoration-danger/70">
             查看更新机制
           </Link>
           <button
             type="button"
             onClick={refresh}
-            className="ml-auto inline-flex items-center gap-1 rounded border border-rose/25 px-2 py-1 text-[10px] text-rose/90 transition hover:bg-rose/10"
+            className="ml-auto inline-flex h-11 items-center gap-1 rounded-control border border-danger-line px-3 text-xs text-danger transition hover:bg-danger-soft"
           >
-            <RefreshCw size={10} /> 重新加载
+            <RefreshCw size={12} /> 重新加载
           </button>
         </div>
       </div>
@@ -41,17 +39,17 @@ export function DataNotices(): JSX.Element | null {
 
   if (error) {
     return (
-      <div className="border-b border-amber/20 bg-amber/[0.035]">
-        <div className="mx-auto flex max-w-shell flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2 text-[10px] text-amber/90 md:px-6">
-          <AlertTriangle size={11} className="shrink-0" />
+      <div className="border-b border-warning-line bg-warning-soft">
+        <div className="mx-auto flex max-w-shell flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2.5 text-xs text-warning md:px-6">
+          <AlertTriangle size={14} className="shrink-0" />
           <span>刷新失败，继续展示上次成功加载的快照。</span>
-          <span className="text-ink-400">{error}</span>
+          <span className="text-content-secondary">{error}</span>
           <button
             type="button"
             onClick={refresh}
-            className="ml-auto inline-flex items-center gap-1 rounded border border-amber/25 px-2 py-1 text-[10px] text-amber/90 transition hover:bg-amber/10"
+            className="ml-auto inline-flex h-11 items-center gap-1 rounded-control border border-warning-line px-3 text-xs text-warning transition hover:bg-warning-soft"
           >
-            <RefreshCw size={10} /> 重试
+            <RefreshCw size={12} /> 重试
           </button>
         </div>
       </div>
@@ -60,14 +58,17 @@ export function DataNotices(): JSX.Element | null {
 
   if (partial || warnings.length > 0) {
     return (
-      <div className="border-b border-amber/20 bg-amber/[0.035]">
-        <div className="mx-auto flex max-w-shell flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2 text-[10px] text-amber/90 md:px-6">
-          <AlertTriangle size={11} className="shrink-0" />
+      <div className="border-b border-warning-line bg-warning-soft">
+        <div className="mx-auto flex max-w-shell flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2.5 text-xs text-warning md:px-6">
+          <AlertTriangle size={14} className="shrink-0" />
           <span>部分数据源已降级，缺失项不会被当作 0。</span>
-          <span className="text-ink-400">
+          <span className="text-content-secondary">
             {warnings.slice(0, 2).join(' · ') || sourceFailures.slice(0, 2).join(' · ')}
           </span>
-          <Link to="/method" className="ml-auto text-ink-400 underline-offset-4 hover:text-ink-200 hover:underline">
+          <Link
+            to="/method"
+            className="ml-auto text-content-secondary underline-offset-4 hover:text-accent hover:underline"
+          >
             数据状态
           </Link>
         </div>

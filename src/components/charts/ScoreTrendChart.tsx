@@ -3,6 +3,8 @@ import type { EChartsOption } from 'echarts';
 import type { HistoryPoint } from '../../lib/types';
 import { formatDateTime } from '../../lib/format';
 import { useEChart } from '../../hooks/useEChart';
+import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
+import { chartTheme, tooltipChrome } from './chartTheme';
 
 interface ScoreTrendChartProps {
   points: HistoryPoint[];
@@ -18,23 +20,28 @@ function axisLabelFor(point: HistoryPoint, index: number, spanMs: number): strin
   return `#${index + 1}`;
 }
 
-export function ScoreTrendChart({ points, height = 280 }: ScoreTrendChartProps): JSX.Element {
+export function ScoreTrendChart({ points, height = 260 }: ScoreTrendChartProps): JSX.Element {
+  const reducedMotion = usePrefersReducedMotion();
   const option = useMemo<EChartsOption>(() => {
     const first = new Date(points[0]?.t ?? 0).getTime();
     const last = new Date(points[points.length - 1]?.t ?? 0).getTime();
     const spanMs = Math.max(0, last - first);
     const labels = points.map((point, index) => axisLabelFor(point, index, spanMs));
     return {
-      animationDuration: 450,
+      animationDuration: reducedMotion ? 0 : 200,
       backgroundColor: 'transparent',
       aria: { enabled: true, label: { description: '插件人气指数与维护健康度历史趋势折线图' } },
-      grid: { left: 38, right: 18, top: 34, bottom: 30, containLabel: true },
+      grid: { left: 40, right: 16, top: 32, bottom: 30, containLabel: true },
       tooltip: {
         trigger: 'axis',
         confine: true,
-        backgroundColor: 'rgba(11,16,23,0.97)',
-        borderColor: '#263449',
-        textStyle: { color: '#c3ceda', fontSize: 11 },
+        backgroundColor: chartTheme.tooltip.background,
+        borderColor: chartTheme.tooltip.border,
+        borderWidth: 1,
+        padding: 0,
+        textStyle: { color: chartTheme.text, fontSize: 12, fontFamily: chartTheme.fontFamily },
+        extraCssText: tooltipChrome(),
+        axisPointer: { type: 'line', lineStyle: { color: chartTheme.threshold, width: 1, type: 'dashed' } },
         formatter: (raw: unknown) => {
           const params = raw as Array<{
             seriesName: string;
@@ -48,29 +55,31 @@ export function ScoreTrendChart({ points, height = 280 }: ScoreTrendChartProps):
           const rows = params
             .map(
               (item) =>
-                `<div style="display:flex;gap:18px;justify-content:space-between"><span style="color:#93a3b8">${item.seriesName}</span><b style="color:${item.color}">${item.value === null ? '—' : item.value.toFixed(1)}</b></div>`,
+                `<div style="display:flex;gap:18px;justify-content:space-between;line-height:18px"><span style="color:${chartTheme.tooltip.muted}">${item.seriesName}</span><b style="color:${chartTheme.strong};font-family:${chartTheme.monoFamily};font-weight:600">${item.value === null ? '—' : item.value.toFixed(1)}</b></div>`,
             )
             .join('');
-          return `<div style="min-width:190px"><div style="color:#e7edf4;margin-bottom:8px">${point ? formatDateTime(point.t) : ''}</div>${rows}</div>`;
+          return `<div style="min-width:190px;padding:10px 12px;font-family:${chartTheme.fontFamily}"><div style="color:${chartTheme.tooltip.title};font-size:13px;font-weight:600;margin-bottom:6px">${point ? formatDateTime(point.t) : ''}</div>${rows}</div>`;
         },
       },
       legend: {
         top: 0,
-        right: 0,
-        textStyle: { color: '#93a3b8', fontSize: 10 },
-        itemWidth: 14,
-        itemHeight: 2,
+        left: 0,
+        textStyle: { color: chartTheme.tooltip.body, fontSize: 12, fontFamily: chartTheme.fontFamily },
+        itemWidth: 10,
+        itemHeight: 10,
+        itemGap: 16,
         icon: 'roundRect',
       },
       xAxis: {
         type: 'category',
         data: labels,
         boundaryGap: false,
-        axisLine: { lineStyle: { color: '#263449' } },
-        axisTick: { show: false },
+        axisLine: { lineStyle: { color: chartTheme.axisLine } },
+        axisTick: { show: true, length: 4, lineStyle: { color: chartTheme.axisLine } },
         axisLabel: {
-          color: '#64748b',
-          fontSize: 9,
+          color: chartTheme.axisText,
+          fontSize: 12,
+          fontFamily: chartTheme.monoFamily,
           hideOverlap: true,
         },
         splitLine: { show: false },
@@ -79,8 +88,13 @@ export function ScoreTrendChart({ points, height = 280 }: ScoreTrendChartProps):
         type: 'value',
         min: 0,
         max: 100,
-        axisLabel: { color: '#64748b', fontSize: 9 },
-        splitLine: { lineStyle: { color: 'rgba(38,52,73,0.4)', type: 'dashed' } },
+        interval: 20,
+        axisLabel: {
+          color: chartTheme.axisText,
+          fontSize: 12,
+          fontFamily: chartTheme.monoFamily,
+        },
+        splitLine: { lineStyle: { color: chartTheme.grid, type: 'solid', width: 1 } },
       },
       series: [
         {
@@ -88,37 +102,35 @@ export function ScoreTrendChart({ points, height = 280 }: ScoreTrendChartProps):
           type: 'line',
           data: points.map((point) => point.maintenance),
           showSymbol: true,
-          symbolSize: 5,
+          symbol: 'circle',
+          symbolSize: 6,
           connectNulls: false,
-          lineStyle: { color: '#48d7b0', width: 2 },
-          itemStyle: { color: '#48d7b0' },
-          areaStyle: {
-            color: {
-              type: 'linear',
-              x: 0,
-              y: 0,
-              x2: 0,
-              y2: 1,
-              colorStops: [
-                { offset: 0, color: 'rgba(72,215,176,0.14)' },
-                { offset: 1, color: 'rgba(72,215,176,0)' },
-              ],
-            },
+          lineStyle: { color: chartTheme.series.maintenance, width: 2 },
+          itemStyle: {
+            color: chartTheme.tooltip.background,
+            borderColor: chartTheme.series.maintenance,
+            borderWidth: 2,
           },
+          areaStyle: { color: chartTheme.area },
         },
         {
           name: '人气指数',
           type: 'line',
           data: points.map((point) => point.popularity),
           showSymbol: true,
-          symbolSize: 5,
+          symbol: 'circle',
+          symbolSize: 6,
           connectNulls: false,
-          lineStyle: { color: '#a89cff', width: 2 },
-          itemStyle: { color: '#a89cff' },
+          lineStyle: { color: chartTheme.series.popularity, width: 2 },
+          itemStyle: {
+            color: chartTheme.tooltip.background,
+            borderColor: chartTheme.series.popularity,
+            borderWidth: 2,
+          },
         },
       ],
     };
-  }, [points]);
+  }, [points, reducedMotion]);
 
   const chartRef = useEChart(option);
   return (

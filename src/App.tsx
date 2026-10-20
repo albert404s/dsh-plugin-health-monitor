@@ -41,7 +41,7 @@ export default function App(): JSX.Element {
       <ScrollToTop />
       <a
         href="#main-content"
-        className="sr-only-focusable fixed left-4 top-4 z-50 rounded-md border border-signal/40 bg-ink-900 px-3 py-2 text-xs text-ink-100"
+        className="sr-only-focusable fixed left-4 top-4 z-50 rounded-control border border-accent-line bg-surface px-3 py-2 text-sm text-content-primary shadow-panel"
       >
         跳至主要内容
       </a>

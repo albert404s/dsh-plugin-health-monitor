@@ -16,8 +16,7 @@ export interface ChangeItem {
   since: string | null;
 }
 
-function watchReasons(plugin: PluginRecord): { reasons: string[]; severity: number } {
-  const reasons: string[] = [];
+function watchReasons(plugin: PluginRecord): { reasons: string[]; severity: number } {  const reasons: string[] = [];
   let severity = 0;
   const highFlags = plugin.scores.risk.flags.filter((flag) => flag.level === 'high');
   const mediumFlags = plugin.scores.risk.flags.filter((flag) => flag.level === 'medium');
@@ -70,6 +69,13 @@ function historyPair(history: HistoryFile, id: string): [HistoryPoint, HistoryPo
   return [points[points.length - 2], points[points.length - 1]];
 }
 
+const RISK_LEVEL_LABELS: Record<HistoryPoint['riskLevel'], string> = {
+  high: '高风险',
+  medium: '需要关注',
+  low: '未见公开风险',
+  unknown: '信息不完整',
+};
+
 export function recentChanges(
   plugins: PluginRecord[],
   history: HistoryFile,
@@ -91,7 +97,7 @@ export function recentChanges(
         items.push({
           plugin,
           title: unknown ? '风险信息发生变化' : '风险信号发生变化',
-          detail: `${previous.riskLevel} → ${latest.riskLevel}`,
+          detail: `${RISK_LEVEL_LABELS[previous.riskLevel]} → ${RISK_LEVEL_LABELS[latest.riskLevel]}`,
           tone: unknown ? 'neutral' : worsened ? 'down' : 'up',
           magnitude: unknown ? 8 : worsened ? 40 : 12,
           since: latest.t,

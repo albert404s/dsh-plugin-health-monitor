@@ -1,19 +1,18 @@
 import { Link } from 'react-router-dom';
 import {
+  ArrowUp,
   ArrowUpRight,
   BookOpen,
-  Boxes,
   Calculator,
   Database,
   GitBranch,
   RefreshCw,
   ShieldAlert,
-  Workflow,
 } from 'lucide-react';
 import { useData } from '../hooks/useData';
 import { SCORE_METHOD_VERSION } from '../lib/types';
 import { formatDateTime } from '../lib/format';
-import { ExternalTextLink, InlineNotice, SectionHeading } from '../components/ui';
+import { ExternalTextLink, InlineNotice } from '../components/ui';
 
 const TOC = [
   { href: '#principles', label: '读数原则' },
@@ -26,58 +25,109 @@ const TOC = [
   { href: '#limits', label: '局限与边界' },
 ];
 
+function MethodSection({
+  id,
+  index,
+  title,
+  description,
+  children,
+}: {
+  id: string;
+  index: string;
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+}): JSX.Element {
+  return (
+    <section id={id} className="scroll-mt-24 border-t border-line pt-6">
+      <p className="text-2xs font-medium text-accent">{index}</p>
+      <h2 className="mt-2 text-2xl font-semibold leading-8 tracking-display text-content-primary">{title}</h2>
+      {description ? (
+        <p className="mt-2 max-w-prose text-sm leading-6 text-content-secondary">{description}</p>
+      ) : null}
+      <div className="mt-5 max-w-prose">{children}</div>
+    </section>
+  );
+}
+
+function ScrollableTable({ label, children }: { label: string; children: React.ReactNode }): JSX.Element {
+  return (
+    <div>
+      <div className="overflow-x-auto rounded-panel border border-line" role="region" aria-label={label} tabIndex={0}>
+        {children}
+      </div>
+      <p className="mt-2 text-2xs text-content-muted lg:hidden">表格较宽，可在表格内左右滑动查看。</p>
+    </div>
+  );
+}
+
 export function MethodPage(): JSX.Element {
   const { data } = useData();
 
   return (
-    <div className="page-enter mx-auto max-w-shell px-4 pb-14 pt-8 md:px-6 md:pt-10">
-      <div className="max-w-3xl">
-        <p className="eyebrow">Methodology / v{SCORE_METHOD_VERSION}</p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-ink-100 md:text-4xl">
+    <div id="top" className="page-enter mx-auto max-w-shell px-4 pb-14 pt-8 md:px-6 md:pt-10">
+      <div className="max-w-prose">
+        <p className="eyebrow">方法 / v{SCORE_METHOD_VERSION}</p>
+        <h1 className="mt-2 text-4xl font-semibold leading-tight tracking-display text-content-primary md:text-5xl">
           指标不是判决书
         </h1>
-        <p className="mt-4 text-sm leading-7 text-ink-300">
+        <p className="mt-4 text-lg leading-[1.65] text-content">
           DSH Plugin Health Monitor 用公开数据帮助阅读 DeepSeek Harness 插件生态。
-          我们不输出“软件质量总分”，而是把
-          <span className="text-ink-200">人气、维护活动、风险信号、数据完整度</span>
+          我们不输出“软件质量总分”，而是把<span className="text-content-primary">人气、维护活动、风险信号、数据完整度</span>
           拆成可解释、可追溯、可质疑的维度。
         </p>
-        <div className="mt-5 flex flex-wrap items-center gap-2 text-[10px] text-ink-500">
-          <span className="rounded border border-ink-700 px-2 py-1 font-mono">方法 v{SCORE_METHOD_VERSION}</span>
-          <span className="rounded border border-ink-700 px-2 py-1 font-mono">数据 schema v1</span>
+        <div className="mt-5 flex flex-wrap items-center gap-2 text-2xs text-content-muted">
+          <span className="rounded-chip border border-line bg-surface px-2 py-1 font-mono">方法 v{SCORE_METHOD_VERSION}</span>
+          <span className="rounded-chip border border-line bg-surface px-2 py-1 font-mono">数据 schema v1</span>
           {data ? (
-            <span className="rounded border border-ink-700 px-2 py-1">
+            <span className="rounded-chip border border-line bg-surface px-2 py-1">
               当前快照 {formatDateTime(data.latest.lastSuccessAt)}
             </span>
           ) : null}
-          <span className="rounded border border-ink-700 px-2 py-1">计划每 6 小时采集</span>
+          <span className="rounded-chip border border-line bg-surface px-2 py-1">数据来源：GitHub / npm / OSV</span>
         </div>
       </div>
 
-      <div className="mt-10 grid gap-10 lg:grid-cols-[210px_minmax(0,1fr)]">
+      <details className="mt-6 rounded-panel border border-line bg-surface lg:hidden">
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-medium text-content-primary marker:hidden">
+          本页目录
+          <span className="text-2xs text-content-muted">8 节</span>
+        </summary>
+        <nav className="grid grid-cols-2 gap-x-4 border-t border-line-hairline px-4 py-2" aria-label="方法页移动端目录">
+          {TOC.map((item) => (
+            <a key={item.href} href={item.href} className="block py-3 text-sm text-content-secondary hover:text-accent">
+              {item.label}
+            </a>
+          ))}
+        </nav>
+      </details>
+
+      <div className="mt-8 grid gap-10 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-12">
         <aside className="hidden lg:block">
-          <nav className="sticky top-24 space-y-1" aria-label="方法页目录">
-            <p className="mb-3 px-2 font-mono text-[9px] uppercase tracking-[0.15em] text-ink-500">On this page</p>
-            {TOC.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                className="block rounded px-2 py-1.5 text-[11px] text-ink-400 transition hover:bg-ink-800/60 hover:text-ink-100"
-              >
-                {item.label}
-              </a>
-            ))}
+          <nav className="sticky top-24" aria-label="方法页目录">
+            <p className="mb-3 text-2xs font-medium text-content-muted">本页目录</p>
+            <div className="space-y-0.5 border-l border-line pl-3">
+              {TOC.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className="block rounded-control px-2 py-1.5 text-xs text-content-secondary transition hover:bg-surface-subtle hover:text-content-primary"
+                >
+                  {item.label}
+                </a>
+              ))}
+            </div>
           </nav>
         </aside>
 
         <div className="min-w-0 space-y-12">
-          <section id="principles" className="scroll-mt-24">
-            <SectionHeading
-              eyebrow="01 / Principles"
-              title="四条读数原则"
-              description="这些原则优先于任何具体权重。"
-            />
-            <div className="mt-5 grid gap-px overflow-hidden rounded-lg border border-ink-700/70 bg-ink-700/60 sm:grid-cols-2">
+          <MethodSection
+            id="principles"
+            index="01 / 读数原则"
+            title="四条读数原则"
+            description="这些原则优先于任何具体权重。"
+          >
+            <div className="grid gap-px border border-line bg-line sm:grid-cols-2">
               {[
                 {
                   title: '相对评价，不是绝对标准',
@@ -96,89 +146,102 @@ export function MethodPage(): JSX.Element {
                   text: '归档、长期 Issue 与 OSV 公开记录都是需要阅读的信号；没有记录不等于安全，未检查会明确显示“未完成”。',
                 },
               ].map((principle) => (
-                <div key={principle.title} className="bg-ink-850/80 p-4">
-                  <h3 className="text-xs font-medium text-ink-100">{principle.title}</h3>
-                  <p className="mt-2 text-[11px] leading-6 text-ink-400">{principle.text}</p>
+                <div key={principle.title} className="bg-surface p-4">
+                  <h3 className="text-base font-semibold text-content-primary">{principle.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-content-secondary">{principle.text}</p>
                 </div>
               ))}
             </div>
-          </section>
+          </MethodSection>
 
-          <section id="sources" className="scroll-mt-24">
-            <SectionHeading
-              eyebrow="02 / Sources"
-              title="数据从哪里来"
-              description="只使用公开、可追溯的数据。项目不安装、不执行、不加载被检测插件的代码。"
-            />
-            <div className="mt-5 overflow-x-auto rounded-lg border border-ink-700/70">
+          <MethodSection
+            id="sources"
+            index="02 / 数据来源"
+            title="数据从哪里来"
+            description="只使用公开、可追溯的数据。项目不安装、不执行、不加载被检测插件的代码。"
+          >
+            <ScrollableTable label="数据来源与准确性边界">
               <table className="w-full min-w-[680px] text-left">
                 <thead>
-                  <tr className="border-b border-ink-700/60 bg-ink-900/50">
-                    <th className="px-4 py-2.5 text-[9px] font-medium uppercase tracking-[0.1em] text-ink-500">来源</th>
-                    <th className="px-4 py-2.5 text-[9px] font-medium uppercase tracking-[0.1em] text-ink-500">字段与窗口</th>
-                    <th className="px-4 py-2.5 text-[9px] font-medium uppercase tracking-[0.1em] text-ink-500">准确性边界</th>
+                  <tr className="border-b border-line bg-surface-subtle">
+                    {['来源', '字段与窗口', '准确性边界'].map((heading) => (
+                      <th
+                        key={heading}
+                        className={heading === '来源' ? 'sticky left-0 bg-surface-subtle px-4 py-2.5 text-2xs font-medium text-content-secondary' : 'px-4 py-2.5 text-2xs font-medium text-content-secondary'}
+                      >
+                        {heading}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-ink-700/40 text-[11px] leading-5">
+                <tbody className="divide-y divide-line-hairline text-xs leading-5">
                   <tr>
-                    <td className="px-4 py-3 font-medium text-ink-200">GitHub REST API</td>
-                    <td className="px-4 py-3 text-ink-300">
+                    <td className="sticky left-0 bg-surface px-4 py-3 align-top text-sm font-medium text-content-primary">
+                      GitHub REST API
+                    </td>
+                    <td className="px-4 py-3 align-top text-content-secondary">
                       Stars、Forks、归档状态、最近非合并提交、近 30 天非合并提交、近 90 天 Issue/PR、长期开放 Issue、Release。
                     </td>
-                    <td className="px-4 py-3 text-ink-400">
+                    <td className="px-4 py-3 align-top text-content-secondary">
                       使用分页与重试；分页上限触发时标记为下限。Issue 列表会过滤 PR；不使用 updated_at 代替最近代码提交。
                     </td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-3 font-medium text-ink-200">npm Download API</td>
-                    <td className="px-4 py-3 text-ink-300">
+                    <td className="sticky left-0 bg-surface px-4 py-3 align-top text-sm font-medium text-content-primary">
+                      npm Download API
+                    </td>
+                    <td className="px-4 py-3 align-top text-content-secondary">
                       近 30 天下载、近 7 天 / 前 7 天对比、日下载序列、latest 版本、engines、DSH peer range。
                     </td>
-                    <td className="px-4 py-3 text-ink-400">
+                    <td className="px-4 py-3 align-top text-content-secondary">
                       只有 npm registry 的 repository 字段与 GitHub 仓库一致时才采信。Star、Fork、Release Asset 下载量不会冒充 npm 下载量。
                     </td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-3 font-medium text-ink-200">OSV API</td>
-                    <td className="px-4 py-3 text-ink-300">
+                    <td className="sticky left-0 bg-surface px-4 py-3 align-top text-sm font-medium text-content-primary">
+                      OSV API
+                    </td>
+                    <td className="px-4 py-3 align-top text-content-secondary">
                       以 npm 包名 + latest 精确版本查询 querybatch，并读取公开漏洞详情。
                     </td>
-                    <td className="px-4 py-3 text-ink-400">
+                    <td className="px-4 py-3 align-top text-content-secondary">
                       只覆盖 OSV 已收录的公开记录。无法精确匹配或请求失败时显示“未完成漏洞检查”，不会显示“安全”或“零风险”。
                     </td>
                   </tr>
                 </tbody>
               </table>
-            </div>
-            <div className="mt-3 flex flex-wrap gap-4 text-[10px] text-ink-500">
+            </ScrollableTable>
+            <div className="mt-3 flex flex-wrap gap-4 text-xs text-content-muted">
               <ExternalTextLink href="https://docs.github.com/rest">GitHub REST 文档</ExternalTextLink>
               <ExternalTextLink href="https://github.com/npm/registry/blob/main/docs/download-counts.md">
                 npm 下载统计口径
               </ExternalTextLink>
               <ExternalTextLink href="https://google.github.io/osv-scanner/">OSV 文档</ExternalTextLink>
             </div>
-          </section>
+          </MethodSection>
 
-          <section id="popularity" className="scroll-mt-24">
-            <SectionHeading
-              eyebrow="03 / Popularity"
-              title="人气指数"
-              description="回答“有多少人在关注或使用”，不回答“好不好”。"
-            />
-            <div className="mt-5 grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)]">
-              <div className="rounded-lg border border-ink-700/70 bg-ink-850/70 p-4">
-                <div className="flex items-center gap-2">
-                  <Calculator size={14} className="text-signal" />
-                  <h3 className="text-xs font-medium text-ink-100">计算</h3>
-                </div>
-                <div className="mt-3 space-y-3 text-[11px] leading-6 text-ink-300">
+          <MethodSection
+            id="popularity"
+            index="03 / 人气指数"
+            title="人气指数"
+            description="回答“有多少人在关注或使用”，不回答“好不好”。"
+          >
+            <div className="grid gap-6 md:grid-cols-2">
+              <div>
+                <h3 className="flex items-center gap-2 text-base font-semibold text-content-primary">
+                  <Calculator size={16} className="text-accent" aria-hidden="true" /> 计算
+                </h3>
+                <div className="mt-3 space-y-3 text-base leading-7 text-content">
                   <p>
-                    对每个有效值先做 <code className="rounded bg-ink-900 px-1.5 py-0.5 font-mono text-[10px] text-ink-100">log10(1 + x)</code>，
-                    再在本次样本内做 min-max 归一化到 0–100。这样可以压缩几个数量级间的差异，避免下载量直接淹没 Star。
+                    对每个有效值先做{' '}
+                    <code className="rounded-chip border-l-2 border-accent bg-surface-subtle px-1.5 py-0.5 font-mono text-sm text-content-primary">
+                      log10(1 + x)
+                    </code>
+                    ，再在本次样本内做 min-max 归一化到 0–100。这样可以压缩几个数量级间的差异，避免下载量直接淹没 Star。
                   </p>
                   <p>
-                    同时有两种数据时：Stars 权重 <b className="text-ink-100">45%</b>，经核验的近 30 天下载量权重{' '}
-                    <b className="text-ink-100">55%</b>。
+                    同时有两种数据时：Stars 权重 <b className="text-content-primary">45%</b>，经核验的近 30 天下载量权重{' '}
+                    <b className="text-content-primary">55%</b>。
                   </p>
                   <p>
                     缺少可靠下载量时，仅使用 Stars 的归一化位置，权重归一为 100%，证据覆盖降为 45%，置信度降为“中”。
@@ -186,36 +249,40 @@ export function MethodPage(): JSX.Element {
                   </p>
                 </div>
               </div>
-              <div className="rounded-lg border border-ink-700/70 bg-ink-900/40 p-4">
-                <p className="text-[10px] uppercase tracking-[0.12em] text-ink-500">为什么不用绝对分</p>
-                <p className="mt-2 text-[11px] leading-6 text-ink-400">
+              <div className="border-l-2 border-accent bg-surface-subtle px-4 py-4">
+                <p className="text-2xs font-medium text-content-muted">为什么不用绝对分</p>
+                <p className="mt-2 text-sm leading-6 text-content-secondary">
                   当前 DSH 插件生态仍在快速变化。Star 与下载量受传播、发布节奏、镜像和统计口径影响，
                   用固定行业阈值会制造虚假精确感。因此本指数表达“在这批插件中的相对位置”，并随收录样本变化。
                 </p>
-                <p className="mt-3 border-t border-ink-700/60 pt-3 text-[10px] leading-5 text-amber/80">
+                <p className="mt-3 border-t border-line-hairline pt-3 text-xs leading-5 text-warning">
                   缺少下载量时不会简单计 0；星级高但下载缺失的插件也不会被强行放入“高人气”象限。
                 </p>
               </div>
             </div>
-          </section>
+          </MethodSection>
 
-          <section id="maintenance" className="scroll-mt-24">
-            <SectionHeading
-              eyebrow="04 / Maintenance"
-              title="维护健康度"
-              description="最近有多少可观察的公开维护证据，而不是代码质量分。"
-            />
-            <div className="mt-5 overflow-x-auto rounded-lg border border-ink-700/70">
+          <MethodSection
+            id="maintenance"
+            index="04 / 维护健康度"
+            title="维护健康度"
+            description="最近有多少可观察的公开维护证据，而不是代码质量分。"
+          >
+            <ScrollableTable label="维护健康度分项、权重与算法">
               <table className="w-full min-w-[720px] text-left">
                 <thead>
-                  <tr className="border-b border-ink-700/60 bg-ink-900/50">
-                    <th className="px-4 py-2.5 text-[9px] font-medium uppercase tracking-[0.1em] text-ink-500">分项</th>
-                    <th className="px-4 py-2.5 text-[9px] font-medium uppercase tracking-[0.1em] text-ink-500">设计权重</th>
-                    <th className="px-4 py-2.5 text-[9px] font-medium uppercase tracking-[0.1em] text-ink-500">算法</th>
-                    <th className="px-4 py-2.5 text-[9px] font-medium uppercase tracking-[0.1em] text-ink-500">缺失/小样本处理</th>
+                  <tr className="border-b border-line bg-surface-subtle">
+                    {['分项', '设计权重', '算法', '缺失 / 小样本处理'].map((heading) => (
+                      <th
+                        key={heading}
+                        className={heading === '分项' ? 'sticky left-0 bg-surface-subtle px-4 py-2.5 text-2xs font-medium text-content-secondary' : 'px-4 py-2.5 text-2xs font-medium text-content-secondary'}
+                      >
+                        {heading}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-ink-700/40 text-[11px] leading-5">
+                <tbody className="divide-y divide-line-hairline text-xs leading-5">
                   {[
                     ['最近代码提交', '30%', '距最近非合并提交：≤7d 100；≤14d 92；≤30d 82；≤60d 68；≤90d 55；≤180d 38；≤365d 20；更久 6。', '无提交日期时整项剔除。'],
                     ['近 30 天非合并提交频率', '15%', '0 次=12，1=38，2–3=55，4–7=72，8–11=88，≥12=100。', '分页达到上限时按已取得的提交数作下限计分。'],
@@ -225,73 +292,78 @@ export function MethodPage(): JSX.Element {
                     ['最近版本发布', '10%', '≤30d 100；≤60d 92；≤90d 80；≤180d 62；≤365d 40；更久 18。', '没有稳定 Release 时不参与评分，不直接惩罚。'],
                   ].map((row) => (
                     <tr key={row[0]}>
-                      <td className="px-4 py-3 font-medium text-ink-200">{row[0]}</td>
-                      <td className="px-4 py-3 font-mono text-ink-300">{row[1]}</td>
-                      <td className="px-4 py-3 text-ink-400">{row[2]}</td>
-                      <td className="px-4 py-3 text-ink-400">{row[3]}</td>
+                      <td className="sticky left-0 bg-surface px-4 py-3 align-top text-sm font-medium text-content-primary">
+                        {row[0]}
+                      </td>
+                      <td className="px-4 py-3 align-top font-mono text-content-secondary">{row[1]}</td>
+                      <td className="px-4 py-3 align-top text-content-secondary">{row[2]}</td>
+                      <td className="px-4 py-3 align-top text-content-secondary">{row[3]}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-            </div>
-            <div className="mt-3 grid gap-3 md:grid-cols-3">
-              <div className="rounded border border-ink-700/60 bg-ink-900/30 p-3 text-[10px] leading-5 text-ink-400">
-                <b className="text-ink-200">证据覆盖 &lt; 45%</b> → 不输出维护分，显示“信息不足”。
-              </div>
-              <div className="rounded border border-ink-700/60 bg-ink-900/30 p-3 text-[10px] leading-5 text-ink-400">
-                <b className="text-ink-200">覆盖 ≥ 80% / 55%</b> → 高 / 中置信，剩余为低置信。
-              </div>
-              <div className="rounded border border-ink-700/60 bg-ink-900/30 p-3 text-[10px] leading-5 text-ink-400">
-                <b className="text-ink-200">提交多 ≠ 质量高</b>。维护分只描述公开活动，不进入“代码质量”判断。
-              </div>
-            </div>
-          </section>
+            </ScrollableTable>
+            <ul className="mt-4 divide-y divide-line-hairline border-y border-line text-sm leading-6 text-content-secondary">
+              <li className="py-3">
+                <b className="text-content-primary">证据覆盖 &lt; 45%</b> → 不输出维护分，显示“信息不足”。
+              </li>
+              <li className="py-3">
+                <b className="text-content-primary">覆盖 ≥ 80% / 55%</b> → 高 / 中置信，剩余为低置信。
+              </li>
+              <li className="py-3">
+                <b className="text-content-primary">提交多 ≠ 质量高</b>。维护分只描述公开活动，不进入“代码质量”判断。
+              </li>
+            </ul>
+          </MethodSection>
 
-          <section id="risk" className="scroll-mt-24">
-            <SectionHeading
-              eyebrow="05 / Risk"
-              title="风险提示"
-              description="按信号分级展示，不做风险总分，也不把“无记录”写成“安全”。"
-            />
-            <div className="mt-5 grid gap-4 md:grid-cols-2">
-              <div className="rounded-lg border border-ink-700/70 bg-ink-850/70 p-4">
-                <div className="flex items-center gap-2">
-                  <ShieldAlert size={14} className="text-amber" />
-                  <h3 className="text-xs font-medium text-ink-100">触发规则</h3>
-                </div>
-                <ul className="mt-3 space-y-2 text-[11px] leading-5 text-ink-400">
-                  <li>· 仓库 archived → 高风险信号。</li>
-                  <li>· 长期开放 Issue ≥ 20 高风险；≥ 5 需关注。</li>
-                  <li>· 开放 Issue ≥ 100 或开放/近 90 天新开 ≥ 75% → 高风险；≥ 50 或 ≥ 50% → 需关注。</li>
-                  <li>· OSV 返回 high/critical → 高风险信号；其他公开记录 → 需关注。</li>
-                  <li>· 未完成漏洞检查、无可靠 npm 数据、数据超过 2 天未更新 → 信息缺口。</li>
-                  <li>· 若 OSV 未完成且无其他高风险信号 → 等级为“风险信息不完整”，不是“低风险”。</li>
+          <MethodSection
+            id="risk"
+            index="05 / 风险提示"
+            title="风险提示"
+            description="按信号分级展示，不做风险总分，也不把“无记录”写成“安全”。"
+          >
+            <div className="grid gap-8 md:grid-cols-2">
+              <div>
+                <h3 className="flex items-center gap-2 text-base font-semibold text-content-primary">
+                  <ShieldAlert size={16} className="text-warning" aria-hidden="true" /> 触发规则
+                </h3>
+                <ul className="mt-3 divide-y divide-line-hairline border-t border-line text-sm leading-6 text-content-secondary">
+                  {[
+                    '仓库 archived → 高风险信号。',
+                    '长期开放 Issue ≥ 20 高风险；≥ 5 需关注。',
+                    '开放 Issue ≥ 100 或开放 / 近 90 天新开 ≥ 75% → 高风险；≥ 50 或 ≥ 50% → 需关注。',
+                    'OSV 返回 high/critical → 高风险信号；其他公开记录 → 需关注。',
+                    '未完成漏洞检查、无可靠 npm 数据、数据超过 2 天未更新 → 信息缺口。',
+                    '若 OSV 未完成且无其他高风险信号 → 等级为“风险信息不完整”，不是“低风险”。',
+                  ].map((rule) => (
+                    <li key={rule} className="py-2.5">
+                      {rule}
+                    </li>
+                  ))}
                 </ul>
               </div>
-              <div className="rounded-lg border border-ink-700/70 bg-ink-900/40 p-4">
-                <div className="flex items-center gap-2">
-                  <GitBranch size={14} className="text-ink-300" />
-                  <h3 className="text-xs font-medium text-ink-100">兼容性证据</h3>
-                </div>
-                <p className="mt-3 text-[11px] leading-6 text-ink-400">
+              <div>
+                <h3 className="flex items-center gap-2 text-base font-semibold text-content-primary">
+                  <GitBranch size={16} className="text-content-secondary" aria-hidden="true" /> 兼容性证据
+                </h3>
+                <p className="mt-3 text-sm leading-6 text-content-secondary">
                   详情页展示 npm 包声明的 Node engines、DSH peer range 与版本链接。
-                  本项目不安装插件、不执行安装脚本、不做运行时兼容性测试。没有声明不等于不兼容，
-                  已声明也不等于已验证。
+                  本项目不安装插件、不执行安装脚本、不做运行时兼容性测试。没有声明不等于不兼容，已声明也不等于已验证。
                 </p>
-                <p className="mt-3 border-t border-ink-700/60 pt-3 text-[10px] leading-5 text-ink-500">
+                <p className="mt-3 border-t border-line-hairline pt-3 text-xs leading-5 text-content-muted">
                   Issue 与 PR 的统计窗口固定为 90 天，分母分别是窗口内创建的非 PR Issue 数和 PR 数。
                 </p>
               </div>
             </div>
-          </section>
+          </MethodSection>
 
-          <section id="completeness" className="scroll-mt-24">
-            <SectionHeading
-              eyebrow="06 / Completeness"
-              title="数据完整度"
-              description="七个数据域，分别记录“是否真的取得”，避免把零值和缺失混在一起。"
-            />
-            <div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          <MethodSection
+            id="completeness"
+            index="06 / 数据完整度"
+            title="数据完整度"
+            description="七个数据域，分别记录“是否真的取得”，避免把零值和缺失混在一起。"
+          >
+            <div className="grid gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
               {[
                 '仓库基础信息',
                 '提交活动',
@@ -301,70 +373,70 @@ export function MethodPage(): JSX.Element {
                 'npm 下载',
                 'OSV 漏洞检查',
               ].map((domain, index) => (
-                <div key={domain} className="rounded border border-ink-700/60 bg-ink-900/30 px-3 py-2.5">
-                  <span className="font-mono text-[9px] text-ink-500">0{index + 1}</span>
-                  <p className="mt-1 text-[11px] text-ink-200">{domain}</p>
+                <div key={domain} className="bg-surface px-3 py-3">
+                  <span className="font-mono text-2xs text-content-muted">0{index + 1}</span>
+                  <p className="mt-1 text-sm text-content-primary">{domain}</p>
                 </div>
               ))}
             </div>
-            <p className="mt-3 text-[11px] leading-6 text-ink-400">
+            <p className="mt-3 text-base leading-7 text-content">
               完整度 = 可用数据域 / 7。它衡量的是“这份画像有多少证据”，不是插件质量。
               没有 Release、没有 Issue 或没有 npm 包是项目的真实状态，但仍会降低画像覆盖，因为对应维度无法形成证据。
             </p>
-          </section>
+          </MethodSection>
 
-          <section id="pipeline" className="scroll-mt-24">
-            <SectionHeading
-              eyebrow="07 / Pipeline"
-              title="更新、历史与部署"
-              description="静态 JSON、独立 data 分支、GitHub Actions 与 Pages。"
-            />
-            <div className="mt-5 grid gap-px overflow-hidden rounded-lg border border-ink-700/70 bg-ink-700/60 sm:grid-cols-2 lg:grid-cols-4">
+          <MethodSection
+            id="pipeline"
+            index="07 / 更新与存储"
+            title="更新、历史与部署"
+            description="静态 JSON、独立 data 分支、GitHub Actions 与 Pages。"
+          >
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {[
-                { icon: <Database size={14} />, title: '采集', text: 'Node/TypeScript 采集 GitHub、npm、OSV，带超时、重试、分页与请求级缓存。' },
-                { icon: <Calculator size={14} />, title: '计算', text: '统一评分模块生成快照、历史点与状态文件。历史点只在成功写入时追加。' },
-                { icon: <GitBranch size={14} />, title: '存储', text: '源码在 main，数据在 data 分支。失败采集只更新 status，不覆盖最后成功快照。' },
-                { icon: <RefreshCw size={14} />, title: '部署', text: 'GitHub Actions 构建并部署 Pages；前端只读取静态 JSON，不含任何 Token。' },
+                { icon: <Database size={15} />, title: '采集', text: 'Node/TypeScript 采集 GitHub、npm、OSV，带超时、重试、分页与请求级缓存。' },
+                { icon: <Calculator size={15} />, title: '计算', text: '统一评分模块生成快照、历史点与状态文件。历史点只在成功写入时追加。' },
+                { icon: <GitBranch size={15} />, title: '存储', text: '源码在 main，数据在 data 分支。失败采集只更新 status，不覆盖最后成功快照。' },
+                { icon: <RefreshCw size={15} />, title: '部署', text: 'GitHub Actions 构建并部署 Pages；前端只读取静态 JSON，不含任何 Token。' },
               ].map((step, index) => (
-                <div key={step.title} className="bg-ink-850/80 p-4">
-                  <div className="flex items-center justify-between text-ink-400">
-                    <span className="text-signal-strong">{step.icon}</span>
-                    <span className="font-mono text-[9px] text-ink-600">0{index + 1}</span>
+                <div key={step.title} className="border-t-2 border-accent-line pt-3">
+                  <div className="flex items-center justify-between text-content-secondary">
+                    <span className="text-accent">{step.icon}</span>
+                    <span className="font-mono text-2xs text-content-muted">0{index + 1}</span>
                   </div>
-                  <h3 className="mt-3 text-xs font-medium text-ink-100">{step.title}</h3>
-                  <p className="mt-1.5 text-[10px] leading-5 text-ink-400">{step.text}</p>
+                  <h3 className="mt-2 text-base font-semibold text-content-primary">{step.title}</h3>
+                  <p className="mt-1 text-sm leading-6 text-content-secondary">{step.text}</p>
                 </div>
               ))}
             </div>
-            <div className="mt-4 grid gap-3 md:grid-cols-2">
-              <div className="rounded border border-ink-700/60 bg-ink-900/30 p-4">
-                <p className="text-[10px] uppercase tracking-[0.12em] text-ink-500">保留策略</p>
-                <ul className="mt-2 space-y-1.5 text-[10px] leading-5 text-ink-400">
-                  <li>· 每 6 小时尝试更新 GitHub 数据；npm 与 OSV 随同刷新。</li>
-                  <li>· 历史保留 90 天，单插件最多保留 400 个点；完整快照最多保留 120 份。</li>
-                  <li>· 连续执行两次更新不会清空历史；失败采集不生成新的 latest 快照。</li>
-                  <li>· data 分支提交不会触发 main 的部署，避免工作流循环。</li>
+            <div className="mt-6 grid gap-8 md:grid-cols-2">
+              <div>
+                <p className="text-2xs font-medium text-content-muted">保留策略</p>
+                <ul className="mt-2 divide-y divide-line-hairline border-t border-line text-sm leading-6 text-content-secondary">
+                  <li className="py-2">每 6 小时尝试更新 GitHub 数据；npm 与 OSV 随同刷新。</li>
+                  <li className="py-2">历史保留 90 天，单插件最多保留 400 个点；完整快照最多保留 120 份。</li>
+                  <li className="py-2">连续执行两次更新不会清空历史；失败采集不生成新的 latest 快照。</li>
+                  <li className="py-2">data 分支提交不会触发 main 的部署，避免工作流循环。</li>
                 </ul>
               </div>
-              <div className="rounded border border-ink-700/60 bg-ink-900/30 p-4">
-                <p className="text-[10px] uppercase tracking-[0.12em] text-ink-500">安全边界</p>
-                <ul className="mt-2 space-y-1.5 text-[10px] leading-5 text-ink-400">
-                  <li>· GitHub Token 只存在于采集进程环境，不进入 Vite 前端构建。</li>
-                  <li>· 构建后扫描产物中的 token 形态，CI 失败即阻止交付。</li>
-                  <li>· 不安装、不执行第三方插件，不把 README/Issue 文本当指令。</li>
-                  <li>· 页面只展示静态 JSON，没有服务端运行时和用户凭据。</li>
+              <div>
+                <p className="text-2xs font-medium text-content-muted">安全边界</p>
+                <ul className="mt-2 divide-y divide-line-hairline border-t border-line text-sm leading-6 text-content-secondary">
+                  <li className="py-2">GitHub Token 只存在于采集进程环境，不进入 Vite 前端构建。</li>
+                  <li className="py-2">构建后扫描产物中的 token 形态，CI 失败即阻止交付。</li>
+                  <li className="py-2">不安装、不执行第三方插件，不把 README/Issue 文本当指令。</li>
+                  <li className="py-2">页面只展示静态 JSON，没有服务端运行时和用户凭据。</li>
                 </ul>
               </div>
             </div>
-          </section>
+          </MethodSection>
 
-          <section id="limits" className="scroll-mt-24">
-            <SectionHeading
-              eyebrow="08 / Limits"
-              title="明确知道它不知道什么"
-              description="这些限制不是免责声明，而是读分时必须带入的条件。"
-            />
-            <div className="mt-5 space-y-3">
+          <MethodSection
+            id="limits"
+            index="08 / 局限与边界"
+            title="明确知道它不知道什么"
+            description="这些限制不是免责声明，而是读分时必须带入的条件。"
+          >
+            <ol className="divide-y divide-line-hairline border-y border-line">
               {[
                 {
                   title: '不是软件质量评估',
@@ -390,35 +462,41 @@ export function MethodPage(): JSX.Element {
                   title: '兼容性未验证',
                   text: '只展示项目声明。真实兼容性需要安装、运行、版本矩阵与宿主环境测试；本项目明确不做这些执行。',
                 },
-              ].map((limit) => (
-                <div key={limit.title} className="rounded border border-ink-700/60 bg-ink-900/30 px-4 py-3">
-                  <h3 className="text-[11px] font-medium text-ink-200">{limit.title}</h3>
-                  <p className="mt-1 text-[10px] leading-5 text-ink-400">{limit.text}</p>
-                </div>
+              ].map((limit, index) => (
+                <li key={limit.title} className="grid gap-1 py-4 sm:grid-cols-[48px_minmax(0,1fr)] sm:gap-4">
+                  <span className="font-mono text-2xs text-content-muted">0{index + 1}</span>
+                  <div>
+                    <h3 className="text-base font-semibold text-content-primary">{limit.title}</h3>
+                    <p className="mt-1 text-sm leading-6 text-content-secondary">{limit.text}</p>
+                  </div>
+                </li>
               ))}
-            </div>
+            </ol>
             <InlineNotice tone="neutral" className="mt-4">
               发现口径问题、数据错误或有新的 DSH 插件要加入？请通过项目 GitHub 仓库提交 Issue 或 PR。
-              配置文件位于 <code className="rounded bg-ink-900 px-1 py-0.5 font-mono text-[10px]">config/plugins.json</code>。
+              配置文件位于 <code className="break-all rounded-chip bg-surface px-1 py-0.5 font-mono text-xs">config/plugins.json</code>。
             </InlineNotice>
-          </section>
+          </MethodSection>
 
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink-700/60 pt-5">
-            <p className="text-[10px] text-ink-500">
-              <BookOpen size={11} className="mr-1 inline" />
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-5">
+            <p className="text-xs text-content-muted">
+              <BookOpen size={13} className="mr-1 inline" aria-hidden="true" />
               文档随代码版本迭代；当前方法版本 {SCORE_METHOD_VERSION}。
             </p>
-            <div className="flex items-center gap-3 text-[10px] text-ink-400">
-              <Link to="/" className="hover:text-ink-100">
-                返回排行榜
+            <div className="flex flex-wrap items-center gap-4 text-xs text-content-secondary">
+              <a href="#top" className="inline-flex items-center gap-1 hover:text-accent">
+                <ArrowUp size={13} /> 回到顶部
+              </a>
+              <Link to="/" className="hover:text-accent">
+                返回总览
               </Link>
               <a
                 href="https://github.com/albert404s/dsh-plugin-health-monitor"
                 target="_blank"
                 rel="noreferrer noopener"
-                className="inline-flex items-center gap-1 hover:text-ink-100"
+                className="inline-flex items-center gap-1 hover:text-accent"
               >
-                源码 <ArrowUpRight size={10} />
+                源码 <ArrowUpRight size={12} />
               </a>
             </div>
           </div>

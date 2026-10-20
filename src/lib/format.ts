@@ -109,10 +109,8 @@ export function scoreLabel(plugin: PluginRecord): string {
 }
 
 export function scoreTone(score: number | null): string {
-  if (score === null) return 'text-ink-400';
-  if (score >= 70) return 'text-mint';
-  if (score >= 50) return 'text-amber';
-  return 'text-rose';
+  if (score === null) return 'text-content-muted';
+  return 'text-content-primary';
 }
 
 export function riskLabel(level: RiskLevel): string {
@@ -130,33 +128,33 @@ export function riskTone(level: RiskLevel): {
 } {
   if (level === 'high') {
     return {
-      text: 'text-rose',
-      border: 'border-rose/25',
-      bg: 'bg-rose/10',
-      dot: 'bg-rose',
+      text: 'text-danger',
+      border: 'border-danger-line',
+      bg: 'bg-danger-soft',
+      dot: 'bg-danger',
     };
   }
   if (level === 'medium') {
     return {
-      text: 'text-amber',
-      border: 'border-amber/25',
-      bg: 'bg-amber/10',
-      dot: 'bg-amber',
+      text: 'text-warning',
+      border: 'border-warning-line',
+      bg: 'bg-warning-soft',
+      dot: 'bg-warning',
     };
   }
   if (level === 'low') {
     return {
-      text: 'text-mint',
-      border: 'border-mint/20',
-      bg: 'bg-mint/5',
-      dot: 'bg-mint',
+      text: 'text-content-secondary',
+      border: 'border-line',
+      bg: 'bg-surface-subtle',
+      dot: 'bg-accent',
     };
   }
   return {
-    text: 'text-ink-300',
-    border: 'border-ink-600',
-    bg: 'bg-ink-700/30',
-    dot: 'bg-ink-400',
+    text: 'text-content-secondary',
+    border: 'border-line',
+    bg: 'bg-surface-subtle',
+    dot: 'bg-content-muted',
   };
 }
 
@@ -175,16 +173,9 @@ export function compactInstall(command: string, max = 64): string {
   return `${command.slice(0, max - 1)}…`;
 }
 
-export function categoryTone(category: string): string {
-  const palette = [
-    'border-signal/25 bg-signal/10 text-signal-strong',
-    'border-mint/20 bg-mint/5 text-mint',
-    'border-amber/20 bg-amber/5 text-amber',
-    'border-ink-600 bg-ink-700/30 text-ink-200',
-  ];
-  let hash = 0;
-  for (const char of category) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-  return palette[hash % palette.length];
+export function categoryTone(_category: string): string {
+  // Categories are neutral in the light dashboard; colour is reserved for status.
+  return 'border-line bg-surface-subtle text-content-secondary';
 }
 
 export function clampPercent(value: number | null): number {

@@ -2,20 +2,15 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, Crosshair, Info, SlidersHorizontal } from 'lucide-react';
 import { useLoadedData } from '../hooks/useData';
-import { QuadrantChart, QUADRANTS } from '../components/charts/QuadrantChart';
-import { categoryLabel, type PluginRecord } from '../lib/types';
+import { useMediaQuery } from '../hooks/useMediaQuery';
+import { QuadrantChart, QUADRANTS, quadrantCounts } from '../components/charts/QuadrantChart';
+import { categoryLabel } from '../lib/types';
 import { categories } from '../lib/filters';
 import { hasQuadrantData, quadrantOf } from '../lib/scoring';
-import {
-  formatCompact,
-  formatScore,
-  riskLabel,
-  scoreLabel,
-} from '../lib/format';
+import { formatCompact, formatScore, riskLabel, scoreLabel } from '../lib/format';
 import { cn } from '../lib/cn';
 import {
   CategoryTag,
-  DataCoverage,
   PluginMonogram,
   RiskBadge,
   ScoreBar,
@@ -26,19 +21,41 @@ type QuadrantKey = keyof typeof QUADRANTS;
 type Focus = 'all' | QuadrantKey;
 type Sort = 'popularity' | 'maintenance' | 'completeness' | 'name';
 
+const FOCUS_KEYS = ['hot-healthy', 'niche-active', 'hot-watch', 'quiet'] as const;
+
+const QUADRANT_DOT: Record<QuadrantKey, string> = {
+  'hot-healthy': 'bg-teal',
+  'niche-active': 'bg-accent',
+  'hot-watch': 'bg-warning',
+  quiet: 'bg-content-muted',
+};
+
 export function QuadrantPage(): JSX.Element {
   const { latest } = useLoadedData();
+  const isMobile = useMediaQuery('(max-width: 639px)');
   const [category, setCategory] = useState('all');
   const [risk, setRisk] = useState('all');
   const [focus, setFocus] = useState<Focus>('all');
   const [sort, setSort] = useState<Sort>('popularity');
 
   const positioned = useMemo(() => latest.plugins.filter(hasQuadrantData), [latest.plugins]);
-  const filtered = useMemo(
+  const candidates = useMemo(
     () =>
-      positioned.filter((plugin) => {
+      latest.plugins.filter((plugin) => {
         if (category !== 'all' && plugin.category !== category) return false;
         if (risk !== 'all' && plugin.scores.risk.level !== risk) return false;
+        return true;
+      }),
+    [latest.plugins, category, risk],
+  );
+  const unpositionedCandidates = useMemo(
+    () => candidates.filter((plugin) => !hasQuadrantData(plugin)),
+    [candidates],
+  );
+  const filtered = useMemo(
+    () =>
+      candidates.filter((plugin) => {
+        if (!hasQuadrantData(plugin)) return false;
         if (focus !== 'all') {
           const key = quadrantOf(
             plugin.scores.popularity.score ?? 0,
@@ -48,7 +65,7 @@ export function QuadrantPage(): JSX.Element {
         }
         return true;
       }),
-    [positioned, category, risk, focus],
+    [candidates, focus],
   );
 
   const sorted = useMemo(() => {
@@ -61,246 +78,268 @@ export function QuadrantPage(): JSX.Element {
     return copy;
   }, [filtered, sort]);
 
-  const counts = useMemo(() => {
-    const result: Record<QuadrantKey, number> = {
-      'hot-healthy': 0,
-      'hot-watch': 0,
-      'niche-active': 0,
-      quiet: 0,
-    };
-    for (const plugin of positioned) {
-      result[
-        quadrantOf(plugin.scores.popularity.score ?? 0, plugin.scores.maintenance.score ?? 0)
-      ] += 1;
-    }
-    return result;
-  }, [positioned]);
+  const counts = useMemo(() => quadrantCounts(latest.plugins), [latest.plugins]);
+  const activeDescription =
+    focus === 'all' ? '全部分区；点击图上气泡进入详情，或使用上方筛选缩小范围。' : QUADRANTS[focus].description;
 
   return (
     <div className="page-enter mx-auto max-w-shell px-4 pb-12 pt-8 md:px-6 md:pt-10">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="eyebrow">Distribution</p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-ink-100 md:text-4xl">
-            人气与健康度
-            <span className="text-ink-400">四象限</span>
+      <div className="flex flex-wrap items-end justify-between gap-5">
+        <div className="min-w-0">
+          <p className="eyebrow">分布视图</p>
+          <h1 className="mt-2 text-4xl font-semibold leading-tight tracking-display text-content-primary md:text-5xl md:leading-[1.1]">
+            人气与健康度四象限
           </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-ink-300">
-            每个点是一个插件。横轴为人气指数，纵轴为维护健康度，气泡面积近似 Star 量级。
-            分界是组织视图的相对阈值，不是行业标准，也不代表质量及格线。
+          <p className="mt-3 max-w-2xl text-base leading-7 text-content-secondary">
+            每个点是一个插件。横轴为人气指数，纵轴为维护健康度，气泡面积近似 Star 量级。分界是组织视图的相对阈值，
+            不是行业标准，也不代表质量及格线。
           </p>
         </div>
-        <div className="flex items-center gap-4 rounded-md border border-ink-700/70 bg-ink-900/40 px-4 py-3">
+        <div className="flex items-center gap-5 border-t border-line pt-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
           <div>
-            <p className="tnum font-mono text-xl text-ink-100">
+            <p className="tnum font-mono text-2xl font-semibold text-content-primary">
               {positioned.length}
-              <span className="text-xs text-ink-500"> / {latest.plugins.length}</span>
+              <span className="text-sm text-content-muted"> / {latest.plugins.length}</span>
             </p>
-            <p className="text-[9px] uppercase tracking-[0.12em] text-ink-500">可定位</p>
+            <p className="text-2xs text-content-muted">可定位</p>
           </div>
-          <div className="h-8 w-px bg-ink-700" />
           <div>
-            <p className="tnum font-mono text-xl text-amber">{latest.plugins.length - positioned.length}</p>
-            <p className="text-[9px] uppercase tracking-[0.12em] text-ink-500">数据不足</p>
+            <p className="tnum font-mono text-2xl font-semibold text-warning">
+              {latest.plugins.length - positioned.length}
+            </p>
+            <p className="text-2xs text-content-muted">未定位</p>
           </div>
+          <p className="max-w-[13rem] text-xs leading-5 text-content-muted">
+            缺少可靠下载或维护证据的插件不会被强行放入象限。
+          </p>
         </div>
       </div>
 
-      <div className="mt-6 grid gap-2 rounded-lg border border-ink-700/60 bg-ink-900/40 p-2 md:grid-cols-[1fr_auto] md:items-center">
-        <div className="flex flex-wrap gap-1.5">
-          <button
-            type="button"
-            onClick={() => setFocus('all')}
-            className={cn(
-              'rounded-md border px-2.5 py-1.5 text-[10px] transition',
-              focus === 'all'
-                ? 'border-signal/40 bg-signal/10 text-ink-100'
-                : 'border-transparent text-ink-400 hover:bg-ink-800/60 hover:text-ink-200',
-            )}
+      <div className="data-band mt-6">
+        <div className="flex flex-col gap-3 px-4 py-3 md:px-5 xl:flex-row xl:items-center xl:justify-between">
+          <div
+            className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap"
+            role="group"
+            aria-label="按象限筛选"
           >
-            全部 {positioned.length}
-          </button>
-          {(Object.keys(QUADRANTS) as QuadrantKey[]).map((key) => (
             <button
-              key={key}
               type="button"
-              onClick={() => setFocus(focus === key ? 'all' : key)}
+              onClick={() => setFocus('all')}
+              aria-pressed={focus === 'all'}
               className={cn(
-                'rounded-md border px-2.5 py-1.5 text-[10px] transition',
-                focus === key
-                  ? 'border-signal/40 bg-signal/10 text-ink-100'
-                  : 'border-transparent text-ink-400 hover:bg-ink-800/60 hover:text-ink-200',
+                'inline-flex h-10 shrink-0 items-center rounded-control border px-3 text-xs transition max-sm:h-11',
+                focus === 'all'
+                  ? 'border-accent-line bg-accent-soft text-accent-active'
+                  : 'border-transparent text-content-secondary hover:bg-surface-subtle hover:text-content-primary',
               )}
             >
-              {QUADRANTS[key].label}
-              <span className="ml-1.5 font-mono text-ink-500">{counts[key]}</span>
+              全部
+              <span className="ml-1.5 font-mono text-content-muted">{positioned.length}</span>
             </button>
-          ))}
-        </div>
-        <div className="flex flex-wrap items-center gap-2 border-t border-ink-700/60 pt-2 md:border-l md:border-t-0 md:pl-2 md:pt-0">
-          <SlidersHorizontal size={11} className="text-ink-500" />
-          <select
-            className="select-field h-8"
-            value={category}
-            onChange={(event) => setCategory(event.target.value)}
-            aria-label="按分类筛选"
-          >
-            <option value="all">分类：全部</option>
-            {categories(latest.plugins).map((item) => (
-              <option key={item} value={item}>
-                {categoryLabel(item)}
-              </option>
+            {FOCUS_KEYS.map((key) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setFocus(focus === key ? 'all' : key)}
+                aria-pressed={focus === key}
+                className={cn(
+                  'inline-flex h-10 shrink-0 items-center gap-1.5 rounded-control border px-3 text-xs transition max-sm:h-11',
+                  focus === key
+                    ? 'border-accent-line bg-accent-soft text-accent-active'
+                    : 'border-transparent text-content-secondary hover:bg-surface-subtle hover:text-content-primary',
+                )}
+              >
+                <span className={cn('h-1.5 w-1.5 rounded-full', QUADRANT_DOT[key])} aria-hidden="true" />
+                {QUADRANTS[key].label}
+                <span className="font-mono text-content-muted">{counts[key]}</span>
+              </button>
             ))}
-          </select>
-          <select
-            className="select-field h-8"
-            value={risk}
-            onChange={(event) => setRisk(event.target.value)}
-            aria-label="按风险筛选"
-          >
-            <option value="all">风险：全部</option>
-            <option value="high">高风险信号</option>
-            <option value="medium">需要关注</option>
-            <option value="low">未见公开风险记录</option>
-            <option value="unknown">信息不完整</option>
-          </select>
-          <select
-            className="select-field h-8"
-            value={sort}
-            onChange={(event) => setSort(event.target.value as Sort)}
-            aria-label="列表排序"
-          >
-            <option value="popularity">按人气</option>
-            <option value="maintenance">按维护</option>
-            <option value="completeness">按数据覆盖</option>
-            <option value="name">按名称</option>
-          </select>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 border-t border-line-hairline pt-3 max-sm:grid max-sm:grid-cols-2 xl:border-l xl:border-t-0 xl:pl-4 xl:pt-0">
+            <SlidersHorizontal size={14} className="hidden text-content-muted sm:block" aria-hidden="true" />
+            <select
+              className="select-field max-sm:w-full"
+              value={category}
+              onChange={(event) => setCategory(event.target.value)}
+              aria-label="按分类筛选"
+            >
+              <option value="all">分类：全部</option>
+              {categories(latest.plugins).map((item) => (
+                <option key={item} value={item}>
+                  {categoryLabel(item)}
+                </option>
+              ))}
+            </select>
+            <select
+              className="select-field max-sm:w-full"
+              value={risk}
+              onChange={(event) => setRisk(event.target.value)}
+              aria-label="按风险筛选"
+            >
+              <option value="all">风险：全部</option>
+              <option value="high">高风险信号</option>
+              <option value="medium">需要关注</option>
+              <option value="low">未见公开风险记录</option>
+              <option value="unknown">信息不完整</option>
+            </select>
+            <select
+              className="select-field max-sm:col-span-2 max-sm:w-full"
+              value={sort}
+              onChange={(event) => setSort(event.target.value as Sort)}
+              aria-label="列表排序"
+            >
+              <option value="popularity">按人气</option>
+              <option value="maintenance">按维护</option>
+              <option value="completeness">按数据覆盖</option>
+              <option value="name">按名称</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <section className="panel overflow-hidden">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-ink-700/60 px-4 py-3 md:px-5">
-            <div className="flex items-center gap-2 text-[11px] text-ink-300">
-              <Crosshair size={13} className="text-signal" />
-              {focus === 'all' ? '全部可定位插件' : QUADRANTS[focus].label}
-              <span className="text-ink-500">·</span>
-              <span className="text-ink-400">{sorted.length} 个</span>
+      <section className="panel mt-4 overflow-hidden" aria-label="四象限图与定位插件列表">
+        <div className="grid xl:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3 md:px-5">
+              <div className="flex min-w-0 items-center gap-2 text-xs text-content-secondary">
+                <Crosshair size={14} className="text-accent" aria-hidden="true" />
+                <span className="font-medium text-content-primary">
+                  {focus === 'all' ? '全部可定位插件' : QUADRANTS[focus].label}
+                </span>
+                <span className="text-line-strong" aria-hidden="true">·</span>
+                <span>{sorted.length} 个</span>
+              </div>
+              <span className="text-2xs text-content-muted">
+                X 人气指数 0–100 · Y 维护健康度 0–100
+              </span>
             </div>
-            <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-ink-500">
-              X: popularity / Y: maintenance
-            </span>
+            <div className="px-1 pb-1 md:px-2">
+              <QuadrantChart
+                plugins={filtered}
+                unpositionedPlugins={unpositionedCandidates}
+                totalCount={latest.plugins.length}
+                height={isMobile ? 420 : 480}
+                ariaLabel="可筛选的 DSH 插件四象限散点图"
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-line px-4 py-2.5 text-2xs text-content-muted md:px-5">
+              <span>悬停 / 点按查看概要 · 点按气泡进入详情</span>
+              <span className="text-content-secondary">固定 0–100 轴，筛选不会重新缩放</span>
+              <span className="ml-auto max-w-md text-right">{activeDescription}</span>
+            </div>
           </div>
-          <div className="px-1 pb-2 md:px-2">
-            <QuadrantChart
-              plugins={filtered}
-              height={560}
-              ariaLabel="可筛选的 DSH 插件四象限散点图"
-            />
-          </div>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-ink-700/60 px-4 py-2.5 text-[9px] text-ink-500 md:px-5">
-            <span>悬停查看概要 · 点击进入详情</span>
-            <span>固定 0–100 轴，筛选不会重新缩放</span>
-            <span className="ml-auto max-w-md text-right">
-              象限：{focus === 'all' ? '全部分区' : QUADRANTS[focus].description}
-            </span>
-          </div>
-        </section>
 
-        <section className="panel flex max-h-[760px] min-h-[420px] flex-col overflow-hidden" aria-label="象限内插件列表">
-          <div className="border-b border-ink-700/60 px-4 py-3.5">
-            <p className="eyebrow">Inside the view</p>
-            <h2 className="mt-1 text-sm font-semibold text-ink-100">定位插件</h2>
-            <p className="mt-1 text-[10px] leading-4 text-ink-400">
-              按所选指标排序；无可靠下载或维护证据不足的插件不在此列表。
-            </p>
-          </div>
-          {sorted.length === 0 ? (
-            <div className="flex flex-1 items-center justify-center px-6 text-center">
-              <p className="text-xs leading-5 text-ink-400">
-                当前筛选下没有可定位插件。清除筛选或查看下方未定位清单。
+          <aside
+            className="flex min-h-0 flex-col border-t border-line xl:border-l xl:border-t-0"
+            aria-label="象限内插件列表"
+          >
+            <div className="border-b border-line px-4 py-3.5">
+              <p className="eyebrow">当前视图</p>
+              <h2 className="mt-1 text-base font-semibold text-content-primary">定位插件</h2>
+              <p className="mt-1 text-xs leading-5 text-content-secondary">
+                按所选指标排序；无可靠下载或维护证据不足的插件不在此列表。
               </p>
             </div>
-          ) : (
-            <div className="min-h-0 flex-1 overflow-y-auto">
-              <ul className="divide-y divide-ink-700/50">
-                {sorted.map((plugin) => (
-                  <li key={plugin.id}>
-                    <Link
-                      to={`/plugins/${encodeURIComponent(plugin.id)}`}
-                      className="group block px-4 py-3 transition hover:bg-ink-800/40"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <PluginMonogram plugin={plugin} size="sm" />
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-xs font-medium text-ink-100 group-hover:text-white">
-                            {plugin.name}
-                          </p>
-                          <div className="mt-0.5 flex items-center gap-1.5">
-                            <CategoryTag category={plugin.category} />
-                            <span className="text-[9px] text-ink-500">{scoreLabel(plugin)}</span>
-                          </div>
-                        </div>
-                        <ArrowUpRight size={12} className="text-ink-600 transition group-hover:text-ink-200" />
-                      </div>
-                      <div className="mt-2 grid grid-cols-2 gap-2">
-                        <div>
-                          <div className="flex justify-between text-[9px]">
-                            <span className="text-ink-500">人气</span>
-                            <span className="tnum font-mono text-ink-200">
-                              {formatScore(plugin.scores.popularity.score)}
-                            </span>
-                          </div>
-                          <ScoreBar value={plugin.scores.popularity.score} className="mt-1 h-1" />
-                        </div>
-                        <div>
-                          <div className="flex justify-between text-[9px]">
-                            <span className="text-ink-500">维护</span>
-                            <span className="tnum font-mono text-ink-200">
-                              {formatScore(plugin.scores.maintenance.score)}
-                            </span>
-                          </div>
-                          <ScoreBar value={plugin.scores.maintenance.score} className="mt-1 h-1" />
-                        </div>
-                      </div>
-                      <div className="mt-2 flex items-center justify-between text-[9px] text-ink-500">
-                        <span>{formatCompact(plugin.github.stars)} stars</span>
-                        <span>{riskLabel(plugin.scores.risk.level)}</span>
-                      </div>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </section>
-      </div>
-
-      <section className="mt-8">
-        <SectionHeading
-          eyebrow="Reading the map"
-          title="如何读这张图"
-          description="象限只帮助组织观察，不替你做出“应该安装”的决定。"
-        />
-        <div className="mt-4 grid gap-px overflow-hidden rounded-lg border border-ink-700/70 bg-ink-700/60 md:grid-cols-4">
-          {(Object.keys(QUADRANTS) as QuadrantKey[]).map((key) => (
-            <div key={key} className="bg-ink-850/80 p-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-ink-100">{QUADRANTS[key].label}</span>
-                <span className="tnum font-mono text-sm text-ink-400">{counts[key]}</span>
+            {sorted.length === 0 ? (
+              <div className="flex flex-1 items-center justify-center px-6 py-12 text-center">
+                <p className="text-sm leading-6 text-content-secondary">
+                  当前筛选下没有可定位插件。清除筛选或查看下方未定位清单。
+                </p>
               </div>
-              <p className="mt-2 text-[10px] leading-5 text-ink-400">{QUADRANTS[key].description}</p>
-            </div>
-          ))}
+            ) : (
+              <div className="min-h-0 flex-1 xl:max-h-[620px] xl:overflow-y-auto">
+                <ul className="divide-y divide-line-hairline">
+                  {sorted.map((plugin) => (
+                    <li key={plugin.id}>
+                      <Link
+                        to={`/plugins/${encodeURIComponent(plugin.id)}`}
+                        className="group block px-4 py-3 transition hover:bg-surface-subtle"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <PluginMonogram plugin={plugin} size="sm" />
+                          <div className="min-w-0 flex-1">
+                            <p className="break-words text-sm font-medium text-content-primary transition group-hover:text-accent">
+                              {plugin.name}
+                            </p>
+                            <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                              <CategoryTag category={plugin.category} />
+                              <span className="text-2xs text-content-muted">{scoreLabel(plugin)}</span>
+                            </div>
+                          </div>
+                          <ArrowUpRight
+                            size={14}
+                            className="text-content-muted transition group-hover:text-accent"
+                            aria-hidden="true"
+                          />
+                        </div>
+                        <div className="mt-2 grid grid-cols-2 gap-2">
+                          <div>
+                            <div className="flex justify-between text-2xs">
+                              <span className="text-content-muted">人气</span>
+                              <span className="tnum font-mono text-content-primary">
+                                {formatScore(plugin.scores.popularity.score)}
+                              </span>
+                            </div>
+                            <ScoreBar value={plugin.scores.popularity.score} className="mt-1" />
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-2xs">
+                              <span className="text-content-muted">维护</span>
+                              <span className="tnum font-mono text-content-primary">
+                                {formatScore(plugin.scores.maintenance.score)}
+                              </span>
+                            </div>
+                            <ScoreBar value={plugin.scores.maintenance.score} className="mt-1" />
+                          </div>
+                        </div>
+                        <div className="mt-2 flex items-center justify-between gap-2 text-2xs text-content-muted">
+                          <span>{formatCompact(plugin.github.stars)} stars</span>
+                          <span className="flex items-center gap-1.5">
+                            {plugin.scores.risk.level === 'low' ? (
+                              <span>{riskLabel(plugin.scores.risk.level)}</span>
+                            ) : (
+                              <RiskBadge level={plugin.scores.risk.level} compact />
+                            )}
+                          </span>
+                        </div>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </aside>
         </div>
       </section>
 
-      <div className="mt-6 flex items-start gap-2 rounded-md border border-ink-700/60 bg-ink-900/30 px-3 py-2.5 text-[10px] leading-5 text-ink-400">
-        <Info size={12} className="mt-0.5 shrink-0 text-ink-500" />
-        <span>
-          “高人气”不等于高质量，“低活跃”也不等于废弃。数据不足的插件不会被强制放到原点或任意象限；
-          它们保留在详情页中，并明确展示缺失原因。
-        </span>
+      <section className="mt-10">
+        <SectionHeading
+          eyebrow="读图"
+          title="如何读这张图"
+          description="象限只帮助组织观察，不替你做出“应该安装”的决定。"
+        />
+        <div className="data-band mt-4">
+          <div className="grid grid-cols-2 divide-x divide-y divide-line-hairline md:grid-cols-4 md:divide-y-0">
+            {FOCUS_KEYS.map((key) => (
+              <div key={key} className="min-w-0 px-4 py-4">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-1.5 text-xs font-medium text-content-primary">
+                    <span className={cn('h-1.5 w-1.5 rounded-full', QUADRANT_DOT[key])} aria-hidden="true" />
+                    {QUADRANTS[key].label}
+                  </span>
+                  <span className="tnum font-mono text-lg text-content-secondary">{counts[key]}</span>
+                </div>
+                <p className="mt-2 text-xs leading-5 text-content-secondary">{QUADRANTS[key].description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <div className="mt-6 border-l-2 border-accent bg-surface-subtle px-4 py-3 text-xs leading-5 text-content-secondary">
+        <Info size={14} className="mr-1.5 inline align-[-2px] text-content-muted" aria-hidden="true" />
+        “高人气”不等于高质量，“低活跃”也不等于废弃。数据不足的插件不会被强制放到原点或任意象限；
+        它们保留在详情页中，并明确展示缺失原因。
       </div>
     </div>
   );
