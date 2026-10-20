@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-20T01:46:56.081Z-961d5f58",
+  "lastAttemptAt": "2026-10-20T01:46:56.081Z",
+  "lastSuccessAt": "2026-10-20T01:46:56.081Z",
+  "outcome": "success",
+  "sources": {
+    "github": {
+      "status": "ok",
+      "fetchedAt": "2026-10-20T01:46:56.081Z",
+      "message": "20 成功 / 0 失败"
+    },
+    "npm": {
+      "status": "ok",
+      "fetchedAt": "2026-10-20T01:46:56.081Z",
+      "message": "18/18 个包映射通过，0 个无法映射，0 个请求失败"
+    },
+    "osv": {
+      "status": "ok",
+      "fetchedAt": "2026-10-20T01:46:56.081Z",
+      "message": "18 个精确版本检查完成，0 个失败"
+    }
+  },
+  "errorCount": 0,
+  "messages": [
+    "评分方法版本 1.0.0"
+  ],
+  "nextRunHint": "GitHub Actions 计划每 6 小时运行；npm 与 OSV 随同刷新。"
+}
