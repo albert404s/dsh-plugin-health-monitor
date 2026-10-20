@@ -15,7 +15,7 @@ export function AttentionPanel({ plugins }: { plugins: PluginRecord[] }): JSX.El
         <h3 className="text-xl font-semibold tracking-title text-content-primary">值得关注</h3>
         <InfoHint text="这里汇总风险信号与数据缺口，不等同于质量差或安全结论。" />
         <Link
-          to="/?risk=high#all-plugins"
+          to="/plugins?risk=high"
           className="ml-auto shrink-0 text-xs text-content-secondary underline-offset-4 transition-colors hover:text-brand-text hover:underline"
         >
           查看高风险插件

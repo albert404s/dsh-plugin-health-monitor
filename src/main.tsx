@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import { DataProvider } from './hooks/useData';
 import './index.css';
+import './orbit.css';
 
 const basename = import.meta.env.BASE_URL.replace(/\/$/, '') || '/';
 

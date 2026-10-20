@@ -47,7 +47,7 @@ export function RankList({
           <p className="mt-1 text-2xs leading-5 text-content-secondary">{description}</p>
         </div>
         <Link
-          to={`/?sort=${metric}#all-plugins`}
+          to={`/plugins?sort=${metric}`}
           className="inline-flex min-h-9 shrink-0 items-center gap-1 text-xs text-content-secondary underline-offset-4 transition-colors hover:text-brand-text hover:underline"
         >
           完整榜单 <ArrowUpRight size={12} aria-hidden="true" />

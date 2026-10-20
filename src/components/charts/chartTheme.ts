@@ -1,80 +1,25 @@
-/**
- * Single source of truth for every colour and font used inside ECharts.
- * Hex values mirror the CSS tokens in docs/design/01-visual-system.md §1.2.
- * Do not add local colour literals in chart components.
- */
+/** ECharts consumes the same CSS colour tokens as the workbench. */
+function token(name: string, alpha = 1): string {
+  const value = typeof document === 'undefined' ? '' : getComputedStyle(document.documentElement).getPropertyValue('--' + name).trim();
+  return 'rgb(' + (value || '135 155 181') + ' / ' + alpha + ')';
+}
 export const chartTheme = {
-  fontFamily:
-    '-apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "PingFang SC", "Noto Sans SC", sans-serif',
-  monoFamily: 'ui-monospace, SFMono-Regular, "Cascadia Code", Consolas, monospace',
-  fontSize: 12,
-  axisFontSize: 11,
-
-  strong: '#1A1A1A',
-  text: '#4A4A46',
-  axisText: '#686864',
-  grid: '#EAEAE6',
-  axisLine: '#8A8A84',
-  threshold: '#8A8A84',
-  labelBackground: 'rgba(255, 255, 255, 0.96)',
-  axisPointerShadow: 'rgba(26, 26, 26, 0.05)',
-
-  /** Neutral band used to mark platform-wide missing days; never a data value. */
-  gapArea: 'rgba(150, 150, 144, 0.16)',
-  gapSwatch: '#E5E5E0',
-
-  tooltip: {
-    background: '#FFFFFF',
-    border: '#C9C9C4',
-    title: '#1A1A1A',
-    body: '#4A4A46',
-    muted: '#686864',
-    footer: '#686864',
-    shadow: '0 16px 40px -16px rgba(26,26,26,.22), 0 1px 2px rgba(26,26,26,.06)',
-  },
-
-  risk: {
-    low: '#2C5264',
-    medium: '#7C5208',
-    high: '#9E2E12',
-    unknown: '#5A5A55',
-  },
-  riskFill: {
-    low: 'rgba(44, 82, 100, 0.10)',
-    medium: 'rgba(124, 82, 8, 0.12)',
-    high: 'rgba(158, 46, 18, 0.16)',
-    unknown: 'rgba(90, 90, 85, 0.08)',
-  },
-  riskSoft: {
-    low: { bg: '#F0F5F8', text: '#2C5264' },
-    medium: { bg: '#FCF5E6', text: '#7C5208' },
-    high: { bg: '#FBEEE9', text: '#9E2E12' },
-    unknown: { bg: '#F4F4F1', text: '#5A5A55' },
-  },
-
-  quadrant: {
-    'hot-healthy': 'rgba(47, 94, 88, 0.050)',
-    'niche-active': 'rgba(38, 38, 36, 0.025)',
-    'hot-watch': 'rgba(138, 138, 132, 0.045)',
-    quiet: 'rgba(90, 90, 85, 0.020)',
-  },
-
-  series: {
-    popularity: '#262624',
-    maintenance: '#2F5E58',
-    bar: '#41413D',
-    barHover: '#1A1A1A',
-  },
-  area: 'rgba(47, 94, 88, 0.08)',
-
-  /** Selected / pinned point, not a brand action. */
-  select: { border: '#1A1A1A', width: 3 },
+  fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif',
+  monoFamily: 'ui-monospace,"Cascadia Code",Consolas,monospace',
+  fontSize: 12, axisFontSize: 12,
+  strong: token('fg-primary'), text: token('fg-body'), axisText: token('chart-axis'),
+  grid: token('chart-grid'), axisLine: token('chart-axis-line'), threshold: token('chart-threshold'),
+  labelBackground: token('surface', .95), axisPointerShadow: token('fg-primary', .04),
+  gapArea: token('chart-gap', .4), gapSwatch: token('chart-gap'),
+  tooltip: { background: token('surface'), border: token('line-strong'), title: token('fg-primary'), body: token('fg-body'), muted: token('fg-tertiary'), footer: token('fg-tertiary'), shadow: '0 16px 40px rgb(0 0 0 / .45)' },
+  risk: { low: token('risk-low'), medium: token('risk-medium'), high: token('risk-high'), unknown: token('risk-unknown') },
+  riskFill: { low: token('risk-low', .16), medium: token('risk-medium', .18), high: token('risk-high', .2), unknown: token('risk-unknown', .12) },
+  riskSoft: { low: { bg: token('risk-low-soft'), text: token('risk-low') }, medium: { bg: token('risk-medium-soft'), text: token('risk-medium') }, high: { bg: token('risk-high-soft'), text: token('risk-high') }, unknown: { bg: token('risk-unknown-soft'), text: token('risk-unknown') } },
+  quadrant: { 'hot-healthy': token('series-maintenance', .045), 'niche-active': token('series-popularity', .025), 'hot-watch': token('risk-medium', .025), quiet: token('fg-tertiary', .015) },
+  series: { popularity: token('series-popularity'), maintenance: token('series-maintenance'), bar: token('series-bar'), barHover: token('series-bar-hover') },
+  area: token('series-maintenance', .08), select: { border: token('brand'), width: 3 },
 } as const;
-
 export const riskColor = (level: keyof typeof chartTheme.risk): string => chartTheme.risk[level];
 export const riskFill = (level: keyof typeof chartTheme.riskFill): string => chartTheme.riskFill[level];
 export const quadrantFill = (key: keyof typeof chartTheme.quadrant): string => chartTheme.quadrant[key];
-
-export function tooltipChrome(): string {
-  return `box-shadow:${chartTheme.tooltip.shadow};border-radius:6px;overflow:hidden;`;
-}
+export function tooltipChrome(): string { return 'box-shadow:' + chartTheme.tooltip.shadow + ';border-radius:10px;overflow:hidden;'; }

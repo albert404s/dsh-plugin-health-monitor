@@ -84,7 +84,7 @@ function ScoreExplainer({
   kind: 'popularity' | 'maintenance';
 }): JSX.Element {
   const score = plugin.scores[kind];
-  const title = kind === 'popularity' ? '为什么是这个人气指数？' : '为什么是这个维护健康度？';
+  const title = kind === 'popularity' ? '为什么是这个关注度？' : '为什么是这个维护活跃度？';
   const [open, setOpen] = useState(false);
   return (
     <div className="overflow-hidden">
@@ -562,7 +562,7 @@ export function PluginDetailPage(): JSX.Element {
               >
           <div className="min-w-0 px-4 py-5 md:px-5">
             <div className="flex items-center gap-1.5 text-2xs font-medium text-content-secondary">
-              <Star size={13} /> 人气指数
+              <Star size={13} /> 关注度
             </div>
             <div className="mt-2 flex flex-wrap items-baseline gap-x-1 gap-y-0.5">
               <span className="readout text-[2.25rem] sm:text-4xl">
@@ -574,10 +574,10 @@ export function PluginDetailPage(): JSX.Element {
             <p className="mt-2 text-xs leading-5 text-content-muted">
               {popularityRank ? `本榜第 ${popularityRank.rank} / ${popularityRank.total} · ` : ''}
               {plugin.scores.popularity.confidence === 'high'
-                ? '高置信'
+                ? '依据较充分'
                 : plugin.scores.popularity.confidence === 'medium'
-                  ? '中置信'
-                  : '低置信'}
+                  ? '依据一般'
+                  : '依据较少'}
             </p>
             <p className="mt-0.5 whitespace-nowrap text-2xs text-content-muted">
               覆盖 {Math.round(plugin.scores.popularity.coverage * 100)}%
@@ -589,7 +589,7 @@ export function PluginDetailPage(): JSX.Element {
 
           <div className="min-w-0 px-4 py-5 md:px-5">
             <div className="flex items-center gap-1.5 text-2xs font-medium text-content-secondary">
-              <GitCommitHorizontal size={13} /> 维护健康度
+              <GitCommitHorizontal size={13} /> 维护活跃度
             </div>
             <div className="mt-2 flex flex-wrap items-baseline gap-x-1 gap-y-0.5">
               <span className="readout text-[2.25rem] sm:text-4xl">
@@ -601,10 +601,10 @@ export function PluginDetailPage(): JSX.Element {
             <p className="mt-2 text-xs leading-5 text-content-muted">
               {maintenanceRank ? `本榜第 ${maintenanceRank.rank} / ${maintenanceRank.total} · ` : ''}
               {plugin.scores.maintenance.confidence === 'high'
-                ? '高置信'
+                ? '依据较充分'
                 : plugin.scores.maintenance.confidence === 'medium'
-                  ? '中置信'
-                  : '低置信'}
+                  ? '依据一般'
+                  : '依据较少'}
             </p>
             <p className="mt-0.5 whitespace-nowrap text-2xs text-content-muted">
               覆盖 {Math.round(plugin.scores.maintenance.coverage * 100)}%

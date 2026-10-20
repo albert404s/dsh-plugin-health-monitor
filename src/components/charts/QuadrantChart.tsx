@@ -37,9 +37,9 @@ export const QUADRANTS = {
 } as const;
 
 const CONFIDENCE_LABELS: Record<string, string> = {
-  high: '高置信',
-  medium: '中置信',
-  low: '低置信',
+  high: '依据较充分',
+  medium: '依据一般',
+  low: '依据较少',
 };
 
 const RISK_LABELS: Record<RiskLevel, string> = {
@@ -99,8 +99,8 @@ function tooltipHtml(plugin: PluginRecord): string {
         </div>
         <div style="color:${chartTheme.tooltip.muted};font-size:12px;line-height:18px;margin-top:4px">${escapeHtml(plugin.repo)}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:12px;line-height:18px;color:${chartTheme.tooltip.body};margin-top:10px">
-          ${row('人气指数', plugin.scores.popularity.score?.toFixed(1) ?? '—')}
-          ${row('维护健康度', plugin.scores.maintenance.score?.toFixed(1) ?? '—')}
+          ${row('关注度', plugin.scores.popularity.score?.toFixed(1) ?? '—')}
+          ${row('维护活跃度', plugin.scores.maintenance.score?.toFixed(1) ?? '—')}
           ${row('GitHub Stars', formatCompact(plugin.github.stars))}
           ${row('30 天下载', downloads)}
           <span style="grid-column:1/3;display:flex;justify-content:space-between;gap:12px">${row('数据覆盖', `${plugin.scores.completeness.available}/${plugin.scores.completeness.total}`)}</span>
@@ -121,7 +121,7 @@ export function QuadrantChart({
   showLabels = true,
   showLegend = true,
   showUnpositioned = true,
-  ariaLabel = 'DSH 插件人气指数与维护健康度四象限散点图',
+  ariaLabel = 'DSH 插件关注度与维护活跃度生态分布散点图',
 }: QuadrantChartProps): JSX.Element {
   const navigate = useNavigate();
   const isNarrow = useMediaQuery('(max-width: 1279px)');
@@ -467,8 +467,8 @@ export function QuadrantChart({
           <thead>
             <tr>
               <th>插件</th>
-              <th>人气指数</th>
-              <th>维护健康度</th>
+              <th>关注度</th>
+              <th>维护活跃度</th>
               <th>风险等级</th>
               <th>数据覆盖</th>
             </tr>

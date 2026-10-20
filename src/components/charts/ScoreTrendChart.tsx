@@ -30,7 +30,7 @@ export function ScoreTrendChart({ points, height = 260 }: ScoreTrendChartProps):
     return {
       animationDuration: reducedMotion ? 0 : 200,
       backgroundColor: 'transparent',
-      aria: { enabled: true, label: { description: '插件人气指数与维护健康度历史趋势折线图' } },
+      aria: { enabled: true, label: { description: '插件关注度与维护活跃度历史趋势折线图' } },
       grid: { left: 40, right: 16, top: 32, bottom: 30, containLabel: true },
       tooltip: {
         trigger: 'axis',
@@ -99,7 +99,7 @@ export function ScoreTrendChart({ points, height = 260 }: ScoreTrendChartProps):
       },
       series: [
         {
-          name: '维护健康度',
+          name: '维护活跃度',
           type: 'line',
           data: points.map((point) => point.maintenance),
           showSymbol: true,
@@ -117,7 +117,7 @@ export function ScoreTrendChart({ points, height = 260 }: ScoreTrendChartProps):
           blur: { itemStyle: { opacity: 0.55 }, lineStyle: { opacity: 0.55 } },
         },
         {
-          name: '人气指数',
+          name: '关注度',
           type: 'line',
           data: points.map((point) => point.popularity),
           showSymbol: true,
@@ -144,7 +144,7 @@ export function ScoreTrendChart({ points, height = 260 }: ScoreTrendChartProps):
         ref={chartRef}
         className="h-full w-full"
         role="img"
-        aria-label="插件人气指数与维护健康度历史趋势"
+        aria-label="插件关注度与维护活跃度历史趋势"
       />
     </div>
   );

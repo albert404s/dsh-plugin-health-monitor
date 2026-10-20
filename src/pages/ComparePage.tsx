@@ -49,7 +49,7 @@ function scoreValue(plugin: PluginRecord, kind: 'popularity' | 'maintenance'): J
       </div>
       <ScoreBar value={score.score} className="mt-1.5 w-24" />
       <p className="mt-1 text-2xs text-content-muted">
-        {score.confidence === 'high' ? '高置信' : score.confidence === 'medium' ? '中置信' : '低置信'} · 覆盖{' '}
+        {score.confidence === 'high' ? '依据较充分' : score.confidence === 'medium' ? '依据一般' : '依据较少'} · 覆盖{' '}
         {Math.round(score.coverage * 100)}%
       </p>
     </div>
@@ -142,14 +142,14 @@ export function ComparePage(): JSX.Element {
 
     return [
       {
-        label: '人气指数',
+        label: '关注度',
         hint: 'Star 与 npm 下载的对数归一化合成',
         a: scoreValue(left, 'popularity'),
         b: scoreValue(right, 'popularity'),
         diff: scoreDiff(left, right, 'popularity'),
       },
       {
-        label: '维护健康度',
+        label: '维护活跃度',
         hint: '提交、Issue、PR 与 Release 的相对信号',
         a: scoreValue(left, 'maintenance'),
         b: scoreValue(right, 'maintenance'),

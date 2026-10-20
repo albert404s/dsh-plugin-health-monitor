@@ -98,10 +98,10 @@ export function QuadrantPage(): JSX.Element {
         <div className="min-w-0">
           <p className="stamp">DISTRIBUTION / 02</p>
           <h1 className="mt-2 text-[2rem] font-semibold leading-[1.15] tracking-tightest text-content-primary md:text-[2.5rem] lg:text-[2.5rem]">
-            人气 × 维护四象限
+            人气 × 维护生态分布
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-content-secondary">
-            每个点是一个插件；横轴为人气指数，纵轴为维护健康度，气泡面积近似 Star 量级。阈值只用于组织视图，不是质量及格线。
+            每个点是一个插件；横轴为关注度，纵轴为维护活跃度，气泡面积近似 Star 量级。阈值只用于组织视图，不是质量及格线。
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-5 border-t border-line pt-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
@@ -234,7 +234,7 @@ export function QuadrantPage(): JSX.Element {
         </div>
       </div>
 
-      <section className="panel mt-4 overflow-hidden" aria-label="四象限图与定位插件列表">
+      <section className="panel mt-4 overflow-hidden" aria-label="生态分布图与定位插件列表">
         <div className="grid xl:grid-cols-[minmax(0,1fr)_360px]">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3 md:px-5">
@@ -254,7 +254,7 @@ export function QuadrantPage(): JSX.Element {
                 unpositionedPlugins={unpositionedCandidates}
                 totalCount={latest.plugins.length}
                 height={QUADRANT_CHART_HEIGHT[breakpoint]}
-                ariaLabel="可筛选的 DSH 插件四象限散点图"
+                ariaLabel="可筛选的 DSH 插件生态分布散点图"
               />
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-line px-4 py-2.5 text-2xs text-content-muted md:px-5">

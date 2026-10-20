@@ -16,7 +16,7 @@ export function NotFoundPage(): JSX.Element {
             这条路径没有数据
           </h1>
           <p className="mt-3 max-w-[34em] text-base leading-7 text-content-secondary">
-            页面可能已被移动。总览、四象限、插件详情和对比页都在主导航中。
+            页面可能已被移动。总览、生态分布、插件详情和对比页都在主导航中。
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-4">
             <ButtonLink to="/">

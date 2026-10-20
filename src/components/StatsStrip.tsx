@@ -70,7 +70,7 @@ export function StatsStrip({ data }: { data: LatestData }): JSX.Element {
             />
           </div>
           <Link
-            to="/?risk=high#all-plugins"
+            to="/plugins?risk=high"
             className="group col-span-1 min-h-[96px] bg-surface transition-colors hover:bg-surface-subtle md:col-span-3 md:min-h-[112px] lg:col-span-1 lg:min-h-[128px]"
             aria-label={`查看 ${stats.highRiskCount} 个高风险插件`}
           >

@@ -154,7 +154,7 @@ export default {
       },
       fontSize: {
         '2xs': ['0.75rem', { lineHeight: '1rem' }],
-        micro: ['0.6875rem', { lineHeight: '0.875rem' }],
+        micro: ['0.75rem', { lineHeight: '0.875rem' }],
         xs: ['0.8125rem', { lineHeight: '1.25rem' }],
         sm: ['0.875rem', { lineHeight: '1.375rem' }],
         base: ['0.9375rem', { lineHeight: '1.5rem' }],

@@ -71,7 +71,7 @@ export function HomePage(): JSX.Element {
               id="home-title"
               className="mt-4 text-[2rem] font-semibold leading-[1.12] tracking-tightest text-content-primary md:text-[2.5rem] lg:text-[2.75rem] xl:text-5xl xl:leading-[1.08]"
             >
-              DSH 插件健康度看板
+              DSH 插件观测站
             </h1>
             <p className="mt-3 max-w-[26em] text-base leading-7 text-content-secondary">
               用 GitHub、npm 与 OSV 的公开数据，比较 {latest.plugins.length} 个 DSH 插件的人气、维护与公开风险。
@@ -86,10 +86,10 @@ export function HomePage(): JSX.Element {
               </ButtonAnchor>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
                 <Link
-                  to="/quadrant"
+                  to="/ecosystem"
                   className="inline-flex min-h-9 items-center text-content-secondary underline-offset-4 transition-colors hover:text-brand-text hover:underline"
                 >
-                  四象限完整视图 →
+                  生态分布完整视图 →
                 </Link>
                 <Link
                   to="/method#popularity"
@@ -120,7 +120,7 @@ export function HomePage(): JSX.Element {
                   id="home-quadrant-title"
                   className="text-xl font-semibold tracking-title text-content-primary"
                 >
-                  人气 × 维护健康度
+                  人气 × 维护活跃度
                 </h2>
                 <p className="mt-1 hidden text-2xs leading-5 text-content-secondary sm:block">
                   越靠右关注度越高，越靠上公开维护活动越充分。
@@ -135,7 +135,7 @@ export function HomePage(): JSX.Element {
                   <p className="text-2xs text-content-muted">已定位插件</p>
                 </div>
                 <Link
-                  to="/quadrant"
+                  to="/ecosystem"
                   className="hidden min-h-9 items-center gap-1 text-xs text-content-secondary underline-offset-4 transition-colors hover:text-brand-text hover:underline sm:inline-flex"
                 >
                   完整视图 <ArrowRight size={12} aria-hidden="true" />
@@ -173,7 +173,7 @@ export function HomePage(): JSX.Element {
               </span>
               <span className="ml-auto hidden sm:inline">悬停 / 点击气泡查看详情</span>
               <Link
-                to="/quadrant"
+                to="/ecosystem"
                 className="ml-auto inline-flex min-h-8 items-center gap-1 text-content-secondary underline-offset-4 hover:text-brand-text hover:underline sm:hidden"
               >
                 完整视图 <ArrowRight size={11} aria-hidden="true" />
@@ -259,12 +259,12 @@ export function HomePage(): JSX.Element {
             >
               {[
                 {
-                  title: '人气指数',
+                  title: '关注度',
                   text: 'Stars 与经核验 npm 下载量的对数归一化；缺下载时调整权重，不记 0。',
                   href: '/method#popularity',
                 },
                 {
-                  title: '维护健康度',
+                  title: '维护活跃度',
                   text: '提交、Issue、PR 与 Release 的公开活动；证据覆盖 <45% 不输出分数。',
                   href: '/method#maintenance',
                 },

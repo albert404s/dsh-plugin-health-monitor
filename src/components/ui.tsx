@@ -35,7 +35,7 @@ export function buttonClasses(variant: ButtonVariant = 'primary', className?: st
   return cn(
     'inline-flex h-10 items-center justify-center gap-2 rounded-control px-4 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-45 max-sm:h-11',
     variant === 'primary'
-      ? 'bg-brand text-white hover:bg-brand-strong active:bg-brand-active'
+      ? 'bg-brand text-content-inverse hover:bg-brand-strong active:bg-brand-active'
       : variant === 'secondary'
         ? 'border border-line-control bg-surface text-content-primary hover:border-content-primary hover:bg-surface-subtle active:bg-surface-sunken'
         : 'text-content-secondary hover:bg-surface-subtle hover:text-content-primary active:bg-surface-sunken',
@@ -146,7 +146,7 @@ export function ConfidenceBadge({
   confidence: Confidence;
   className?: string;
 }): JSX.Element {
-  const labels = { high: '高置信', medium: '中置信', low: '低置信' };
+  const labels = { high: '依据较充分', medium: '依据一般', low: '依据较少' };
   return (
     <span
       className={cn(
@@ -555,7 +555,7 @@ export function Pagination({
               className={cn(
                 'h-10 min-w-10 rounded-control px-2 text-xs transition-colors max-sm:h-11 max-sm:min-w-11',
                 value === page
-                  ? 'bg-brand text-white hover:bg-brand-strong'
+                  ? 'bg-brand text-content-inverse hover:bg-brand-strong'
                   : 'text-content-secondary hover:bg-surface-subtle hover:text-content-primary',
               )}
             >

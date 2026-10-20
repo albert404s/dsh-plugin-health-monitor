@@ -18,8 +18,8 @@ import { ExternalTextLink, InlineNotice } from '../components/ui';
 const TOC = [
   { href: '#principles', label: '读数原则' },
   { href: '#sources', label: '数据来源' },
-  { href: '#popularity', label: '人气指数' },
-  { href: '#maintenance', label: '维护健康度' },
+  { href: '#popularity', label: '关注度' },
+  { href: '#maintenance', label: '维护活跃度' },
   { href: '#risk', label: '风险提示' },
   { href: '#completeness', label: '数据完整度' },
   { href: '#pipeline', label: '更新与存储' },
@@ -196,7 +196,7 @@ export function MethodPage(): JSX.Element {
               {[
                 {
                   title: '相对评价，不是绝对标准',
-                  text: '指数在本次收录的插件样本内计算。样本变化会改变排名，因此所有分数都显示数据快照时间与置信度。',
+                  text: '指数在本次收录的插件样本内计算。样本变化会改变排名，因此所有分数都显示数据快照时间与评分依据。',
                 },
                 {
                   title: '缺失不是 0',
@@ -288,8 +288,8 @@ export function MethodPage(): JSX.Element {
 
           <MethodSection
             id="popularity"
-            index="03 / 人气指数"
-            title="人气指数"
+            index="03 / 关注度"
+            title="关注度"
             description="回答“有多少人在关注或使用”，不回答“好不好”。"
           >
             <div className="grid gap-6 md:grid-cols-2">
@@ -310,8 +310,8 @@ export function MethodPage(): JSX.Element {
                     <b className="text-content-primary">55%</b>。
                   </p>
                   <p>
-                    缺少可靠下载量时，仅使用 Stars 的归一化位置，权重归一为 100%，证据覆盖降为 45%，置信度降为“中”。
-                    该插件仍可在详情页查看，但不会进入四象限定位。
+                    缺少可靠下载量时，仅使用 Stars 的归一化位置，权重归一为 100%，证据覆盖降为 45%，评分依据降为“中”。
+                    该插件仍可在详情页查看，但不会进入生态分布定位。
                   </p>
                 </div>
               </div>
@@ -330,8 +330,8 @@ export function MethodPage(): JSX.Element {
 
           <MethodSection
             id="maintenance"
-            index="04 / 维护健康度"
-            title="维护健康度"
+            index="04 / 维护活跃度"
+            title="维护活跃度"
             description="最近有多少可观察的公开维护证据，而不是代码质量分。"
           >
             <div className="space-y-3 md:hidden">
@@ -355,7 +355,7 @@ export function MethodPage(): JSX.Element {
               ))}
             </div>
             <div className="hidden md:block">
-              <ScrollableTable label="维护健康度分项、权重与算法">
+              <ScrollableTable label="维护活跃度分项、权重与算法">
                 <table className="w-full min-w-[720px] text-left">
                   <thead>
                     <tr className="border-b border-line-strong bg-surface-subtle">
@@ -393,7 +393,7 @@ export function MethodPage(): JSX.Element {
                 <b className="text-content-primary">证据覆盖 &lt; 45%</b> → 不输出维护分，显示“信息不足”。
               </li>
               <li className="py-3">
-                <b className="text-content-primary">覆盖 ≥ 80% / 55%</b> → 高 / 中置信，剩余为低置信。
+                <b className="text-content-primary">覆盖 ≥ 80% / 55%</b> → 高 / 依据一般，剩余为依据较少。
               </li>
               <li className="py-3">
                 <b className="text-content-primary">提交多 ≠ 质量高</b>。维护分只描述公开活动，不进入“代码质量”判断。

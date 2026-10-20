@@ -1,48 +1,47 @@
-import { useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
-
-function titleFor(pathname: string): string {
-  if (pathname === '/') return '总览 · DSH 插件健康度看板';
-  if (pathname === '/quadrant') return '四象限 · DSH 插件健康度看板';
-  if (pathname === '/compare') return '插件对比 · DSH 插件健康度看板';
-  if (pathname === '/method') return '方法与局限 · DSH 插件健康度看板';
-  if (pathname.startsWith('/plugins/')) return '插件详情 · DSH 插件健康度看板';
-  return '页面不存在 · DSH 插件健康度看板';
-}
-
-/**
- * The router owns title, focus and scrolling. Hash links focus their real target
- * so the plugin index is reachable from the header without creating a new page.
- */
+import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useLocation, useNavigationType } from 'react-router-dom';
+const titles: Record<string, string> = { '/': '概览', '/plugins': '插件库', '/ecosystem': '生态分布', '/compare': '插件对比', '/method': '数据与方法' };
 export function ScrollToTop(): null {
-  const { pathname, hash } = useLocation();
-  const previousPath = useRef<string | null>(null);
-
+  const { pathname, hash, key } = useLocation();
+  const navigation = useNavigationType();
+  const previous = useRef<string | null>(null);
+  const positions = useRef(new Map<string, number>());
   useEffect(() => {
-    document.title = titleFor(pathname);
+    document.title = (titles[pathname] ?? (pathname.startsWith('/plugins/') ? '插件详情' : '页面不存在')) + ' · ORBIT 插件观测站';
   }, [pathname]);
-
   useEffect(() => {
-    const frame = window.requestAnimationFrame(() => {
-      if (hash) {
-        const id = decodeURIComponent(hash.slice(1));
+    const remember = (): void => { positions.current.set(key, window.scrollY); };
+    window.addEventListener('scroll', remember, { passive: true });
+    return () => window.removeEventListener('scroll', remember);
+  }, [key]);
+  useLayoutEffect(() => {
+    const changed = previous.current !== pathname;
+    const first = previous.current === null;
+    previous.current = pathname;
+    if (navigation === 'POP' && !first && positions.current.has(key)) {
+      window.scrollTo({ top: positions.current.get(key) ?? 0, behavior: 'instant' });
+      return;
+    }
+    if (hash) {
+      let id: string;
+      try { id = decodeURIComponent(hash.slice(1)); } catch { return; }
+      const focus = (): boolean => {
         const target = document.getElementById(id);
-        if (target) {
-          target.scrollIntoView({ block: 'start' });
-          if (typeof target.focus === 'function') target.focus({ preventScroll: true });
-          previousPath.current = pathname;
-          return;
-        }
-      }
-
+        if (!target) return false;
+        target.scrollIntoView({ block: 'start', behavior: 'instant' });
+        target.focus({ preventScroll: true });
+        return true;
+      };
+      if (focus()) return;
+      const observer = new MutationObserver(() => { if (focus()) observer.disconnect(); });
+      observer.observe(document.body, { subtree: true, childList: true });
+      const timer = window.setTimeout(() => observer.disconnect(), 12000);
+      return () => { observer.disconnect(); clearTimeout(timer); };
+    }
+    if (changed) {
       window.scrollTo({ top: 0, behavior: 'instant' });
-      if (previousPath.current !== pathname) {
-        document.getElementById('main-content')?.focus({ preventScroll: true });
-      }
-      previousPath.current = pathname;
-    });
-    return () => window.cancelAnimationFrame(frame);
-  }, [pathname, hash]);
-
+      document.getElementById('main-content')?.focus({ preventScroll: true });
+    }
+  }, [pathname, hash, key, navigation]);
   return null;
 }

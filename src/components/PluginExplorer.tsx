@@ -39,8 +39,8 @@ import {
 } from './ui';
 
 const SORT_OPTIONS: Array<{ value: SortKey; label: string }> = [
-  { value: 'popularity', label: '人气指数' },
-  { value: 'maintenance', label: '维护健康度' },
+  { value: 'popularity', label: '关注度' },
+  { value: 'maintenance', label: '维护活跃度' },
   { value: 'completeness', label: '数据完整度' },
   { value: 'stars', label: 'GitHub Stars' },
   { value: 'downloads', label: 'npm 下载量' },
@@ -239,7 +239,7 @@ export function PluginExplorer({
             tabIndex={-1}
             className="mt-1.5 scroll-mt-24 text-2xl font-semibold leading-8 tracking-title text-content-primary lg:text-3xl lg:leading-9"
           >
-            插件索引
+            插件库
           </h2>
         </div>
         <p className="tnum text-xs text-content-secondary" aria-live="polite">
@@ -468,7 +468,7 @@ export function PluginExplorer({
           <>
             <div className="hidden lg:block">
               <table className="w-full table-fixed border-collapse text-left">
-                <caption className="sr-only">插件索引，共 {sorted.length} 个结果</caption>
+                <caption className="sr-only">插件库，共 {sorted.length} 个结果</caption>
                 <colgroup>
                   <col className="w-[36%]" />
                   <col className="w-[11%]" />
@@ -504,7 +504,7 @@ export function PluginExplorer({
                         active={state.sort === 'maintenance'}
                         onClick={() => update({ sort: 'maintenance' })}
                       >
-                        维护健康度
+                        维护活跃度
                       </SortButton>
                     </th>
                     <th scope="col" className="h-10 px-2 py-2 text-2xs font-medium text-content-secondary">
