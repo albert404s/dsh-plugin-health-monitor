@@ -6,8 +6,8 @@ import { isCount, isUtcDay, normalizeDaily, shiftUtcDay } from './data-quality';
  * collector already guards the derived weekly change; the UI must apply the
  * same rule so those days are not drawn or averaged as real zero downloads.
  *
- * Rule (kept in sync with scripts/collect.ts applyNpmGapGuard):
- * a date is a platform gap when at least 5 verified packages have a data point
+ * Rule (kept in sync with scripts/lib/clean.ts applyNpmGapGuard):
+ * a date is a suspected platform gap when at least 5 verified packages have a data point
  * and at least 80% of those points are zero.
  */
 export const PLATFORM_GAP_MIN_SERIES = 5;
