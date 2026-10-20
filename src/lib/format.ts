@@ -128,33 +128,33 @@ export function riskTone(level: RiskLevel): {
 } {
   if (level === 'high') {
     return {
-      text: 'text-danger',
-      border: 'border-danger-line',
-      bg: 'bg-danger-soft',
-      dot: 'bg-danger',
+      text: 'text-risk-high',
+      border: 'border-risk-high-line',
+      bg: 'bg-risk-high-soft',
+      dot: 'bg-risk-high',
     };
   }
   if (level === 'medium') {
     return {
-      text: 'text-warning',
-      border: 'border-warning-line',
-      bg: 'bg-warning-soft',
-      dot: 'bg-warning',
+      text: 'text-risk-medium',
+      border: 'border-risk-medium-line',
+      bg: 'bg-risk-medium-soft',
+      dot: 'bg-risk-medium',
     };
   }
   if (level === 'low') {
     return {
-      text: 'text-content-secondary',
-      border: 'border-line',
-      bg: 'bg-surface-subtle',
-      dot: 'bg-accent',
+      text: 'text-content-muted',
+      border: 'border-transparent',
+      bg: 'bg-transparent',
+      dot: 'bg-risk-low',
     };
   }
   return {
-    text: 'text-content-secondary',
-    border: 'border-line',
-    bg: 'bg-surface-subtle',
-    dot: 'bg-content-muted',
+    text: 'text-risk-unknown',
+    border: 'border-dashed border-risk-unknown-line',
+    bg: 'bg-risk-unknown-soft',
+    dot: 'bg-risk-unknown',
   };
 }
 

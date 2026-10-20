@@ -36,7 +36,7 @@ export function DownloadBars({ daily, height = 260, gapDates = EMPTY_GAP_DATES }
       animationDuration: reducedMotion ? 0 : 200,
       backgroundColor: 'transparent',
       aria: { enabled: true, label: { description: ariaDescription } },
-      grid: { left: 40, right: 16, top: 32, bottom: 28, containLabel: true },
+      grid: { left: 40, right: 16, top: 34, bottom: 28, containLabel: true },
       tooltip: {
         trigger: 'axis',
         confine: true,
@@ -78,7 +78,8 @@ export function DownloadBars({ daily, height = 260, gapDates = EMPTY_GAP_DATES }
       legend: {
         top: 0,
         left: 0,
-        textStyle: { color: chartTheme.tooltip.body, fontSize: 12, fontFamily: chartTheme.fontFamily },
+        textStyle: { color: chartTheme.text, fontSize: 12, fontFamily: chartTheme.fontFamily },
+        inactiveColor: chartTheme.axisText,
         itemWidth: 10,
         itemHeight: 10,
         itemGap: 16,
@@ -91,7 +92,7 @@ export function DownloadBars({ daily, height = 260, gapDates = EMPTY_GAP_DATES }
         axisTick: { show: true, length: 4, lineStyle: { color: chartTheme.axisLine } },
         axisLabel: {
           color: chartTheme.axisText,
-          fontSize: 12,
+          fontSize: chartTheme.axisFontSize,
           fontFamily: chartTheme.monoFamily,
           interval: points.length > 18 ? 4 : 2,
         },
@@ -100,7 +101,7 @@ export function DownloadBars({ daily, height = 260, gapDates = EMPTY_GAP_DATES }
         type: 'value',
         axisLabel: {
           color: chartTheme.axisText,
-          fontSize: 12,
+          fontSize: chartTheme.axisFontSize,
           fontFamily: chartTheme.monoFamily,
           formatter: (value: number) => formatCompact(value),
         },
@@ -114,11 +115,12 @@ export function DownloadBars({ daily, height = 260, gapDates = EMPTY_GAP_DATES }
           // the 7-day mean. Real zero days keep their numeric 0.
           data: points.map((point) => point.downloads),
           barMaxWidth: 14,
+          barCategoryGap: '35%',
           itemStyle: {
             color: chartTheme.series.bar,
             borderRadius: [2, 2, 0, 0],
           },
-          emphasis: { itemStyle: { color: chartTheme.series.barHover } },
+          emphasis: { focus: 'series', itemStyle: { color: chartTheme.series.barHover } },
           markArea:
             gapLabels.length > 0
               ? {

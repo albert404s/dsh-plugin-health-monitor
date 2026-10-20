@@ -303,16 +303,16 @@ export function ComparePage(): JSX.Element {
     <div className="page-enter mx-auto max-w-shell px-4 pb-12 pt-8 md:px-6 md:pt-10">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="eyebrow">并排查看</p>
-          <h1 className="mt-2 text-4xl font-semibold leading-tight tracking-display text-content-primary md:text-5xl">
+          <p className="stamp">COMPARE / 03</p>
+          <h1 className="mt-2 text-[2rem] font-semibold leading-[1.15] tracking-tightest text-content-primary md:text-4xl lg:text-[2.5rem]">
             并排比较两个插件
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-content-secondary">
-            对齐相同的统计窗口和数据来源，展示可核对的差异。比较结果不是质量排名，也不会基于单一指标替你选“更好”的插件。
+            对齐同一采集窗口，展示可核对的差异；不会基于单一指标评判谁“更好”。
           </p>
         </div>
         <div className="flex items-center gap-2 text-xs text-content-muted">
-          <Scale size={14} /> {plugins.length} 个可比较对象
+          <Scale size={14} aria-hidden="true" /> {plugins.length} 个可比较对象
         </div>
       </div>
 
@@ -334,7 +334,7 @@ export function ComparePage(): JSX.Element {
                   <button
                     type="button"
                     onClick={swap}
-                    className="inline-flex h-11 items-center gap-1.5 rounded-control border border-line-strong bg-surface px-4 text-sm text-content-secondary transition hover:border-content-muted hover:text-content-primary"
+                    className="inline-flex h-11 items-center gap-1.5 rounded-control border border-line-control bg-surface px-4 text-sm text-content-secondary transition hover:border-content-muted hover:text-content-primary"
                     aria-label="交换两侧插件"
                   >
                     <ArrowLeftRight size={15} /> 交换 A / B
@@ -344,14 +344,14 @@ export function ComparePage(): JSX.Element {
               <div className={cn('px-4 py-4 md:px-5', index === 1 ? 'lg:pl-0' : 'lg:pr-0')}>
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-xs text-content-secondary">
-                    <span className="mr-1.5 inline-flex h-5 w-5 items-center justify-center rounded-chip bg-accent-soft font-mono text-2xs text-accent-active">
+                    <span className="mr-1.5 inline-flex h-5 w-5 items-center justify-center rounded-chip bg-brand-soft font-mono text-2xs text-brand-text">
                       {label}
                     </span>
                     {compareSideLabel(label, plugin)}
                   </span>
                   <Link
                     to={`/plugins/${encodeURIComponent(plugin.id)}`}
-                    className="inline-flex items-center gap-1 text-xs text-content-secondary hover:text-accent"
+                    className="inline-flex items-center gap-1 text-xs text-content-secondary hover:text-brand-text"
                   >
                     详情 <ArrowUpRight size={11} />
                   </Link>
@@ -381,7 +381,7 @@ export function ComparePage(): JSX.Element {
                     <div className="flex flex-wrap items-center gap-1.5">
                       <Link
                         to={`/plugins/${encodeURIComponent(plugin.id)}`}
-                        className="break-words text-lg font-semibold text-content-primary hover:text-accent"
+                        className="break-words text-lg font-semibold text-content-primary hover:text-brand-text"
                       >
                         {plugin.name}
                       </Link>
@@ -407,7 +407,7 @@ export function ComparePage(): JSX.Element {
             <button
               type="button"
               onClick={swap}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-control border border-line-strong bg-surface text-content-secondary transition hover:border-content-muted hover:text-content-primary"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-control border border-line-control bg-surface text-content-secondary transition hover:border-content-muted hover:text-content-primary"
               aria-label="交换两侧插件"
             >
               <ArrowLeftRight size={16} />
@@ -428,10 +428,10 @@ export function ComparePage(): JSX.Element {
 
       <div
         className={cn(
-          'mt-4 flex items-start gap-2.5 border-l-2 px-3 py-2.5 text-xs leading-5',
+          'mt-4 flex items-start gap-2.5 border px-3 py-2.5 text-xs leading-5',
           left.scores.completeness.score === right.scores.completeness.score
-            ? 'border-line-strong bg-surface-subtle text-content-secondary'
-            : 'border-warning bg-warning-soft text-warning',
+            ? 'border-line bg-surface-subtle text-content-secondary'
+            : 'border-warning-line bg-warning-soft text-warning',
         )}
       >
         <Info size={14} className="mt-0.5 shrink-0" aria-hidden="true" />
@@ -444,13 +444,20 @@ export function ComparePage(): JSX.Element {
 
       <section className="mt-6" aria-labelledby="compare-matrix-title">
         <SectionHeading
-          eyebrow="指标矩阵"
+          eyebrow="04 / METRIC MATRIX"
           title={<span id="compare-matrix-title">指标对照</span>}
-          description="同一采集窗口；差异只描述方向与大小，不评价优劣。"
         />
-        <p className="mt-2 break-words text-xs text-content-secondary">
-          B 相对 A：{summary.map((item) => `${item.label} ${item.value}`).join(' · ')}
-        </p>
+
+        <div className="data-band mt-4">
+          <div className="grid grid-cols-1 divide-y divide-line-hairline md:grid-cols-3 md:divide-x md:divide-y-0">
+            {summary.map((item) => (
+              <div key={item.label} className="min-w-0 px-4 py-3 md:px-5">
+                <p className="text-2xs font-medium text-content-muted">{item.label}</p>
+                <p className="mt-1.5 break-words font-mono text-sm text-content-primary">{item.value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
 
         <div className="panel mt-4 overflow-clip">
           <div className="hidden lg:block">
@@ -462,17 +469,17 @@ export function ComparePage(): JSX.Element {
                 <col className="w-[20%]" />
               </colgroup>
               <thead>
-                <tr className="border-b border-line bg-surface-subtle">
-                  <th className="sticky top-16 z-20 border-b border-line bg-surface-subtle px-4 py-3 text-2xs font-medium text-content-secondary md:px-5">
+                <tr className="border-b border-line-control bg-surface-subtle">
+                  <th className="sticky top-[var(--header-h)] z-20 border-b border-line-control bg-surface-subtle px-4 py-3 text-2xs font-medium text-content-secondary md:px-5">
                     指标
                   </th>
-                  <th className="sticky top-16 z-20 border-b border-line bg-surface-subtle px-3 py-3 text-2xs font-medium text-content-secondary">
+                  <th className="sticky top-[var(--header-h)] z-20 border-b border-line-control bg-surface-subtle px-3 py-3 text-2xs font-medium text-content-secondary">
                     {compareSideLabel('A', left)}
                   </th>
-                  <th className="sticky top-16 z-20 border-b border-line bg-surface-subtle px-3 py-3 text-2xs font-medium text-content-secondary">
+                  <th className="sticky top-[var(--header-h)] z-20 border-b border-line-control bg-surface-subtle px-3 py-3 text-2xs font-medium text-content-secondary">
                     {compareSideLabel('B', right)}
                   </th>
-                  <th className="sticky top-16 z-20 border-b border-line bg-surface-subtle px-3 py-3 text-2xs font-medium text-content-secondary">
+                  <th className="sticky top-[var(--header-h)] z-20 border-b border-line-control bg-surface-subtle px-3 py-3 text-2xs font-medium text-content-secondary">
                     差异 B − A
                   </th>
                 </tr>

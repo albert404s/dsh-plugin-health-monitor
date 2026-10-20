@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowUp,
@@ -25,6 +26,37 @@ const TOC = [
   { href: '#limits', label: '局限与边界' },
 ];
 
+const METHOD_SOURCES = [
+  {
+    name: 'GitHub REST API',
+    fields:
+      'Stars、Forks、归档状态、最近非合并提交、近 30 天非合并提交、近 90 天 Issue/PR、长期开放 Issue、Release。',
+    limits:
+      '使用分页与重试；分页上限触发时标记为下限。Issue 列表会过滤 PR；不使用 updated_at 代替最近代码提交。',
+  },
+  {
+    name: 'npm Download API',
+    fields: '近 30 天下载、近 7 天 / 前 7 天对比、日下载序列、latest 版本、engines、DSH peer range。',
+    limits:
+      '只有 npm registry 的 repository 字段与 GitHub 仓库一致时才采信。Star、Fork、Release Asset 下载量不会冒充 npm 下载量。',
+  },
+  {
+    name: 'OSV API',
+    fields: '以 npm 包名 + latest 精确版本查询 querybatch，并读取公开漏洞详情。',
+    limits:
+      '只覆盖 OSV 已收录的公开记录。无法精确匹配或请求失败时显示“未完成漏洞检查”，不会显示“安全”或“零风险”。',
+  },
+];
+
+const MAINTENANCE_ROWS = [
+  ['最近代码提交', '30%', '距最近非合并提交：≤7d 100；≤14d 92；≤30d 82；≤60d 68；≤90d 55；≤180d 38；≤365d 20；更久 6。', '无提交日期时整项剔除。'],
+  ['近 30 天非合并提交频率', '15%', '0 次=12，1=38，2–3=55，4–7=72，8–11=88，≥12=100。', '分页达到上限时按已取得的提交数作下限计分。'],
+  ['近期 Issue 关闭率', '20%', '近 90 天创建的非 PR Issue 中当前已关闭比例 × 100。', '少于 5 条按 n/5 折减权重；0 条新 Issue 不参与，不扣分。'],
+  ['开放 Issue 积压', '10%', '若当前有开放 Issue：100 − (开放 Issue 数 / 近 90 天新开 Issue 数) × 100。', '按近 90 天新开样本缩放权重；无开放 Issue 时不参与。'],
+  ['近期 PR 合并率', '15%', '近 90 天创建 PR 中已合并比例 × 100。', '少于 3 条按 n/3 折减；PR 功能不可用时剔除，不记 0。'],
+  ['最近版本发布', '10%', '≤30d 100；≤60d 92；≤90d 80；≤180d 62；≤365d 40；更久 18。', '没有稳定 Release 时不参与评分，不直接惩罚。'],
+] as const;
+
 function MethodSection({
   id,
   index,
@@ -38,10 +70,14 @@ function MethodSection({
   description?: string;
   children: React.ReactNode;
 }): JSX.Element {
+  const [sectionNumber, ...sectionLabel] = index.split(' / ');
   return (
     <section id={id} className="scroll-mt-24 border-t border-line pt-6">
-      <p className="text-2xs font-medium text-accent">{index}</p>
-      <h2 className="mt-2 text-2xl font-semibold leading-8 tracking-display text-content-primary">{title}</h2>
+      <p className="flex flex-wrap items-center gap-2">
+        <span className="index">{sectionNumber}</span>
+        <span className="text-2xs font-medium text-content-muted">{sectionLabel.join(' / ')}</span>
+      </p>
+      <h2 className="mt-2 text-2xl font-semibold leading-8 tracking-title text-content-primary">{title}</h2>
       {description ? (
         <p className="mt-2 max-w-prose text-sm leading-6 text-content-secondary">{description}</p>
       ) : null}
@@ -63,15 +99,35 @@ function ScrollableTable({ label, children }: { label: string; children: React.R
 
 export function MethodPage(): JSX.Element {
   const { data } = useData();
+  const [activeSection, setActiveSection] = useState<string>(TOC[0].href);
+
+  useEffect(() => {
+    function syncActiveSection(): void {
+      let current = TOC[0].href;
+      for (const item of TOC) {
+        const section = document.getElementById(item.href.slice(1));
+        if (section && section.getBoundingClientRect().top <= 180) current = item.href;
+      }
+      setActiveSection(current);
+    }
+    syncActiveSection();
+    window.addEventListener('scroll', syncActiveSection, { passive: true });
+    window.addEventListener('resize', syncActiveSection);
+    return () => {
+      window.removeEventListener('scroll', syncActiveSection);
+      window.removeEventListener('resize', syncActiveSection);
+    };
+  }, []);
 
   return (
-    <div id="top" className="page-enter mx-auto max-w-shell px-4 pb-14 pt-8 md:px-6 md:pt-10">
-      <div className="max-w-prose">
-        <p className="eyebrow">方法 / v{SCORE_METHOD_VERSION}</p>
-        <h1 className="mt-2 text-4xl font-semibold leading-tight tracking-display text-content-primary md:text-5xl">
+    <div id="top" className="page-enter mx-auto max-w-shell px-4 pb-14 pt-6 md:px-6 md:pt-8">
+      <div className="lg:mx-auto lg:max-w-[1080px]">
+      <div className="max-w-[48rem]">
+        <p className="stamp">METHOD / v{SCORE_METHOD_VERSION}</p>
+        <h1 className="mt-2 text-[2rem] font-semibold leading-[1.15] tracking-tightest text-content-primary md:text-4xl lg:text-[2.5rem]">
           指标不是判决书
         </h1>
-        <p className="mt-4 text-lg leading-[1.65] text-content">
+        <p className="mt-4 max-w-[34em] text-base leading-7 text-content md:text-lg md:leading-[1.7]">
           DSH Plugin Health Monitor 用公开数据帮助阅读 DeepSeek Harness 插件生态。
           我们不输出“软件质量总分”，而是把<span className="text-content-primary">人气、维护活动、风险信号、数据完整度</span>
           拆成可解释、可追溯、可质疑的维度。
@@ -89,29 +145,38 @@ export function MethodPage(): JSX.Element {
       </div>
 
       <details className="mt-6 rounded-panel border border-line bg-surface lg:hidden">
-        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-medium text-content-primary marker:hidden">
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-medium text-content-primary">
           本页目录
           <span className="text-2xs text-content-muted">8 节</span>
         </summary>
         <nav className="grid grid-cols-2 gap-x-4 border-t border-line-hairline px-4 py-2" aria-label="方法页移动端目录">
           {TOC.map((item) => (
-            <a key={item.href} href={item.href} className="block py-3 text-sm text-content-secondary hover:text-accent">
+            <a
+              key={item.href}
+              href={item.href}
+              className="flex min-h-11 items-center text-xs text-content-secondary hover:text-brand-text"
+            >
               {item.label}
             </a>
           ))}
         </nav>
       </details>
 
-      <div className="mt-8 grid gap-10 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-12">
+      <div className="mt-8 grid gap-10 lg:grid-cols-[180px_minmax(0,1fr)] lg:gap-8 xl:grid-cols-[200px_minmax(0,1fr)] xl:gap-12">
         <aside className="hidden lg:block">
-          <nav className="sticky top-24" aria-label="方法页目录">
-            <p className="mb-3 text-2xs font-medium text-content-muted">本页目录</p>
-            <div className="space-y-0.5 border-l border-line pl-3">
+          <nav className="sticky top-[calc(var(--header-h)+16px)]" aria-label="方法页目录">
+            <p className="stamp mb-3">ON THIS PAGE</p>
+            <div className="space-y-0.5 border-l border-line pl-2">
               {TOC.map((item) => (
                 <a
                   key={item.href}
                   href={item.href}
-                  className="block rounded-control px-2 py-1.5 text-xs text-content-secondary transition hover:bg-surface-subtle hover:text-content-primary"
+                  aria-current={activeSection === item.href ? 'location' : undefined}
+                  className={
+                    activeSection === item.href
+                      ? '-ml-px block border-l-2 border-brand bg-brand-soft/50 px-2 py-1.5 text-xs font-semibold text-content-primary'
+                      : '-ml-px block border-l-2 border-transparent px-2 py-1.5 text-xs text-content-secondary transition-colors hover:border-line-strong hover:bg-surface-subtle hover:text-content-primary'
+                  }
                 >
                   {item.label}
                 </a>
@@ -160,57 +225,58 @@ export function MethodPage(): JSX.Element {
             title="数据从哪里来"
             description="只使用公开、可追溯的数据。项目不安装、不执行、不加载被检测插件的代码。"
           >
-            <ScrollableTable label="数据来源与准确性边界">
-              <table className="w-full min-w-[680px] text-left">
-                <thead>
-                  <tr className="border-b border-line bg-surface-subtle">
-                    {['来源', '字段与窗口', '准确性边界'].map((heading) => (
-                      <th
-                        key={heading}
-                        className={heading === '来源' ? 'sticky left-0 bg-surface-subtle px-4 py-2.5 text-2xs font-medium text-content-secondary' : 'px-4 py-2.5 text-2xs font-medium text-content-secondary'}
-                      >
-                        {heading}
-                      </th>
+            <div className="space-y-3 md:hidden">
+              {METHOD_SOURCES.map((source) => (
+                <div key={source.name} className="border border-line bg-surface">
+                  <h3 className="border-b border-line bg-surface-subtle px-4 py-2.5 text-sm font-semibold text-content-primary">
+                    {source.name}
+                  </h3>
+                  <dl className="divide-y divide-line-hairline">
+                    <div className="px-4 py-3">
+                      <dt className="text-2xs font-medium text-content-muted">字段与窗口</dt>
+                      <dd className="mt-1 text-xs leading-5 text-content-secondary">{source.fields}</dd>
+                    </div>
+                    <div className="px-4 py-3">
+                      <dt className="text-2xs font-medium text-content-muted">准确性边界</dt>
+                      <dd className="mt-1 text-xs leading-5 text-content-secondary">{source.limits}</dd>
+                    </div>
+                  </dl>
+                </div>
+              ))}
+            </div>
+            <div className="hidden md:block">
+              <ScrollableTable label="数据来源与准确性边界">
+                <table className="w-full min-w-[680px] text-left">
+                  <thead>
+                    <tr className="border-b border-line-strong bg-surface-subtle">
+                      {['来源', '字段与窗口', '准确性边界'].map((heading) => (
+                        <th
+                          key={heading}
+                          className={
+                            heading === '来源'
+                              ? 'sticky left-0 bg-surface-subtle px-4 py-2.5 text-2xs font-medium text-content-secondary'
+                              : 'px-4 py-2.5 text-2xs font-medium text-content-secondary'
+                          }
+                        >
+                          {heading}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-line-hairline text-xs leading-5">
+                    {METHOD_SOURCES.map((source) => (
+                      <tr key={source.name}>
+                        <td className="sticky left-0 bg-surface px-4 py-3 align-top text-sm font-medium text-content-primary">
+                          {source.name}
+                        </td>
+                        <td className="px-4 py-3 align-top text-content-secondary">{source.fields}</td>
+                        <td className="px-4 py-3 align-top text-content-secondary">{source.limits}</td>
+                      </tr>
                     ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-line-hairline text-xs leading-5">
-                  <tr>
-                    <td className="sticky left-0 bg-surface px-4 py-3 align-top text-sm font-medium text-content-primary">
-                      GitHub REST API
-                    </td>
-                    <td className="px-4 py-3 align-top text-content-secondary">
-                      Stars、Forks、归档状态、最近非合并提交、近 30 天非合并提交、近 90 天 Issue/PR、长期开放 Issue、Release。
-                    </td>
-                    <td className="px-4 py-3 align-top text-content-secondary">
-                      使用分页与重试；分页上限触发时标记为下限。Issue 列表会过滤 PR；不使用 updated_at 代替最近代码提交。
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="sticky left-0 bg-surface px-4 py-3 align-top text-sm font-medium text-content-primary">
-                      npm Download API
-                    </td>
-                    <td className="px-4 py-3 align-top text-content-secondary">
-                      近 30 天下载、近 7 天 / 前 7 天对比、日下载序列、latest 版本、engines、DSH peer range。
-                    </td>
-                    <td className="px-4 py-3 align-top text-content-secondary">
-                      只有 npm registry 的 repository 字段与 GitHub 仓库一致时才采信。Star、Fork、Release Asset 下载量不会冒充 npm 下载量。
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="sticky left-0 bg-surface px-4 py-3 align-top text-sm font-medium text-content-primary">
-                      OSV API
-                    </td>
-                    <td className="px-4 py-3 align-top text-content-secondary">
-                      以 npm 包名 + latest 精确版本查询 querybatch，并读取公开漏洞详情。
-                    </td>
-                    <td className="px-4 py-3 align-top text-content-secondary">
-                      只覆盖 OSV 已收录的公开记录。无法精确匹配或请求失败时显示“未完成漏洞检查”，不会显示“安全”或“零风险”。
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </ScrollableTable>
+                  </tbody>
+                </table>
+              </ScrollableTable>
+            </div>
             <div className="mt-3 flex flex-wrap gap-4 text-xs text-content-muted">
               <ExternalTextLink href="https://docs.github.com/rest">GitHub REST 文档</ExternalTextLink>
               <ExternalTextLink href="https://github.com/npm/registry/blob/main/docs/download-counts.md">
@@ -229,12 +295,12 @@ export function MethodPage(): JSX.Element {
             <div className="grid gap-6 md:grid-cols-2">
               <div>
                 <h3 className="flex items-center gap-2 text-base font-semibold text-content-primary">
-                  <Calculator size={16} className="text-accent" aria-hidden="true" /> 计算
+                  <Calculator size={16} className="text-content-secondary" aria-hidden="true" /> 计算
                 </h3>
                 <div className="mt-3 space-y-3 text-base leading-7 text-content">
                   <p>
                     对每个有效值先做{' '}
-                    <code className="rounded-chip border-l-2 border-accent bg-surface-subtle px-1.5 py-0.5 font-mono text-sm text-content-primary">
+                    <code className="rounded-chip border-l-2 border-content-primary bg-surface-subtle px-1.5 py-0.5 font-mono text-sm text-content-primary">
                       log10(1 + x)
                     </code>
                     ，再在本次样本内做 min-max 归一化到 0–100。这样可以压缩几个数量级间的差异，避免下载量直接淹没 Star。
@@ -249,7 +315,7 @@ export function MethodPage(): JSX.Element {
                   </p>
                 </div>
               </div>
-              <div className="border-l-2 border-accent bg-surface-subtle px-4 py-4">
+              <div className="border-l-2 border-content-primary bg-surface-subtle px-4 py-4">
                 <p className="text-2xs font-medium text-content-muted">为什么不用绝对分</p>
                 <p className="mt-2 text-sm leading-6 text-content-secondary">
                   当前 DSH 插件生态仍在快速变化。Star 与下载量受传播、发布节奏、镜像和统计口径影响，
@@ -268,41 +334,60 @@ export function MethodPage(): JSX.Element {
             title="维护健康度"
             description="最近有多少可观察的公开维护证据，而不是代码质量分。"
           >
-            <ScrollableTable label="维护健康度分项、权重与算法">
-              <table className="w-full min-w-[720px] text-left">
-                <thead>
-                  <tr className="border-b border-line bg-surface-subtle">
-                    {['分项', '设计权重', '算法', '缺失 / 小样本处理'].map((heading) => (
-                      <th
-                        key={heading}
-                        className={heading === '分项' ? 'sticky left-0 bg-surface-subtle px-4 py-2.5 text-2xs font-medium text-content-secondary' : 'px-4 py-2.5 text-2xs font-medium text-content-secondary'}
-                      >
-                        {heading}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-line-hairline text-xs leading-5">
-                  {[
-                    ['最近代码提交', '30%', '距最近非合并提交：≤7d 100；≤14d 92；≤30d 82；≤60d 68；≤90d 55；≤180d 38；≤365d 20；更久 6。', '无提交日期时整项剔除。'],
-                    ['近 30 天非合并提交频率', '15%', '0 次=12，1=38，2–3=55，4–7=72，8–11=88，≥12=100。', '分页达到上限时按已取得的提交数作下限计分。'],
-                    ['近期 Issue 关闭率', '20%', '近 90 天创建的非 PR Issue 中当前已关闭比例 × 100。', '少于 5 条按 n/5 折减权重；0 条新 Issue 不参与，不扣分。'],
-                    ['开放 Issue 积压', '10%', '若当前有开放 Issue：100 − (开放 Issue 数 / 近 90 天新开 Issue 数) × 100。', '按近 90 天新开样本缩放权重；无开放 Issue 时不参与。'],
-                    ['近期 PR 合并率', '15%', '近 90 天创建 PR 中已合并比例 × 100。', '少于 3 条按 n/3 折减；PR 功能不可用时剔除，不记 0。'],
-                    ['最近版本发布', '10%', '≤30d 100；≤60d 92；≤90d 80；≤180d 62；≤365d 40；更久 18。', '没有稳定 Release 时不参与评分，不直接惩罚。'],
-                  ].map((row) => (
-                    <tr key={row[0]}>
-                      <td className="sticky left-0 bg-surface px-4 py-3 align-top text-sm font-medium text-content-primary">
-                        {row[0]}
-                      </td>
-                      <td className="px-4 py-3 align-top font-mono text-content-secondary">{row[1]}</td>
-                      <td className="px-4 py-3 align-top text-content-secondary">{row[2]}</td>
-                      <td className="px-4 py-3 align-top text-content-secondary">{row[3]}</td>
+            <div className="space-y-3 md:hidden">
+              {MAINTENANCE_ROWS.map((row) => (
+                <div key={row[0]} className="border border-line bg-surface">
+                  <div className="flex items-center justify-between gap-3 border-b border-line bg-surface-subtle px-4 py-2.5">
+                    <h3 className="text-sm font-semibold text-content-primary">{row[0]}</h3>
+                    <span className="tnum font-mono text-xs text-content-secondary">{row[1]}</span>
+                  </div>
+                  <dl className="divide-y divide-line-hairline">
+                    <div className="px-4 py-3">
+                      <dt className="text-2xs font-medium text-content-muted">算法</dt>
+                      <dd className="mt-1 text-xs leading-5 text-content-secondary">{row[2]}</dd>
+                    </div>
+                    <div className="px-4 py-3">
+                      <dt className="text-2xs font-medium text-content-muted">缺失 / 小样本处理</dt>
+                      <dd className="mt-1 text-xs leading-5 text-content-secondary">{row[3]}</dd>
+                    </div>
+                  </dl>
+                </div>
+              ))}
+            </div>
+            <div className="hidden md:block">
+              <ScrollableTable label="维护健康度分项、权重与算法">
+                <table className="w-full min-w-[720px] text-left">
+                  <thead>
+                    <tr className="border-b border-line-strong bg-surface-subtle">
+                      {['分项', '设计权重', '算法', '缺失 / 小样本处理'].map((heading) => (
+                        <th
+                          key={heading}
+                          className={
+                            heading === '分项'
+                              ? 'sticky left-0 bg-surface-subtle px-4 py-2.5 text-2xs font-medium text-content-secondary'
+                              : 'px-4 py-2.5 text-2xs font-medium text-content-secondary'
+                          }
+                        >
+                          {heading}
+                        </th>
+                      ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </ScrollableTable>
+                  </thead>
+                  <tbody className="divide-y divide-line-hairline text-xs leading-5">
+                    {MAINTENANCE_ROWS.map((row) => (
+                      <tr key={row[0]}>
+                        <td className="sticky left-0 bg-surface px-4 py-3 align-top text-sm font-medium text-content-primary">
+                          {row[0]}
+                        </td>
+                        <td className="px-4 py-3 align-top font-mono text-content-secondary">{row[1]}</td>
+                        <td className="px-4 py-3 align-top text-content-secondary">{row[2]}</td>
+                        <td className="px-4 py-3 align-top text-content-secondary">{row[3]}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </ScrollableTable>
+            </div>
             <ul className="mt-4 divide-y divide-line-hairline border-y border-line text-sm leading-6 text-content-secondary">
               <li className="py-3">
                 <b className="text-content-primary">证据覆盖 &lt; 45%</b> → 不输出维护分，显示“信息不足”。
@@ -325,7 +410,7 @@ export function MethodPage(): JSX.Element {
             <div className="grid gap-8 md:grid-cols-2">
               <div>
                 <h3 className="flex items-center gap-2 text-base font-semibold text-content-primary">
-                  <ShieldAlert size={16} className="text-warning" aria-hidden="true" /> 触发规则
+                  <ShieldAlert size={16} className="text-risk-high" aria-hidden="true" /> 触发规则
                 </h3>
                 <ul className="mt-3 divide-y divide-line-hairline border-t border-line text-sm leading-6 text-content-secondary">
                   {[
@@ -398,9 +483,9 @@ export function MethodPage(): JSX.Element {
                 { icon: <GitBranch size={15} />, title: '存储', text: '源码在 main，数据在 data 分支。失败采集只更新 status，不覆盖最后成功快照。' },
                 { icon: <RefreshCw size={15} />, title: '部署', text: 'GitHub Actions 构建并部署 Pages；前端只读取静态 JSON，不含任何 Token。' },
               ].map((step, index) => (
-                <div key={step.title} className="border-t-2 border-accent-line pt-3">
+                <div key={step.title} className="border-t-2 border-metal-200 pt-3">
                   <div className="flex items-center justify-between text-content-secondary">
-                    <span className="text-accent">{step.icon}</span>
+                    <span className="text-content-secondary">{step.icon}</span>
                     <span className="font-mono text-2xs text-content-muted">0{index + 1}</span>
                   </div>
                   <h3 className="mt-2 text-base font-semibold text-content-primary">{step.title}</h3>
@@ -484,23 +569,24 @@ export function MethodPage(): JSX.Element {
               文档随代码版本迭代；当前方法版本 {SCORE_METHOD_VERSION}。
             </p>
             <div className="flex flex-wrap items-center gap-4 text-xs text-content-secondary">
-              <a href="#top" className="inline-flex items-center gap-1 hover:text-accent">
+              <a href="#top" className="inline-flex items-center gap-1 hover:text-brand-text">
                 <ArrowUp size={13} /> 回到顶部
               </a>
-              <Link to="/" className="hover:text-accent">
+              <Link to="/" className="hover:text-brand-text">
                 返回总览
               </Link>
               <a
                 href="https://github.com/albert404s/dsh-plugin-health-monitor"
                 target="_blank"
                 rel="noreferrer noopener"
-                className="inline-flex items-center gap-1 hover:text-accent"
+                className="inline-flex items-center gap-1 hover:text-brand-text"
               >
                 源码 <ArrowUpRight size={12} />
               </a>
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

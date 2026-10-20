@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { EChartsOption } from 'echarts';
 import type { PluginRecord, RiskLevel } from '../../lib/types';
 import { quadrantOf, hasQuadrantData } from '../../lib/scoring';
@@ -95,7 +95,7 @@ function tooltipHtml(plugin: PluginRecord): string {
       <div style="padding:12px 14px 10px">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
           <strong style="color:${chartTheme.tooltip.title};font-size:13px;line-height:18px;font-weight:600">${escapeHtml(plugin.name)}</strong>
-          <span style="flex:none;border-radius:4px;padding:2px 6px;font-size:12px;line-height:16px;background:${riskStyle.bg};color:${riskStyle.text}">${escapeHtml(riskLabel)}</span>
+          <span style="flex:none;border-radius:2px;padding:2px 6px;font-size:12px;line-height:16px;background:${riskStyle.bg};color:${riskStyle.text}">${escapeHtml(riskLabel)}</span>
         </div>
         <div style="color:${chartTheme.tooltip.muted};font-size:12px;line-height:18px;margin-top:4px">${escapeHtml(plugin.repo)}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:12px;line-height:18px;color:${chartTheme.tooltip.body};margin-top:10px">
@@ -154,11 +154,12 @@ export function QuadrantChart({
       itemStyle: {
         color: riskFill(plugin.scores.risk.level),
         borderColor: riskColor(plugin.scores.risk.level),
-        borderWidth: plugin.scores.risk.level === 'high' ? 2 : 1.5,
+        borderWidth: plugin.scores.risk.level === 'high' ? 2.5 : 1.5,
       },
       label: { show: effectiveShowLabels && topIds.has(plugin.id) },
     }));
     const pluginById = new Map(positioned.map((plugin) => [plugin.id, plugin]));
+    const highRiskData = data.filter((item) => item.risk === 'high');
     const maxStars = Math.max(...positioned.map((plugin) => plugin.github.stars), 1);
     const symbolSize = (stars: number): number => {
       const normalized = Math.log10(stars + 1) / Math.log10(maxStars + 1);
@@ -166,7 +167,7 @@ export function QuadrantChart({
     };
     const axisLabel = {
       color: chartTheme.axisText,
-      fontSize: chartTheme.fontSize,
+      fontSize: chartTheme.axisFontSize,
       fontFamily: chartTheme.monoFamily,
     };
 
@@ -224,8 +225,43 @@ export function QuadrantChart({
       },
       series: [
         {
+          // A static outer ring is the non-colour cue for high-risk bubbles.
+          name: '高风险外环',
           type: 'scatter',
+          z: 1,
+          silent: true,
+          data: highRiskData,
+          symbolSize: (value: unknown) => {
+            const numbers = value as number[];
+            return symbolSize(Array.isArray(numbers) ? numbers[2] : 1) + 10;
+          },
+          itemStyle: {
+            color: 'transparent',
+            borderColor: chartTheme.risk.high,
+            borderWidth: 1,
+            opacity: 0.35,
+          },
+          emphasis: { disabled: true },
+          label: { show: false },
+          tooltip: { show: false },
+        },
+        {
+          name: '插件',
+          type: 'scatter',
+          z: 2,
           data,
+          selectedMode: 'single',
+          select: {
+            itemStyle: {
+              borderColor: chartTheme.select.border,
+              borderWidth: chartTheme.select.width,
+            },
+            label: {
+              show: true,
+              color: chartTheme.strong,
+              backgroundColor: chartTheme.labelBackground,
+            },
+          },
           symbolSize: (value: unknown) => {
             const numbers = value as number[];
             return symbolSize(Array.isArray(numbers) ? numbers[2] : 1);
@@ -234,7 +270,7 @@ export function QuadrantChart({
             formatter: (params: unknown) => {
               const dataItem = (params as { data?: QuadrantDatum }).data;
               if (!dataItem || !topIds.has(dataItem.id)) return '';
-              return dataItem.name.length > 20 ? `${dataItem.name.slice(0, 19)}…` : dataItem.name;
+              return dataItem.name.length > 14 ? `${dataItem.name.slice(0, 13)}…` : dataItem.name;
             },
             position: 'top',
             distance: 6,
@@ -249,7 +285,7 @@ export function QuadrantChart({
           },
           labelLayout: { hideOverlap: true },
           emphasis: {
-            scale: 1.2,
+            scale: 1.18,
             itemStyle: {
               borderWidth: 2.5,
             },
@@ -261,10 +297,22 @@ export function QuadrantChart({
           },
           markLine: {
             silent: true,
-            symbol: 'none',
+            symbol: ['none', 'none'],
             lineStyle: { color: chartTheme.threshold, type: 'dashed', width: 1 },
-            label: { show: false },
-            data: [{ xAxis: POPULARITY_THRESHOLD }, { yAxis: MAINTENANCE_THRESHOLD }],
+            label: {
+              show: true,
+              position: 'end',
+              color: chartTheme.axisText,
+              fontSize: 10,
+              fontFamily: chartTheme.monoFamily,
+              backgroundColor: chartTheme.labelBackground,
+              borderRadius: 2,
+              padding: [2, 4],
+            },
+            data: [
+              { xAxis: POPULARITY_THRESHOLD, label: { formatter: 'X 50' } },
+              { yAxis: MAINTENANCE_THRESHOLD, label: { formatter: 'Y 60' } },
+            ],
           },
           markArea: {
             silent: true,
@@ -318,8 +366,8 @@ export function QuadrantChart({
         setActiveId(id);
         const dataIndex = params.dataIndex ?? positioned.findIndex((plugin) => plugin.id === id);
         if (dataIndex >= 0) {
-          chart.dispatchAction({ type: 'showTip', seriesIndex: 0, dataIndex });
-          chart.dispatchAction({ type: 'highlight', seriesIndex: 0, dataIndex });
+          chart.dispatchAction({ type: 'showTip', seriesIndex: 1, dataIndex });
+          chart.dispatchAction({ type: 'highlight', seriesIndex: 1, dataIndex });
         }
         return;
       }
@@ -328,16 +376,21 @@ export function QuadrantChart({
   });
 
   const unpositioned = (unpositionedPlugins ?? plugins).filter((plugin) => !hasQuadrantData(plugin));
-  const total = totalCount ?? plugins.length;
   return (
     <div className={className}>
-      <div className="relative w-full" style={{ height }}>
+      <div className="relative w-full min-w-0" style={{ height }}>
         <div ref={chartRef} className="h-full w-full" role="img" aria-label={ariaLabel} />
         {positioned.length === 0 ? (
           <div className="absolute inset-0 flex items-center justify-center px-6 text-center">
-            <p className="max-w-sm text-sm leading-6 text-content-secondary">
-              当前没有同时具备“已评分维护数据”和“经核验 npm 下载量”的插件，因此不把它们强行放进象限。
-            </p>
+            <div className="max-w-sm">
+              <p className="text-sm leading-6 text-content-secondary">当前没有可定位插件。</p>
+              <Link
+                to="/quadrant#unpositioned-plugins"
+                className="mt-1 inline-flex min-h-9 items-center text-xs text-content-secondary underline underline-offset-4 hover:text-brand-text"
+              >
+                查看未定位原因
+              </Link>
+            </div>
           </div>
         ) : null}
       </div>
@@ -358,32 +411,39 @@ export function QuadrantChart({
             需要关注
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span
-              className="h-2 w-2 rounded-full border-[1.5px] bg-transparent"
-              style={{ borderColor: riskColor('high') }}
-            />
-            高风险信号
+            <span className="relative inline-flex h-3.5 w-3.5 items-center justify-center" aria-hidden="true">
+              <span
+                className="absolute inset-0 rounded-full border opacity-35"
+                style={{ borderColor: riskColor('high') }}
+              />
+              <span
+                className="h-2 w-2 rounded-full border-[1.5px] bg-transparent"
+                style={{ borderColor: riskColor('high') }}
+              />
+            </span>
+            高风险信号 · 外环
           </span>
           <span className="inline-flex items-center gap-1.5">
             <span
-              className="h-2 w-2 rounded-full border-[1.5px] bg-transparent"
+              className="h-2 w-2 rounded-full border-[1.5px] border-dashed bg-transparent"
               style={{ borderColor: riskColor('unknown') }}
             />
             风险信息不完整
           </span>
-          <span className="ml-auto text-content-muted">
-            气泡面积 ≈ Star 量级 · 共定位 {positioned.length}/{total}
-          </span>
+          <span className="ml-auto text-content-muted">气泡面积 ≈ Star 量级</span>
         </div>
       ) : null}
       {isCoarsePointer ? (
         <p className="mt-2 text-2xs text-content-muted">触屏设备：第一次点按查看概要，再次点按进入详情。</p>
       ) : null}
       {showUnpositioned && unpositioned.length > 0 ? (
-        <details className="mt-3 rounded-control border border-line bg-surface-subtle px-3 py-2 text-xs">
-          <summary className="flex min-h-11 cursor-pointer list-none items-center text-xs marker:hidden">
+        <details
+          id="unpositioned-plugins"
+          className="mt-3 rounded-control border border-line bg-surface-subtle px-3 py-2 text-xs"
+        >
+          <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-xs">
             <span>{unpositioned.length} 个插件未进入象限</span>
-            <span className="ml-2 text-content-muted">缺少维护评分或经核验下载量，点击查看原因</span>
+            <span className="text-content-muted">缺少维护评分或经核验下载量，点击查看原因</span>
           </summary>
           <ul className="mt-2 space-y-1.5 text-content-secondary">
             {unpositioned.map((plugin) => (

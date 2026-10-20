@@ -33,12 +33,12 @@ export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 
 export function buttonClasses(variant: ButtonVariant = 'primary', className?: string): string {
   return cn(
-    'inline-flex h-10 items-center justify-center gap-2 rounded-control px-4 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas disabled:cursor-not-allowed disabled:opacity-45 max-sm:h-11',
+    'inline-flex h-10 items-center justify-center gap-2 rounded-control px-4 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-45 max-sm:h-11',
     variant === 'primary'
-      ? 'bg-accent text-white hover:bg-accent-hover active:bg-accent-active'
+      ? 'bg-brand text-white hover:bg-brand-strong active:bg-brand-active'
       : variant === 'secondary'
-        ? 'border border-line-strong bg-surface text-content-primary hover:border-content-muted hover:bg-surface-subtle'
-        : 'text-content-secondary hover:bg-surface-subtle hover:text-content-primary',
+        ? 'border border-line-control bg-surface text-content-primary hover:border-content-primary hover:bg-surface-subtle active:bg-surface-sunken'
+        : 'text-content-secondary hover:bg-surface-subtle hover:text-content-primary active:bg-surface-sunken',
     className,
   );
 }
@@ -82,7 +82,7 @@ export function SectionHeading({
     <div className={cn('flex flex-wrap items-end justify-between gap-4', className)}>
       <div className="min-w-0">
         {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
-        <h2 className="mt-1.5 text-2xl font-semibold leading-8 tracking-display text-content-primary">
+        <h2 className="mt-1.5 text-2xl font-semibold leading-8 tracking-title text-content-primary lg:text-3xl lg:leading-9">
           {title}
         </h2>
         {description ? (
@@ -127,9 +127,12 @@ export function ScoreBar({
 }): JSX.Element {
   const width = value === null ? 0 : Math.max(0, Math.min(100, value));
   return (
-    <div className={cn('h-1 w-full overflow-hidden rounded-full bg-surface-sunken', className)}>
+    <div className={cn('h-1 w-full overflow-hidden rounded-chip bg-surface-sunken', className)}>
       <div
-        className={cn('h-full rounded-full', muted || value === null ? 'bg-content-disabled' : 'bg-accent')}
+        className={cn(
+          'h-full rounded-chip transition-[width] duration-200',
+          muted || value === null ? 'bg-content-disabled' : 'bg-series-bar',
+        )}
         style={{ width: `${width}%` }}
       />
     </div>
@@ -181,10 +184,27 @@ export function RiskBadge({
         : level === 'low'
           ? ShieldCheck
           : ShieldQuestion;
+  if (level === 'low') {
+    return (
+      <span
+        className={cn(
+          'inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap py-1 text-2xs font-medium text-content-muted',
+          className,
+        )}
+        title={riskLabel(level)}
+      >
+        <Icon size={12} strokeWidth={2} aria-hidden="true" />
+        {compact ? RISK_SHORT[level] : riskLabel(level)}
+      </span>
+    );
+  }
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-chip border px-2 py-1 text-2xs font-medium',
+        'inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-chip border px-2 py-1 text-2xs font-medium',
+        level === 'high' ? 'border-l-2 border-l-risk-high' : '',
+        level === 'medium' ? 'border-l-2 border-l-risk-medium' : '',
+        level === 'unknown' ? 'border-dashed' : '',
         tone.border,
         tone.bg,
         tone.text,
@@ -244,7 +264,7 @@ export function DataCoverage({
               key={index}
               className={cn(
                 'h-2 w-1.5 rounded-[1px]',
-                index < completeness.available ? 'bg-accent/80' : 'bg-surface-sunken',
+                index < completeness.available ? 'bg-series-bar' : 'bg-surface-sunken',
               )}
             />
           ))}
@@ -304,8 +324,8 @@ export function PluginMonogram({
 
 export function CategoryTag({ category }: { category: string }): JSX.Element {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-chip border border-line bg-surface-subtle px-1.5 py-0.5 text-2xs text-content-secondary">
-      <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
+    <span className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-chip border border-line bg-surface-subtle px-1.5 py-0.5 text-2xs text-content-secondary">
+      <span className="h-1.5 w-1.5 rounded-[1px] bg-content-muted" aria-hidden="true" />
       {categoryLabel(category)}
     </span>
   );
@@ -324,7 +344,7 @@ export function CopyButton({
   return (
     <div
       className={cn(
-        'flex flex-col overflow-hidden rounded-control border border-line-strong bg-surface sm:flex-row sm:items-stretch',
+        'flex flex-col overflow-hidden rounded-control border border-line-control bg-surface sm:flex-row sm:items-stretch',
         className,
       )}
     >
@@ -333,7 +353,7 @@ export function CopyButton({
       </code>
       <button
         type="button"
-        className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 border-t border-line px-3 text-2xs text-content-secondary transition hover:bg-surface-subtle hover:text-content-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent sm:h-auto sm:border-l sm:border-t-0"
+        className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 border-t border-line px-3 text-2xs text-content-secondary transition-colors hover:bg-surface-subtle hover:text-content-primary sm:h-auto sm:border-l sm:border-t-0"
         onClick={async () => {
           try {
             await navigator.clipboard.writeText(value);
@@ -382,7 +402,7 @@ export function ExternalTextLink({
       target="_blank"
       rel="noreferrer noopener"
       className={cn(
-        'inline-flex items-center gap-1 text-content-secondary underline-offset-4 transition hover:text-accent hover:underline',
+        'inline-flex items-center gap-1 text-content-secondary underline-offset-4 transition-colors hover:text-brand-text hover:underline',
         className,
       )}
     >
@@ -441,7 +461,7 @@ export function InfoHint({
     <span className="relative inline-flex align-middle">
       <button
         type="button"
-        className="relative inline-flex h-7 w-7 items-center justify-center rounded-full text-content-muted transition after:absolute after:-inset-2 after:content-[''] hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="relative inline-flex h-7 w-7 items-center justify-center rounded-control text-content-muted transition-colors after:absolute after:-inset-2 after:content-[''] hover:bg-surface-subtle hover:text-content-primary"
         aria-label={`查看说明：${text}`}
         aria-expanded={open}
         aria-describedby={open ? id : undefined}
@@ -457,7 +477,7 @@ export function InfoHint({
         id={id}
         role="tooltip"
         className={cn(
-          'absolute bottom-[calc(100%+6px)] z-30 w-60 max-w-[calc(100vw-2rem)] rounded-control border border-line bg-surface px-3 py-2 text-xs font-normal leading-5 text-content-secondary shadow-pop',
+          'absolute bottom-[calc(100%+6px)] z-30 w-60 max-w-[calc(100vw-2rem)] rounded-panel border border-line-strong bg-surface px-3 py-2.5 text-xs font-normal leading-5 text-content-secondary shadow-pop',
           align === 'right' ? 'right-0' : 'left-0',
           open ? 'block' : 'hidden',
         )}
@@ -482,15 +502,15 @@ export function StatCell({
   className?: string;
 }): JSX.Element {
   return (
-    <div className={cn('min-w-0 px-4 py-5 md:px-5', className)}>
+    <div className={cn('min-w-0 px-4 py-4 md:px-5 md:py-5 xl:py-6', className)}>
       <div className="flex items-center gap-1.5 text-2xs font-medium text-content-secondary">
         {icon ? <span className="text-content-muted">{icon}</span> : null}
         {label}
       </div>
-      <div className="mt-2 tnum text-4xl font-semibold leading-none tracking-display text-content-primary">
+      <div className="readout mt-2.5 text-[2.25rem] md:text-[2.5rem] xl:text-[2.75rem]">
         {value}
       </div>
-      {detail ? <div className="mt-2 text-xs leading-5 text-content-muted">{detail}</div> : null}
+      {detail ? <div className="mt-2 text-2xs leading-5 text-content-muted md:text-xs">{detail}</div> : null}
     </div>
   );
 }
@@ -510,7 +530,7 @@ export function Pagination({
   const list = [...pages].filter((value) => value >= 1 && value <= totalPages).sort((a, b) => a - b);
   return (
     <nav className="flex flex-wrap items-center justify-between gap-3" aria-label="插件列表分页">
-      <p className="tnum text-xs text-content-muted">
+      <p className="tnum font-mono text-2xs text-content-muted">
         第 {page} / {totalPages} 页 · 共 {total} 个结果
       </p>
       <div className="flex flex-wrap items-center gap-1.5">
@@ -518,7 +538,7 @@ export function Pagination({
           type="button"
           onClick={() => onPageChange(page - 1)}
           disabled={page <= 1}
-          className="inline-flex h-10 min-w-10 items-center justify-center gap-1 rounded-control border border-line-strong px-2.5 text-xs text-content-secondary transition hover:border-content-muted hover:text-content-primary disabled:cursor-not-allowed disabled:opacity-35 max-sm:h-11"
+          className="inline-flex h-10 min-w-10 items-center justify-center gap-1 rounded-control border border-line-control px-2.5 text-xs text-content-secondary transition-colors hover:border-content-primary hover:bg-surface-subtle hover:text-content-primary disabled:cursor-not-allowed disabled:opacity-35 max-sm:h-11"
           aria-label="上一页"
         >
           <ChevronLeft size={14} /> 上一页
@@ -533,9 +553,9 @@ export function Pagination({
               onClick={() => onPageChange(value)}
               aria-current={value === page ? 'page' : undefined}
               className={cn(
-                'h-10 min-w-10 rounded-control px-2 text-xs transition max-sm:h-11 max-sm:min-w-11',
+                'h-10 min-w-10 rounded-control px-2 text-xs transition-colors max-sm:h-11 max-sm:min-w-11',
                 value === page
-                  ? 'bg-accent text-white'
+                  ? 'bg-brand text-white hover:bg-brand-strong'
                   : 'text-content-secondary hover:bg-surface-subtle hover:text-content-primary',
               )}
             >
@@ -547,7 +567,7 @@ export function Pagination({
           type="button"
           onClick={() => onPageChange(page + 1)}
           disabled={page >= totalPages}
-          className="inline-flex h-10 min-w-10 items-center justify-center gap-1 rounded-control border border-line-strong px-2.5 text-xs text-content-secondary transition hover:border-content-muted hover:text-content-primary disabled:cursor-not-allowed disabled:opacity-35 max-sm:h-11"
+          className="inline-flex h-10 min-w-10 items-center justify-center gap-1 rounded-control border border-line-control px-2.5 text-xs text-content-secondary transition-colors hover:border-content-primary hover:bg-surface-subtle hover:text-content-primary disabled:cursor-not-allowed disabled:opacity-35 max-sm:h-11"
           aria-label="下一页"
         >
           下一页 <ChevronRight size={14} />
@@ -569,12 +589,12 @@ export function EmptyState({
   icon?: ReactNode;
 }): JSX.Element {
   return (
-    <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-      <div className="flex h-12 w-12 items-center justify-center rounded-control border border-line bg-surface-subtle text-content-secondary">
+    <div className="flex min-h-[280px] flex-col items-center justify-center px-6 py-16 text-center">
+      <div className="flex h-12 w-12 items-center justify-center rounded-chip border border-dashed border-line-strong bg-surface-subtle text-content-secondary">
         {icon ?? <SearchX size={20} strokeWidth={1.6} />}
       </div>
-      <h3 className="mt-4 text-base font-semibold text-content-primary">{title}</h3>
-      <p className="mt-1.5 max-w-md text-sm leading-6 text-content-secondary">{description}</p>
+      <h3 className="mt-4 text-[0.9375rem] font-semibold text-content-primary">{title}</h3>
+      <p className="mt-1.5 max-w-md text-xs leading-5 text-content-secondary">{description}</p>
       {action ? <div className="mt-5">{action}</div> : null}
     </div>
   );
@@ -583,11 +603,11 @@ export function EmptyState({
 export function LoadingState({ label = '正在读取本地数据快照' }: { label?: string }): JSX.Element {
   return (
     <div className="flex min-h-[55vh] flex-col items-center justify-center gap-4" role="status" aria-live="polite">
-      <Loader2 size={22} className="animate-spin text-accent" aria-hidden="true" />
+      <Loader2 size={22} className="animate-spin text-content-secondary" aria-hidden="true" />
       <p className="text-sm text-content-secondary">{label}</p>
       <div className="mt-2 grid w-full max-w-2xl grid-cols-2 gap-2 md:grid-cols-4" aria-hidden="true">
         {Array.from({ length: 4 }, (_, index) => (
-          <div key={index} className="h-20 rounded-panel border border-line bg-surface-sunken" />
+          <div key={index} className="h-20 rounded-panel border border-line-hairline bg-surface-sunken" />
         ))}
       </div>
     </div>
@@ -631,11 +651,11 @@ npm run dev`}
         )}
         <div className="mt-6 flex flex-wrap items-center gap-3">
           {onRetry ? (
-            <button type="button" onClick={onRetry} className={buttonClasses('primary')}>
+            <button type="button" onClick={onRetry} className={buttonClasses('secondary')}>
               <ArrowLeft size={14} className="rotate-180" /> 重新加载
             </button>
           ) : null}
-          <Link to="/method" className="text-sm text-content-secondary underline-offset-4 hover:text-accent hover:underline">
+          <Link to="/method" className="text-sm text-content-secondary underline-offset-4 transition-colors hover:text-brand-text hover:underline">
             查看数据方法与更新机制
           </Link>
         </div>
@@ -662,7 +682,7 @@ export function InlineNotice({
           : tone === 'rose'
             ? 'border-danger-line bg-danger-soft text-danger'
             : tone === 'mint'
-              ? 'border-line bg-surface-subtle text-content-secondary'
+              ? 'border-success-line bg-success-soft text-success'
               : 'border-line bg-surface-subtle text-content-secondary',
         className,
       )}

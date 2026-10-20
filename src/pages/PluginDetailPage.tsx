@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
+  ArrowRight,
   ArrowUpRight,
   BookOpen,
   CalendarClock,
@@ -9,12 +10,14 @@ import {
   GitCommitHorizontal,
   Github,
   Globe2,
+  List,
   Package,
   ShieldAlert,
   ShieldQuestion,
   Star,
 } from 'lucide-react';
 import { useLoadedData } from '../hooks/useData';
+import { useBreakpoint } from '../hooks/useBreakpoint';
 import type { PluginRecord, ScoreComponent } from '../lib/types';
 import {
   formatCompact,
@@ -48,6 +51,18 @@ import {
   SectionHeading,
 } from '../components/ui';
 import { cn } from '../lib/cn';
+
+const DETAIL_TOC = [
+  { id: 'score-summary', label: '评分摘要' },
+  { id: 'raw-metrics', label: '原始读数' },
+  { id: 'trend', label: '趋势与下载' },
+  { id: 'explain', label: '评分解释' },
+  { id: 'evidence', label: '处理与证据' },
+  { id: 'risk-evidence', label: '风险提示' },
+  { id: 'sources', label: '数据来源' },
+] as const;
+
+const TREND_HEIGHT = { mobile: 220, tablet: 240, desktop: 280, wide: 280 } as const;
 
 function scoreRank(
   plugin: PluginRecord,
@@ -204,7 +219,7 @@ function DataSourcesPanel({ plugin }: { plugin: PluginRecord }): JSX.Element {
   };
   const statusTone = (status: string): string => {
     if (status === 'ok' || status === 'checked' || status === 'verified') {
-      return 'border-line bg-surface-subtle text-content-secondary';
+      return 'border-success-line bg-success-soft text-success';
     }
     if (status === 'error' || status === 'failed') {
       return 'border-danger-line bg-danger-soft text-danger';
@@ -238,7 +253,7 @@ function DataSourcesPanel({ plugin }: { plugin: PluginRecord }): JSX.Element {
   ];
 
   return (
-    <section className="panel overflow-hidden" aria-labelledby="sources-title">
+    <section id="sources" className="panel scroll-mt-24 overflow-hidden" aria-labelledby="sources-title">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3.5 md:px-5">
         <div className="flex items-center gap-2">
           <BookOpen size={16} className="text-content-muted" aria-hidden="true" />
@@ -322,7 +337,7 @@ function DataSourcesPanel({ plugin }: { plugin: PluginRecord }): JSX.Element {
           href={`${import.meta.env.BASE_URL}data/latest.json`}
           target="_blank"
           rel="noreferrer noopener"
-          className="ml-auto inline-flex items-center gap-1 text-content-secondary hover:text-accent"
+          className="ml-auto inline-flex items-center gap-1 text-content-secondary hover:text-brand-text"
         >
           查看原始 JSON <ArrowUpRight size={11} />
         </a>
@@ -355,6 +370,26 @@ export function PluginDetailPage(): JSX.Element {
           new Date(historyPoints[0].t).getTime()) /
         3_600_000
       : 0;
+  const breakpoint = useBreakpoint();
+  const [activeSection, setActiveSection] = useState<string>(DETAIL_TOC[0].id);
+
+  useEffect(() => {
+    function syncActiveSection(): void {
+      let current: string = DETAIL_TOC[0].id;
+      for (const item of DETAIL_TOC) {
+        const section = document.getElementById(item.id);
+        if (section && section.getBoundingClientRect().top <= 180) current = item.id;
+      }
+      setActiveSection(current);
+    }
+    syncActiveSection();
+    window.addEventListener('scroll', syncActiveSection, { passive: true });
+    window.addEventListener('resize', syncActiveSection);
+    return () => {
+      window.removeEventListener('scroll', syncActiveSection);
+      window.removeEventListener('resize', syncActiveSection);
+    };
+  }, [plugin?.id]);
 
   if (!plugin) {
     return (
@@ -382,12 +417,19 @@ export function PluginDetailPage(): JSX.Element {
   );
   const otherWarnings = plugin.warnings.filter((warning) => !weeklyWarnings.includes(warning));
   const trendReady = historyPoints.length >= 3 && historySpanHours >= 6;
+  const hasDownloadData = plugin.npm.status === 'verified' && plugin.npm.daily.length > 0;
+  const splitCharts = trendReady && hasDownloadData;
   const completeness = plugin.scores.completeness;
+  const railSources = [
+    { name: 'GitHub', status: data.latest.sources.github.status },
+    { name: 'npm', status: data.latest.sources.npm.status },
+    { name: 'OSV', status: data.latest.sources.osv.status },
+  ];
 
   return (
     <div className="page-enter mx-auto max-w-shell px-4 pb-12 pt-6 md:px-6 md:pt-8">
       <nav className="flex items-center gap-1.5 text-xs text-content-muted" aria-label="面包屑">
-        <Link to="/" className="inline-flex items-center gap-1 hover:text-accent">
+        <Link to="/" className="inline-flex min-h-9 items-center gap-1 hover:text-brand-text">
           <ArrowLeft size={13} /> 总览
         </Link>
         <span className="text-line-strong" aria-hidden="true">/</span>
@@ -400,14 +442,14 @@ export function PluginDetailPage(): JSX.Element {
             <PluginMonogram plugin={plugin} size="lg" />
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="break-words text-[2rem] font-semibold leading-10 tracking-display text-content-primary">
+                <h1 className="max-w-full break-words text-[1.75rem] font-semibold leading-9 tracking-tightest text-content-primary md:text-[2rem] md:leading-10 [overflow-wrap:anywhere]">
                   {plugin.name}
                 </h1>
                 <CategoryTag category={plugin.category} />
                 <RiskBadge level={risk.level} />
                 <CoverageChip completeness={completeness} />
                 {plugin.repository.archived ? (
-                  <span className="rounded-chip border border-danger-line bg-danger-soft px-1.5 py-0.5 text-2xs text-danger">
+                  <span className="rounded-chip border border-risk-high-line bg-risk-high-soft px-1.5 py-0.5 text-2xs text-risk-high">
                     已归档
                   </span>
                 ) : null}
@@ -418,7 +460,7 @@ export function PluginDetailPage(): JSX.Element {
                   href={plugin.repository.url}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="inline-flex max-w-full items-center gap-1 break-all font-mono text-content-secondary hover:text-accent"
+                  className="inline-flex max-w-full items-center gap-1 break-all font-mono text-content-secondary hover:text-brand-text"
                 >
                   <Github size={13} /> {plugin.repo}
                 </a>
@@ -427,7 +469,7 @@ export function PluginDetailPage(): JSX.Element {
                     href={plugin.repository.homepageUrl}
                     target="_blank"
                     rel="noreferrer noopener"
-                    className="inline-flex items-center gap-1 hover:text-accent"
+                    className="inline-flex items-center gap-1 hover:text-brand-text"
                   >
                     <Globe2 size={13} /> 项目主页
                   </a>
@@ -437,7 +479,7 @@ export function PluginDetailPage(): JSX.Element {
                     href={plugin.npm.registryUrl}
                     target="_blank"
                     rel="noreferrer noopener"
-                    className="inline-flex items-center gap-1 hover:text-accent"
+                    className="inline-flex items-center gap-1 hover:text-brand-text"
                   >
                     <Package size={13} /> {plugin.npm.packageName}
                   </a>
@@ -453,7 +495,7 @@ export function PluginDetailPage(): JSX.Element {
               href={plugin.repository.url}
               target="_blank"
               rel="noreferrer noopener"
-              className="inline-flex h-10 items-center gap-1.5 rounded-control border border-line-strong bg-surface px-4 text-sm text-content-primary transition hover:border-content-muted hover:bg-surface-subtle max-sm:h-11"
+              className="inline-flex h-10 items-center gap-1.5 rounded-control border border-line-control bg-surface px-4 text-sm text-content-primary transition-colors hover:border-content-primary hover:bg-surface-subtle max-sm:h-11"
             >
               <Github size={14} /> GitHub <ArrowUpRight size={12} />
             </a>
@@ -463,7 +505,7 @@ export function PluginDetailPage(): JSX.Element {
         <p className="mt-4 max-w-3xl text-base leading-6 text-content">{plugin.curatorNote}</p>
         {plugin.repository.description ? (
           <details className="mt-2 max-w-3xl">
-            <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-1 text-xs text-content-muted hover:text-accent sm:min-h-0">
+            <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-1 text-xs text-content-muted hover:text-brand-text sm:min-h-0">
               <span aria-hidden="true">▸</span> 项目原始简介
             </summary>
             <p className="mt-2 text-sm leading-6 text-content-secondary">{plugin.repository.description}</p>
@@ -492,17 +534,38 @@ export function PluginDetailPage(): JSX.Element {
         ) : null}
       </header>
 
-      <DataBand className="mt-6">
-        <div
-          className="grid grid-cols-2 divide-x divide-y divide-line-hairline lg:grid-cols-4 lg:divide-y-0"
-          aria-label="评分摘要"
-        >
+      <details className="mt-4 rounded-panel border border-line bg-surface xl:hidden">
+        <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 px-4 py-3 text-sm font-medium text-content-primary">
+          <List size={15} aria-hidden="true" /> 本页导航
+          <span className="ml-auto text-2xs text-content-muted">7 项</span>
+        </summary>
+        <nav className="grid grid-cols-2 gap-x-4 border-t border-line-hairline px-4 py-2" aria-label="插件详情目录">
+          {DETAIL_TOC.map((item) => (
+            <a
+              key={item.id}
+              href={`#${item.id}`}
+              className="flex min-h-10 items-center text-xs text-content-secondary hover:text-brand-text"
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+      </details>
+
+      <div className="mt-6 xl:grid xl:grid-cols-12 xl:gap-6">
+        <div className="min-w-0 xl:col-span-8">
+          <div id="score-summary" className="scroll-mt-24">
+            <DataBand>
+              <div
+                className="grid grid-cols-2 divide-x divide-y divide-line-hairline lg:grid-cols-4 lg:divide-y-0"
+                aria-label="评分摘要"
+              >
           <div className="min-w-0 px-4 py-5 md:px-5">
             <div className="flex items-center gap-1.5 text-2xs font-medium text-content-secondary">
               <Star size={13} /> 人气指数
             </div>
             <div className="mt-2 flex flex-wrap items-baseline gap-x-1 gap-y-0.5">
-              <span className="tnum font-mono text-[2rem] font-semibold leading-none text-content-primary sm:text-4xl">
+              <span className="readout text-[2.25rem] sm:text-4xl">
                 {formatScore(plugin.scores.popularity.score)}
               </span>
               <span className="text-xs text-content-muted">/ 100</span>
@@ -514,11 +577,13 @@ export function PluginDetailPage(): JSX.Element {
                 ? '高置信'
                 : plugin.scores.popularity.confidence === 'medium'
                   ? '中置信'
-                  : '低置信'}{' '}
-              · 覆盖 {Math.round(plugin.scores.popularity.coverage * 100)}%
+                  : '低置信'}
             </p>
-            <a href="#explain-popularity" className="mt-2 inline-flex items-center gap-1 text-xs text-content-secondary hover:text-accent">
-              为什么是这个分？ <ArrowUpRight size={11} />
+            <p className="mt-0.5 whitespace-nowrap text-2xs text-content-muted">
+              覆盖 {Math.round(plugin.scores.popularity.coverage * 100)}%
+            </p>
+            <a href="#explain-popularity" className="mt-2 inline-flex min-h-8 items-center gap-1 text-xs text-content-secondary underline-offset-4 hover:text-brand-text hover:underline">
+              查看计算 <ArrowRight size={11} aria-hidden="true" />
             </a>
           </div>
 
@@ -527,7 +592,7 @@ export function PluginDetailPage(): JSX.Element {
               <GitCommitHorizontal size={13} /> 维护健康度
             </div>
             <div className="mt-2 flex flex-wrap items-baseline gap-x-1 gap-y-0.5">
-              <span className="tnum font-mono text-[2rem] font-semibold leading-none text-content-primary sm:text-4xl">
+              <span className="readout text-[2.25rem] sm:text-4xl">
                 {formatScore(plugin.scores.maintenance.score)}
               </span>
               <span className="text-xs text-content-muted">/ 100</span>
@@ -539,11 +604,13 @@ export function PluginDetailPage(): JSX.Element {
                 ? '高置信'
                 : plugin.scores.maintenance.confidence === 'medium'
                   ? '中置信'
-                  : '低置信'}{' '}
-              · 覆盖 {Math.round(plugin.scores.maintenance.coverage * 100)}%
+                  : '低置信'}
             </p>
-            <a href="#explain-maintenance" className="mt-2 inline-flex items-center gap-1 text-xs text-content-secondary hover:text-accent">
-              为什么是这个分？ <ArrowUpRight size={11} />
+            <p className="mt-0.5 whitespace-nowrap text-2xs text-content-muted">
+              覆盖 {Math.round(plugin.scores.maintenance.coverage * 100)}%
+            </p>
+            <a href="#explain-maintenance" className="mt-2 inline-flex min-h-8 items-center gap-1 text-xs text-content-secondary underline-offset-4 hover:text-brand-text hover:underline">
+              查看计算 <ArrowRight size={11} aria-hidden="true" />
             </a>
           </div>
 
@@ -554,11 +621,11 @@ export function PluginDetailPage(): JSX.Element {
             <div className="mt-2 flex flex-wrap items-baseline gap-x-1 gap-y-0.5">
               <span
                 className={cn(
-                  'tnum font-mono text-[2rem] font-semibold leading-none sm:text-4xl',
+                  'readout text-[2.25rem] sm:text-4xl',
                   risk.level === 'high'
-                    ? 'text-danger'
+                    ? 'text-risk-high'
                     : risk.level === 'medium'
-                      ? 'text-warning'
+                      ? 'text-risk-medium'
                       : 'text-content-primary',
                 )}
               >
@@ -574,8 +641,8 @@ export function PluginDetailPage(): JSX.Element {
                 ? `${risk.flags.length} 条信号需要阅读；不代表存在安全事件。`
                 : '未命中归档、积压或公开漏洞规则；仍不等于安全审计。'}
             </p>
-            <a href="#risk-evidence" className="mt-2 inline-flex items-center gap-1 text-xs text-content-secondary hover:text-accent">
-              查看风险证据 <ArrowUpRight size={11} />
+            <a href="#risk-evidence" className="mt-2 inline-flex min-h-8 items-center gap-1 text-xs text-content-secondary underline-offset-4 hover:text-brand-text hover:underline">
+              查看风险证据 <ArrowRight size={11} aria-hidden="true" />
             </a>
           </div>
 
@@ -584,7 +651,7 @@ export function PluginDetailPage(): JSX.Element {
               <CircleDot size={13} /> 数据完整度
             </div>
             <div className="mt-2 flex flex-wrap items-baseline gap-x-1 gap-y-0.5">
-              <span className="tnum font-mono text-[2rem] font-semibold leading-none text-content-primary sm:text-4xl">
+              <span className="readout text-[2.25rem] sm:text-4xl">
                 {completeness.available}
               </span>
               <span className="text-xs text-content-muted">/ {completeness.total} 域</span>
@@ -595,13 +662,15 @@ export function PluginDetailPage(): JSX.Element {
             <p className="mt-2 text-xs leading-5 text-content-muted">
               完整度 {completeness.score}% · 缺失不参与评分，也不记为 0。
             </p>
-            <Link to="/method#completeness" className="mt-2 inline-flex items-center gap-1 text-xs text-content-secondary hover:text-accent">
-              数据域说明 <ArrowUpRight size={11} />
+            <Link to="/method#completeness" className="mt-2 inline-flex min-h-8 items-center gap-1 text-xs text-content-secondary underline-offset-4 hover:text-brand-text hover:underline">
+              查看计算 <ArrowRight size={11} aria-hidden="true" />
             </Link>
           </div>
         </div>
       </DataBand>
+          </div>
 
+          <div id="raw-metrics" className="scroll-mt-24">
       <DataBand className="mt-4">
         <div className="grid grid-cols-2 divide-x divide-y divide-line-hairline md:grid-cols-4 md:divide-y-0">
           <RawMetric
@@ -676,15 +745,16 @@ export function PluginDetailPage(): JSX.Element {
           />
         </div>
       </DataBand>
+          </div>
 
-      <section className="mt-10 border-t border-line pt-6" aria-labelledby="trend-title">
+      <section id="trend" className="mt-10 scroll-mt-24 border-t border-line pt-6" aria-labelledby="trend-title">
         <SectionHeading
           eyebrow="时间序列"
           title={<span id="trend-title">趋势与下载</span>}
           description="指数趋势来自 data 分支的历史快照；下载趋势来自 npm 最近 30 天日数据。历史不足时不画趋势线。"
         />
         <div className="panel mt-4 overflow-hidden">
-          <div className="grid lg:grid-cols-2 lg:divide-x lg:divide-line">
+          <div className={cn('grid', splitCharts && 'lg:grid-cols-2 lg:divide-x lg:divide-line')}>
             <div className="min-w-0">
               <div className="flex flex-wrap items-start justify-between gap-2 border-b border-line px-4 py-3">
                 <div>
@@ -695,10 +765,13 @@ export function PluginDetailPage(): JSX.Element {
               </div>
               {trendReady ? (
                 <div className="px-1 pb-1">
-                  <ScoreTrendChart points={historyPoints} height={260} />
+                  <ScoreTrendChart points={historyPoints} height={TREND_HEIGHT[breakpoint]} />
                 </div>
               ) : (
-                <div className="flex min-h-[260px] items-center justify-center px-6 py-8 text-center">
+                <div
+                  className="flex items-center justify-center px-6 py-8 text-center"
+                  style={{ minHeight: TREND_HEIGHT[breakpoint] }}
+                >
                   <div>
                     <CalendarClock size={22} className="mx-auto text-content-muted" />
                     <p className="mt-3 text-sm font-medium text-content-primary">历史数据积累中</p>
@@ -716,7 +789,7 @@ export function PluginDetailPage(): JSX.Element {
               )}
             </div>
 
-            <div className="min-w-0 border-t border-line lg:border-t-0">
+            <div className={cn('min-w-0 border-t border-line', splitCharts && 'lg:border-l lg:border-t-0')}>
               <div className="flex flex-wrap items-start justify-between gap-2 border-b border-line px-4 py-3">
                 <div>
                   <p className="text-sm font-semibold text-content-primary">npm 下载</p>
@@ -728,12 +801,15 @@ export function PluginDetailPage(): JSX.Element {
                   </span>
                 ) : null}
               </div>
-              {plugin.npm.status === 'verified' && plugin.npm.daily.length > 0 ? (
+              {hasDownloadData ? (
                 <div className="px-1 pb-1">
-                  <DownloadBars daily={plugin.npm.daily} gapDates={gapDates} height={260} />
+                  <DownloadBars daily={plugin.npm.daily} gapDates={gapDates} height={TREND_HEIGHT[breakpoint]} />
                 </div>
               ) : (
-                <div className="flex min-h-[260px] items-center justify-center px-6 py-8 text-center">
+                <div
+                  className="flex items-center justify-center px-6 py-8 text-center"
+                  style={{ minHeight: TREND_HEIGHT[breakpoint] }}
+                >
                   <div>
                     <Package size={22} className="mx-auto text-content-muted" />
                     <p className="mt-3 text-sm font-medium text-content-primary">暂无可靠 npm 下载数据</p>
@@ -754,7 +830,7 @@ export function PluginDetailPage(): JSX.Element {
         </div>
       </section>
 
-      <section className="mt-10 border-t border-line pt-6" aria-labelledby="explain-title">
+      <section id="explain" className="mt-10 scroll-mt-24 border-t border-line pt-6" aria-labelledby="explain-title">
         <SectionHeading
           eyebrow="可解释性"
           title={<span id="explain-title">为什么得到这个评分</span>}
@@ -770,7 +846,7 @@ export function PluginDetailPage(): JSX.Element {
         </div>
       </section>
 
-      <section className="mt-10 border-t border-line pt-6" aria-labelledby="evidence-title">
+      <section id="evidence" className="mt-10 scroll-mt-24 border-t border-line pt-6" aria-labelledby="evidence-title">
         <SectionHeading
           eyebrow="证据"
           title={<span id="evidence-title">处理与安全证据</span>}
@@ -780,7 +856,7 @@ export function PluginDetailPage(): JSX.Element {
           <div className="min-w-0 px-4 py-4 md:px-5">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <CircleDot size={16} className="text-accent" aria-hidden="true" />
+                <CircleDot size={16} className="text-content-secondary" aria-hidden="true" />
                 <h3 className="text-base font-semibold text-content-primary">Issue 与 PR 处理</h3>
               </div>
               <span className="text-2xs text-content-muted">窗口 90 天 · 不含 PR 计入 Issue</span>
@@ -990,9 +1066,9 @@ export function PluginDetailPage(): JSX.Element {
                           className={cn(
                             'mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full',
                             flag.level === 'high'
-                              ? 'bg-danger'
+                              ? 'bg-risk-high'
                               : flag.level === 'medium'
-                                ? 'bg-warning'
+                                ? 'bg-risk-medium'
                                 : 'bg-content-muted',
                           )}
                           aria-hidden="true"
@@ -1016,7 +1092,7 @@ export function PluginDetailPage(): JSX.Element {
               </ul>
             )}
           </div>
-          <div className="border-l-2 border-accent bg-surface-subtle px-4 py-4">
+          <div className="border border-line bg-surface-subtle px-4 py-4">
             <div className="flex items-center gap-2">
               <ShieldQuestion size={16} className="text-content-muted" aria-hidden="true" />
               <p className="text-sm font-semibold text-content-primary">边界说明</p>
@@ -1037,17 +1113,83 @@ export function PluginDetailPage(): JSX.Element {
         </div>
       </section>
 
-      <div className="mt-10">
-        <DataSourcesPanel plugin={plugin} />
-      </div>
+          <div className="mt-10">
+            <DataSourcesPanel plugin={plugin} />
+          </div>
+        </div>
 
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-line py-4">
-        <p className="max-w-2xl text-xs leading-5 text-content-secondary">
-          对比页只展示指标差异，不会基于单一指标断言谁“更好”。请结合样本量、口径与原始链接阅读。
-        </p>
-        <ButtonLink to={`/compare?a=${encodeURIComponent(plugin.id)}`} variant="secondary">
-          选择对比插件 <ArrowUpRight size={12} />
-        </ButtonLink>
+        <aside className="hidden xl:col-span-3 xl:col-start-10 xl:block" aria-label="本页辅助导航">
+          <div className="sticky top-[calc(var(--header-h)+16px)] max-h-[calc(100dvh-var(--header-h)-32px)] overflow-y-auto border-t border-line pt-4">
+            <p className="stamp">ON THIS PAGE</p>
+            <nav className="mt-3 border-l border-line" aria-label="详情页目录">
+              {DETAIL_TOC.map((item) => (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  aria-current={activeSection === item.id ? 'location' : undefined}
+                  className={cn(
+                    '-ml-px block border-l-2 px-3 py-1.5 text-xs transition-colors',
+                    activeSection === item.id
+                      ? 'border-brand font-semibold text-content-primary'
+                      : 'border-transparent text-content-secondary hover:text-content-primary',
+                  )}
+                >
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+
+            <div className="mt-6 border-t border-line pt-4">
+              <p className="stamp">SNAPSHOT</p>
+              <time
+                className="timestamp mt-2 block"
+                dateTime={data.latest.lastSuccessAt}
+                title={data.latest.lastSuccessAt}
+              >
+                {formatDateTime(data.latest.lastSuccessAt)} · UTC+8
+              </time>
+              <div className="mt-2 space-y-1.5">
+                {railSources.map((source) => (
+                  <div key={source.name} className="flex items-center gap-2 text-2xs text-content-secondary">
+                    <span
+                      className={cn(
+                        'status-light',
+                        source.status === 'ok'
+                          ? 'bg-success'
+                          : source.status === 'partial'
+                            ? 'bg-warning'
+                            : 'bg-danger',
+                      )}
+                      aria-hidden="true"
+                    />
+                    <span className="flex-1">{source.name}</span>
+                    <span>
+                      {source.status === 'ok' ? '正常' : source.status === 'partial' ? '部分' : '失败'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <a
+                href="#sources"
+                className="mt-2 inline-flex min-h-8 items-center text-xs text-content-secondary underline-offset-4 hover:text-brand-text hover:underline"
+              >
+                查看采集详情 →
+              </a>
+            </div>
+
+            <div className="mt-6 border-t border-line pt-4">
+              <p className="text-sm font-semibold text-content-primary">对比</p>
+              <p className="mt-1 text-2xs leading-5 text-content-muted">当前插件将作为 A 侧。</p>
+              <ButtonLink
+                to={`/compare?a=${encodeURIComponent(plugin.id)}`}
+                variant="secondary"
+                className="mt-3 w-full"
+              >
+                加入对比
+              </ButtonLink>
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
   );

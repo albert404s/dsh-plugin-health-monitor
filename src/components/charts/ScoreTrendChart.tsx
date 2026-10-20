@@ -64,7 +64,8 @@ export function ScoreTrendChart({ points, height = 260 }: ScoreTrendChartProps):
       legend: {
         top: 0,
         left: 0,
-        textStyle: { color: chartTheme.tooltip.body, fontSize: 12, fontFamily: chartTheme.fontFamily },
+        textStyle: { color: chartTheme.text, fontSize: 12, fontFamily: chartTheme.fontFamily },
+        inactiveColor: chartTheme.axisText,
         itemWidth: 10,
         itemHeight: 10,
         itemGap: 16,
@@ -78,7 +79,7 @@ export function ScoreTrendChart({ points, height = 260 }: ScoreTrendChartProps):
         axisTick: { show: true, length: 4, lineStyle: { color: chartTheme.axisLine } },
         axisLabel: {
           color: chartTheme.axisText,
-          fontSize: 12,
+          fontSize: chartTheme.axisFontSize,
           fontFamily: chartTheme.monoFamily,
           hideOverlap: true,
         },
@@ -91,7 +92,7 @@ export function ScoreTrendChart({ points, height = 260 }: ScoreTrendChartProps):
         interval: 20,
         axisLabel: {
           color: chartTheme.axisText,
-          fontSize: 12,
+          fontSize: chartTheme.axisFontSize,
           fontFamily: chartTheme.monoFamily,
         },
         splitLine: { lineStyle: { color: chartTheme.grid, type: 'solid', width: 1 } },
@@ -112,6 +113,8 @@ export function ScoreTrendChart({ points, height = 260 }: ScoreTrendChartProps):
             borderWidth: 2,
           },
           areaStyle: { color: chartTheme.area },
+          emphasis: { focus: 'series' },
+          blur: { itemStyle: { opacity: 0.55 }, lineStyle: { opacity: 0.55 } },
         },
         {
           name: '人气指数',
@@ -127,6 +130,8 @@ export function ScoreTrendChart({ points, height = 260 }: ScoreTrendChartProps):
             borderColor: chartTheme.series.popularity,
             borderWidth: 2,
           },
+          emphasis: { focus: 'series' },
+          blur: { itemStyle: { opacity: 0.55 }, lineStyle: { opacity: 0.55 } },
         },
       ],
     };
