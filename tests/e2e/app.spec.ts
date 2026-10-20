@@ -171,6 +171,7 @@ for(const width of [390,768,1024,1366,1440,1920]){
 
 test('mobile drawer supports navigation and Escape focus restoration',async({page})=>{
   await page.setViewportSize({width:390,height:844});await page.goto('/');
+  await expect(page.locator('.orbit-breadcrumb .orbit-quiet-hint')).toBeVisible();
   const menu=page.getByRole('button',{name:'打开导航菜单'});
   await menu.click();await expect(page.getByRole('dialog',{name:'导航菜单'})).toBeVisible();
   await page.keyboard.press('Escape');await expect(menu).toBeFocused();
