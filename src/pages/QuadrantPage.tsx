@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowUpRight, Crosshair, SlidersHorizontal } from 'lucide-react';
 import { useLoadedData } from '../hooks/useData';
 import { useBreakpoint } from '../hooks/useBreakpoint';
@@ -35,10 +35,27 @@ const QUADRANT_CHART_HEIGHT = { mobile: 340, tablet: 420, desktop: 460, wide: 52
 export function QuadrantPage(): JSX.Element {
   const { latest } = useLoadedData();
   const breakpoint = useBreakpoint();
-  const [category, setCategory] = useState('all');
-  const [risk, setRisk] = useState('all');
-  const [focus, setFocus] = useState<Focus>('all');
-  const [sort, setSort] = useState<Sort>('popularity');
+  const [params, setParams] = useSearchParams();
+  const rawCategory = params.get('category') ?? 'all';
+  const category = categories(latest.plugins).includes(rawCategory) ? rawCategory : 'all';
+  const rawRisk = params.get('risk') ?? 'all';
+  const risk = ['high', 'medium', 'low', 'unknown'].includes(rawRisk) ? rawRisk : 'all';
+  const rawFocus = params.get('focus') ?? 'all';
+  const focus: Focus = FOCUS_KEYS.includes(rawFocus as QuadrantKey) ? rawFocus as QuadrantKey : 'all';
+  const rawSort = params.get('sort') ?? 'popularity';
+  const sort: Sort = ['popularity','maintenance','completeness','name'].includes(rawSort) ? rawSort as Sort : 'popularity';
+  function update(key: string, value: string): void {
+    const next = new URLSearchParams(params);
+    if (value === 'all' || (key === 'sort' && value === 'popularity')) next.delete(key); else next.set(key, value);
+    next.delete('selected');
+    setParams(next);
+  }
+  const setCategory = (value: string): void => update('category', value);
+  const setRisk = (value: string): void => update('risk', value);
+  const setFocus = (value: Focus): void => update('focus', value);
+  const setSort = (value: Sort): void => update('sort', value);
+  const selected = latest.plugins.find((plugin) => plugin.id === params.get('selected'));
+  const selectPlugin = (id: string): void => { const next = new URLSearchParams(params); next.set('selected', id); setParams(next, {replace: true}); };
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const positioned = useMemo(() => latest.plugins.filter(hasQuadrantData), [latest.plugins]);
@@ -85,20 +102,15 @@ export function QuadrantPage(): JSX.Element {
   const activeFilterCount =
     Number(category !== 'all') + Number(risk !== 'all') + Number(sort !== 'popularity');
 
-  function clearFilters(): void {
-    setCategory('all');
-    setRisk('all');
-    setFocus('all');
-    setSort('popularity');
-  }
+  function clearFilters(): void { setParams(new URLSearchParams()); }
 
   return (
-    <div className="page-enter mx-auto max-w-shell px-4 pb-14 pt-6 md:px-6 md:pt-8">
+    <div className="orbit-page orbit-ecosystem page-enter">
       <div className="flex flex-wrap items-end justify-between gap-5">
         <div className="min-w-0">
-          <p className="stamp">DISTRIBUTION / 02</p>
+          <p className="stamp">ECOSYSTEM / 03</p>
           <h1 className="mt-2 text-[2rem] font-semibold leading-[1.15] tracking-tightest text-content-primary md:text-[2.5rem] lg:text-[2.5rem]">
-            人气 × 维护生态分布
+            生态分布
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-content-secondary">
             每个点是一个插件；横轴为关注度，纵轴为维护活跃度，气泡面积近似 Star 量级。阈值只用于组织视图，不是质量及格线。
@@ -246,11 +258,13 @@ export function QuadrantPage(): JSX.Element {
                 <span className="text-line-strong" aria-hidden="true">·</span>
                 <span>{sorted.length} 个</span>
               </div>
-              <span className="text-2xs text-content-muted">X 人气 0–100 · Y 维护 0–100</span>
+              <span className="text-2xs text-content-muted">X 关注度 0–100 · Y 维护 0–100</span>
             </div>
             <div className="min-w-0 px-1 pb-1 md:px-2">
               <QuadrantChart
                 plugins={filtered}
+                onSelect={selectPlugin}
+                selectedId={selected?.id}
                 unpositionedPlugins={unpositionedCandidates}
                 totalCount={latest.plugins.length}
                 height={QUADRANT_CHART_HEIGHT[breakpoint]}
@@ -258,7 +272,7 @@ export function QuadrantPage(): JSX.Element {
               />
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-line px-4 py-2.5 text-2xs text-content-muted md:px-5">
-              <span>悬停 / 点按查看概要 · 点按气泡进入详情</span>
+              <span>点击气泡或列表选择插件 · 从摘要进入详情</span>
               <span className="text-content-secondary">固定 0–100 轴，筛选不会重新缩放</span>
             </div>
           </div>
@@ -274,6 +288,7 @@ export function QuadrantPage(): JSX.Element {
                 无可靠下载或维护证据不足的插件不在此列表。
               </p>
             </div>
+            {selected && filtered.some((plugin) => plugin.id === selected.id) ? <div className="orbit-selected-summary" role="status"><p className="orbit-kicker">已选择插件</p><h3 className="mt-2 text-base font-semibold text-content-primary">{selected.name}</h3><p className="mt-2 text-xs leading-6 text-content-secondary">{selected.curatorNote}</p><p className="mt-2 text-xs text-content-secondary">关注度 {formatScore(selected.scores.popularity.score)} · 维护活跃度 {formatScore(selected.scores.maintenance.score)}</p><Link className="mt-3 inline-flex min-h-9 items-center gap-1 text-sm text-brand-text" to={`/plugins/${encodeURIComponent(selected.id)}`}>查看详情 <ArrowUpRight size={14} aria-hidden="true" /></Link></div> : null}
             {sorted.length === 0 ? (
               <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 py-12 text-center">
                 <p className="text-sm leading-6 text-content-secondary">当前筛选下没有可定位插件。</p>
@@ -298,9 +313,10 @@ export function QuadrantPage(): JSX.Element {
                 <ul className="divide-y divide-line-hairline">
                   {sorted.map((plugin) => (
                     <li key={plugin.id}>
-                      <Link
-                        to={`/plugins/${encodeURIComponent(plugin.id)}`}
-                        className="group block px-4 py-3 transition-colors hover:bg-surface-subtle"
+                      <button type="button"
+                        onClick={() => selectPlugin(plugin.id)}
+                        aria-pressed={selected?.id === plugin.id}
+                        className="group block w-full px-4 py-3 text-left transition-colors hover:bg-surface-subtle aria-pressed:bg-brand-soft"
                       >
                         <div className="flex items-center gap-2.5">
                           <PluginMonogram plugin={plugin} size="sm" />
@@ -322,7 +338,7 @@ export function QuadrantPage(): JSX.Element {
                         <div className="mt-2 grid grid-cols-2 gap-2">
                           <div>
                             <div className="flex justify-between text-2xs">
-                              <span className="text-content-muted">人气</span>
+                              <span className="text-content-muted">关注度</span>
                               <span className="tnum font-mono text-content-primary">
                                 {formatScore(plugin.scores.popularity.score)}
                               </span>
@@ -349,7 +365,7 @@ export function QuadrantPage(): JSX.Element {
                             )}
                           </span>
                         </div>
-                      </Link>
+                      </button>
                     </li>
                   ))}
                 </ul>

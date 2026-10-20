@@ -122,8 +122,9 @@ export function DataNotices(): JSX.Element | null {
           <AlertTriangle size={14} className="shrink-0" aria-hidden="true" />
           <span className="font-medium">部分数据源已降级，缺失项不会被当作 0。</span>
           <span className="text-content-secondary">
-            {warnings.slice(0, 2).join(' · ') || sourceFailures.slice(0, 2).join(' · ')}
+            {warnings[0]?.split('：')[0] || sourceFailures.slice(0, 2).join(' · ')}
           </span>
+          {warnings.length > 0 ? <details className="w-full text-content-secondary"><summary className="min-h-9 cursor-pointer py-2 text-xs">{warnings.length} 条数据说明</summary><ul className="space-y-2 pb-2">{warnings.map((warning, index) => <li key={index} className="break-words text-xs leading-6">{warning}</li>)}</ul></details> : null}
           <Link
             to="/method"
             className="ml-auto text-content-secondary underline-offset-4 hover:text-brand-text hover:underline"

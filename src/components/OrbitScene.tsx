@@ -10,14 +10,16 @@ export function OrbitScene(): JSX.Element {
     const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
     let cleanup: (() => void) | undefined;
     let cancelled = false;
+    let generation = 0;
     let timer: number | undefined;
-    const stop = (): void => { cleanup?.(); cleanup = undefined; setReady(false); };
+    const stop = (): void => { generation++; cleanup?.(); cleanup = undefined; setReady(false); };
     const start = (): void => {
       stop();
       if (cancelled || motion.matches || !desktop.matches || connection?.saveData) return;
+      const current = generation;
       timer = window.setTimeout(() => {
         void import('../lib/orbit-scene').then(({ mountOrbit }) => {
-          if (cancelled || motion.matches || !desktop.matches || !host.current) return;
+          if (cancelled || current !== generation || motion.matches || !desktop.matches || !host.current) return;
           cleanup = mountOrbit(host.current, setReady);
         }).catch(() => setReady(false));
       }, 650);

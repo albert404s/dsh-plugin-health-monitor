@@ -23,6 +23,7 @@ import {
   SectionHeading,
 } from '../components/ui';
 import { cn } from '../lib/cn';
+import { comparisonText } from '../lib/comparison';
 
 interface CompareRow {
   label: string;
@@ -49,7 +50,7 @@ function scoreValue(plugin: PluginRecord, kind: 'popularity' | 'maintenance'): J
       </div>
       <ScoreBar value={score.score} className="mt-1.5 w-24" />
       <p className="mt-1 text-2xs text-content-muted">
-        {score.confidence === 'high' ? '依据较充分' : score.confidence === 'medium' ? '依据一般' : '依据较少'} · 覆盖{' '}
+        {score.confidence === 'high' ? '依据较充分' : score.confidence === 'medium' ? '依据一般' : '依据较少'} · 评分依据覆盖{' '}
         {Math.round(score.coverage * 100)}%
       </p>
     </div>
@@ -57,12 +58,7 @@ function scoreValue(plugin: PluginRecord, kind: 'popularity' | 'maintenance'): J
 }
 
 function scoreDiff(a: PluginRecord, b: PluginRecord, kind: 'popularity' | 'maintenance'): string {
-  const left = a.scores[kind].score;
-  const right = b.scores[kind].score;
-  if (left === null || right === null) return '不可比';
-  const difference = right - left;
-  if (Math.abs(difference) < 0.05) return '相同';
-  return `B ${difference > 0 ? '高' : '低'} ${Math.abs(difference).toFixed(1)}`;
+  return comparisonText(a, b, kind);
 }
 
 function numericDiff(left: number | null, right: number | null, unit = ''): string {
@@ -108,7 +104,7 @@ export function ComparePage(): JSX.Element {
     setResetNotice(false);
     const next = new URLSearchParams(searchParams);
     next.set(side, value);
-    setSearchParams(next, { replace: true });
+    setSearchParams(next);
   }
 
   function swap(): void {
@@ -117,7 +113,7 @@ export function ComparePage(): JSX.Element {
     const next = new URLSearchParams(searchParams);
     next.set('a', right.id);
     next.set('b', left.id);
-    setSearchParams(next, { replace: true });
+    setSearchParams(next);
   }
 
   const rows = useMemo<CompareRow[]>(() => {
@@ -252,7 +248,7 @@ export function ComparePage(): JSX.Element {
         diff: numericDiff(left.scores.completeness.score, right.scores.completeness.score, ' pp'),
       },
       {
-        label: '公开风险',
+        label: '关注事项',
         hint: '归档、长期 Issue、OSV 与数据缺口',
         a: <RiskBadge level={left.scores.risk.level} compact />,
         b: <RiskBadge level={right.scores.risk.level} compact />,
@@ -294,18 +290,18 @@ export function ComparePage(): JSX.Element {
   }
 
   const summary = [
-    { label: '人气', value: scoreDiff(left, right, 'popularity') },
+    { label: '关注度', value: scoreDiff(left, right, 'popularity') },
     { label: '维护', value: scoreDiff(left, right, 'maintenance') },
     { label: '覆盖', value: numericDiff(left.scores.completeness.score, right.scores.completeness.score, ' pp') },
   ];
 
   return (
-    <div className="page-enter mx-auto max-w-shell px-4 pb-12 pt-8 md:px-6 md:pt-10">
+    <div className="orbit-page orbit-compare page-enter">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="stamp">COMPARE / 03</p>
           <h1 className="mt-2 text-[2rem] font-semibold leading-[1.15] tracking-tightest text-content-primary md:text-4xl lg:text-[2.5rem]">
-            并排比较两个插件
+            插件对比
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-content-secondary">
             对齐同一采集窗口，展示可核对的差异；不会基于单一指标评判谁“更好”。

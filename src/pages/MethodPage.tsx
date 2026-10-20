@@ -20,7 +20,7 @@ const TOC = [
   { href: '#sources', label: '数据来源' },
   { href: '#popularity', label: '关注度' },
   { href: '#maintenance', label: '维护活跃度' },
-  { href: '#risk', label: '风险提示' },
+  { href: '#risk', label: '关注事项' },
   { href: '#completeness', label: '数据完整度' },
   { href: '#pipeline', label: '更新与存储' },
   { href: '#limits', label: '局限与边界' },
@@ -120,16 +120,16 @@ export function MethodPage(): JSX.Element {
   }, []);
 
   return (
-    <div id="top" className="page-enter mx-auto max-w-shell px-4 pb-14 pt-6 md:px-6 md:pt-8">
+    <div id="top" className="orbit-page orbit-method page-enter">
       <div className="lg:mx-auto lg:max-w-[1080px]">
       <div className="max-w-[48rem]">
         <p className="stamp">METHOD / v{SCORE_METHOD_VERSION}</p>
         <h1 className="mt-2 text-[2rem] font-semibold leading-[1.15] tracking-tightest text-content-primary md:text-4xl lg:text-[2.5rem]">
-          指标不是判决书
+          数据与方法
         </h1>
         <p className="mt-4 max-w-[34em] text-base leading-7 text-content md:text-lg md:leading-[1.7]">
-          DSH Plugin Health Monitor 用公开数据帮助阅读 DeepSeek Harness 插件生态。
-          我们不输出“软件质量总分”，而是把<span className="text-content-primary">人气、维护活动、风险信号、数据完整度</span>
+          ORBIT 用公开数据帮助阅读 DeepSeek Harness 插件生态。
+          我们不输出“软件质量总分”，而是把<span className="text-content-primary">关注度、维护活动、关注事项、数据完整度</span>
           拆成可解释、可追溯、可质疑的维度。
         </p>
         <div className="mt-5 flex flex-wrap items-center gap-2 text-2xs text-content-muted">
@@ -162,6 +162,7 @@ export function MethodPage(): JSX.Element {
         </nav>
       </details>
 
+      <details className="panel mt-6 p-5" open><summary className="cursor-pointer text-sm font-semibold text-content-primary">先读这三点，就能开始使用</summary><div className="mt-4 grid gap-5 md:grid-cols-3"><div><h2 className="text-sm font-medium text-brand-text">01 · 看用途</h2><p className="mt-2 text-sm leading-7 text-content-secondary">在插件库按功能筛选，分数不能替代功能适配。</p></div><div><h2 className="text-sm font-medium text-brand-text">02 · 看证据</h2><p className="mt-2 text-sm leading-7 text-content-secondary">维护活跃度描述公开活动；数据缺失不等于零。</p></div><div><h2 className="text-sm font-medium text-brand-text">03 · 再比较</h2><p className="mt-2 text-sm leading-7 text-content-secondary">仅当方法、参与分项和有效权重一致时计算分差。</p></div></div></details>
       <div className="mt-8 grid gap-10 lg:grid-cols-[180px_minmax(0,1fr)] lg:gap-8 xl:grid-cols-[200px_minmax(0,1fr)] xl:gap-12">
         <aside className="hidden lg:block">
           <nav className="sticky top-[calc(var(--header-h)+16px)]" aria-label="方法页目录">
@@ -310,7 +311,7 @@ export function MethodPage(): JSX.Element {
                     <b className="text-content-primary">55%</b>。
                   </p>
                   <p>
-                    缺少可靠下载量时，仅使用 Stars 的归一化位置，权重归一为 100%，证据覆盖降为 45%，评分依据降为“中”。
+                    缺少可靠下载量时，仅使用 Stars 的归一化位置，权重归一为 100%，评分依据覆盖降为 45%，依据等级为一般。
                     该插件仍可在详情页查看，但不会进入生态分布定位。
                   </p>
                 </div>
@@ -393,7 +394,7 @@ export function MethodPage(): JSX.Element {
                 <b className="text-content-primary">证据覆盖 &lt; 45%</b> → 不输出维护分，显示“信息不足”。
               </li>
               <li className="py-3">
-                <b className="text-content-primary">覆盖 ≥ 80% / 55%</b> → 高 / 依据一般，剩余为依据较少。
+                <b className="text-content-primary">覆盖 ≥ 80% / 55%</b> → 依据较充分 / 一般，剩余为依据较少。
               </li>
               <li className="py-3">
                 <b className="text-content-primary">提交多 ≠ 质量高</b>。维护分只描述公开活动，不进入“代码质量”判断。
@@ -404,7 +405,7 @@ export function MethodPage(): JSX.Element {
           <MethodSection
             id="risk"
             index="05 / 风险提示"
-            title="风险提示"
+            title="关注事项"
             description="按信号分级展示，不做风险总分，也不把“无记录”写成“安全”。"
           >
             <div className="grid gap-8 md:grid-cols-2">

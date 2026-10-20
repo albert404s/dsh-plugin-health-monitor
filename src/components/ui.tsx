@@ -160,7 +160,7 @@ export function ConfidenceBadge({
 }
 
 const RISK_SHORT: Record<RiskLevel, string> = {
-  high: '高风险',
+  high: '优先核查',
   medium: '需关注',
   low: '未见风险',
   unknown: '信息不完整',

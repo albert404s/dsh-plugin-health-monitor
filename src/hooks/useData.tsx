@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
@@ -14,7 +15,8 @@ import type {
   PluginRecord,
   StatusFile,
 } from '../lib/types';
-import { HISTORY_SCHEMA_VERSION, LATEST_SCHEMA_VERSION, STATUS_SCHEMA_VERSION } from '../lib/types';
+import { HISTORY_SCHEMA_VERSION, STATUS_SCHEMA_VERSION } from '../lib/types';
+import { parseLatest, parseHistory, parseStatus } from '../lib/contracts';
 import { isDataStale } from '../lib/format';
 
 interface DataContextValue {
@@ -44,33 +46,6 @@ async function fetchJson<T>(file: string, signal: AbortSignal): Promise<T> {
   return (await response.json()) as T;
 }
 
-function isPluginRecord(value: unknown): value is PluginRecord {
-  if (!value || typeof value !== 'object') return false;
-  const plugin = value as Partial<PluginRecord>;
-  return Boolean(
-    typeof plugin.id === 'string' &&
-      typeof plugin.repo === 'string' &&
-      plugin.scores?.popularity &&
-      plugin.scores?.maintenance &&
-      plugin.scores?.risk &&
-      plugin.scores?.completeness &&
-      plugin.github?.issues &&
-      plugin.github?.pullRequests &&
-      plugin.npm &&
-      plugin.security,
-  );
-}
-
-function isLatest(value: unknown): value is LatestData {
-  if (!value || typeof value !== 'object') return false;
-  const data = value as Partial<LatestData>;
-  return (
-    data.schemaVersion === LATEST_SCHEMA_VERSION &&
-    typeof data.generatedAt === 'string' &&
-    Array.isArray(data.plugins)
-  );
-}
-
 function fallbackStatus(latest: LatestData): StatusFile {
   return {
     schemaVersion: STATUS_SCHEMA_VERSION,
@@ -87,6 +62,7 @@ function fallbackStatus(latest: LatestData): StatusFile {
 
 export function DataProvider({ children }: { children: ReactNode }): JSX.Element {
   const [data, setData] = useState<DataBundle | null>(null);
+  const previousData = useRef<DataBundle | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [warnings, setWarnings] = useState<string[]>([]);
@@ -106,42 +82,28 @@ export function DataProvider({ children }: { children: ReactNode }): JSX.Element
     }, FETCH_TIMEOUT_MS);
     setLoading(true);
     setError(null);
-    setWarnings([]);
+
 
     async function load(): Promise<void> {
       const nextWarnings: string[] = [];
       try {
         const loaded = await fetchJson<unknown>('latest.json', controller.signal);
-        if (!isLatest(loaded)) {
-          throw new Error('latest.json 的 schemaVersion 或数据结构不兼容');
-        }
-        const validPlugins = loaded.plugins.filter(isPluginRecord);
-        if (validPlugins.length !== loaded.plugins.length) {
-          nextWarnings.push(
-            `有 ${loaded.plugins.length - validPlugins.length} 条插件记录字段不完整，已跳过。`,
-          );
-        }
-        const rawLatest: LatestData = { ...loaded, plugins: validPlugins };
+        const latestResult = parseLatest(loaded, previousData.current?.latest);
+        nextWarnings.push(...latestResult.warnings);
+        const rawLatest = latestResult.data;
 
         let history: HistoryFile;
         try {
           const rawHistory = await fetchJson<unknown>('history.json', controller.signal);
-          if (
-            !rawHistory ||
-            typeof rawHistory !== 'object' ||
-            (rawHistory as HistoryFile).schemaVersion !== HISTORY_SCHEMA_VERSION ||
-            !(rawHistory as HistoryFile).plugins ||
-            typeof (rawHistory as HistoryFile).plugins !== 'object'
-          ) {
-            throw new Error('history.json 数据结构不兼容');
-          }
-          history = rawHistory as HistoryFile;
+          const historyResult = parseHistory(rawHistory);
+          nextWarnings.push(...historyResult.warnings);
+          history = historyResult.data;
         } catch (historyError) {
           if (controller.signal.aborted) throw historyError;
           nextWarnings.push(
             `趋势历史暂不可用：${historyError instanceof Error ? historyError.message : String(historyError)}`,
           );
-          history = {
+          history = previousData.current?.history ?? {
             schemaVersion: HISTORY_SCHEMA_VERSION,
             updatedAt: rawLatest.generatedAt,
             retentionDays: 90,
@@ -152,14 +114,7 @@ export function DataProvider({ children }: { children: ReactNode }): JSX.Element
         let status: StatusFile;
         try {
           const rawStatus = await fetchJson<unknown>('status.json', controller.signal);
-          if (
-            !rawStatus ||
-            typeof rawStatus !== 'object' ||
-            (rawStatus as StatusFile).schemaVersion !== STATUS_SCHEMA_VERSION
-          ) {
-            throw new Error('status.json 数据结构不兼容');
-          }
-          status = rawStatus as StatusFile;
+          status = parseStatus(rawStatus);
         } catch (statusError) {
           if (controller.signal.aborted) throw statusError;
           nextWarnings.push(
@@ -168,7 +123,9 @@ export function DataProvider({ children }: { children: ReactNode }): JSX.Element
           status = fallbackStatus(rawLatest);
         }
 
-        setData({ latest: rawLatest, history, status });
+        if (controller.signal.aborted) return;
+        previousData.current = { latest: rawLatest, history, status };
+        setData(previousData.current);
         setWarnings(nextWarnings);
         setRefreshedAt(new Date().toISOString());
       } catch (loadError) {

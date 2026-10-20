@@ -13,7 +13,6 @@ import {
   List,
   Package,
   ShieldAlert,
-  ShieldQuestion,
   Star,
 } from 'lucide-react';
 import { useLoadedData } from '../hooks/useData';
@@ -51,6 +50,7 @@ import {
   SectionHeading,
 } from '../components/ui';
 import { cn } from '../lib/cn';
+import { AttentionSummary } from '../components/AttentionSummary';
 
 const DETAIL_TOC = [
   { id: 'score-summary', label: '评分摘要' },
@@ -58,7 +58,7 @@ const DETAIL_TOC = [
   { id: 'trend', label: '趋势与下载' },
   { id: 'explain', label: '评分解释' },
   { id: 'evidence', label: '处理与证据' },
-  { id: 'risk-evidence', label: '风险提示' },
+  { id: 'risk-evidence', label: '关注事项' },
   { id: 'sources', label: '数据来源' },
 ] as const;
 
@@ -427,10 +427,10 @@ export function PluginDetailPage(): JSX.Element {
   ];
 
   return (
-    <div className="page-enter mx-auto max-w-shell px-4 pb-12 pt-6 md:px-6 md:pt-8">
+    <div className="orbit-page orbit-detail page-enter">
       <nav className="flex items-center gap-1.5 text-xs text-content-muted" aria-label="面包屑">
-        <Link to="/" className="inline-flex min-h-9 items-center gap-1 hover:text-brand-text">
-          <ArrowLeft size={13} /> 总览
+        <Link to="/plugins" className="inline-flex min-h-9 items-center gap-1 hover:text-brand-text">
+          <ArrowLeft size={13} /> 插件库
         </Link>
         <span className="text-line-strong" aria-hidden="true">/</span>
         <span className="truncate text-content-secondary">{plugin.repo}</span>
@@ -502,7 +502,7 @@ export function PluginDetailPage(): JSX.Element {
           </div>
         </div>
 
-        <p className="mt-4 max-w-3xl text-base leading-6 text-content">{plugin.curatorNote}</p>
+        <p className="mt-4 max-w-3xl text-base leading-6 text-content">{plugin.curatorNote}</p><p className="mt-3 max-w-3xl text-sm leading-7 text-content-secondary">公开维护活动：<b className="font-medium text-content-primary">{plugin.scores.maintenance.score === null ? '证据不足' : plugin.scores.maintenance.score >= 75 ? '近期较活跃' : '建议结合提交记录核实'}</b> · {plugin.security.status === 'checked' ? `精确版本查询返回 ${plugin.security.vulnerabilities.length} 条公开漏洞记录` : '漏洞检查尚未完成'}。<a href="#risk-evidence" className="text-brand-text underline-offset-4 hover:underline">阅读关注事项 →</a></p>
         {plugin.repository.description ? (
           <details className="mt-2 max-w-3xl">
             <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-1 text-xs text-content-muted hover:text-brand-text sm:min-h-0">
@@ -1044,73 +1044,9 @@ export function PluginDetailPage(): JSX.Element {
       </section>
 
       <section id="risk-evidence" className="mt-10 scroll-mt-24 border-t border-line pt-6">
-        <SectionHeading
-          eyebrow="风险"
-          title="风险提示逐条说明"
-          description="风险提示来自归档状态、长期未关闭 Issue、OSV 记录与数据新鲜度。它们不能替代安全审计或兼容性测试。"
-          action={<RiskBadge level={risk.level} />}
-        />
-        <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-          <div className="min-w-0 border-t border-line">
-            {risk.flags.length === 0 ? (
-              <p className="py-5 text-sm leading-6 text-content-secondary">
-                当前没有命中高风险或中等风险规则。请注意，这仍然不是“安全”或“零风险”的结论。
-              </p>
-            ) : (
-              <ul className="divide-y divide-line-hairline">
-                {risk.flags.map((flag) => (
-                  <li key={flag.code} className="py-3.5">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex min-w-0 items-start gap-2">
-                        <span
-                          className={cn(
-                            'mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full',
-                            flag.level === 'high'
-                              ? 'bg-risk-high'
-                              : flag.level === 'medium'
-                                ? 'bg-risk-medium'
-                                : 'bg-content-muted',
-                          )}
-                          aria-hidden="true"
-                        />
-                        <p className="text-sm font-medium text-content-primary">{flag.title}</p>
-                      </div>
-                      <span className="shrink-0 text-2xs text-content-muted">
-                        {flag.level === 'high' ? '高' : flag.level === 'medium' ? '需关注' : '信息'}
-                      </span>
-                    </div>
-                    <p className="mt-1.5 pl-3.5 text-xs leading-5 text-content-secondary">{flag.detail}</p>
-                    {flag.evidenceUrl ? (
-                      <div className="mt-1 pl-3.5">
-                        <ExternalTextLink href={flag.evidenceUrl} className="text-2xs">
-                          查看原始证据
-                        </ExternalTextLink>
-                      </div>
-                    ) : null}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-          <div className="border border-line bg-surface-subtle px-4 py-4">
-            <div className="flex items-center gap-2">
-              <ShieldQuestion size={16} className="text-content-muted" aria-hidden="true" />
-              <p className="text-sm font-semibold text-content-primary">边界说明</p>
-            </div>
-            <ul className="mt-3 space-y-2.5">
-              {risk.limitations.map((limitation) => (
-                <li key={limitation} className="flex items-start gap-2 text-xs leading-5 text-content-secondary">
-                  <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-content-muted" aria-hidden="true" />
-                  {limitation}
-                </li>
-              ))}
-            </ul>
-            <div className="mt-4 border-t border-line pt-3">
-              <p className="text-2xs font-medium text-content-muted">当前结论</p>
-              <p className="mt-1 text-sm text-content-primary">{risk.label}</p>
-            </div>
-          </div>
-        </div>
+        <SectionHeading eyebrow="ATTENTION" title="关注事项" description="分别核对维护活动、公开漏洞与数据缺口；原始证据可继续追溯。" action={<RiskBadge level={risk.level} />} />
+        <div className="mt-4"><AttentionSummary plugin={plugin} /></div>
+        <details className="mt-4 rounded-control border border-line bg-surface p-4"><summary className="cursor-pointer text-sm text-content-secondary">理解这些提示的边界</summary><ul className="mt-3 space-y-2">{risk.limitations.map((limitation) => <li key={limitation} className="text-xs leading-6 text-content-secondary">{limitation}</li>)}</ul></details>
       </section>
 
           <div className="mt-10">

@@ -15,24 +15,24 @@ export const MAINTENANCE_THRESHOLD = 60;
 
 export const QUADRANTS = {
   'hot-healthy': {
-    label: '高人气 · 健康',
-    short: '热门且健康',
-    description: '关注度与近期维护活动都处于本榜单上半区。',
+    label: '热门 · 活跃',
+    short: '热门且活跃',
+    description: '关注度与近期维护活动都处于视图参考阈值之上。',
   },
   'niche-active': {
-    label: '小众 · 稳健',
+    label: '小众 · 活跃',
     short: '冷门但维护活跃',
-    description: '关注度低于中位参考，但近期维护活动较充足。',
+    description: '关注度低于视图参考阈值，但近期维护活动较充足。',
   },
   'hot-watch': {
-    label: '高人气 · 待维护',
+    label: '热门 · 需关注',
     short: '热门但需关注',
     description: '关注度较高，但公开维护证据相对不足，需要结合详情判断。',
   },
   quiet: {
-    label: '低活跃 · 观察',
+    label: '低关注 · 待观察',
     short: '低关注且低活跃',
-    description: '两项指数均低于中位参考；可能仍在稳定使用，不等于质量差。',
+    description: '两项指数均低于视图参考阈值；可能仍在稳定使用，不等于质量差。',
   },
 } as const;
 
@@ -43,10 +43,10 @@ const CONFIDENCE_LABELS: Record<string, string> = {
 };
 
 const RISK_LABELS: Record<RiskLevel, string> = {
-  high: '高风险信号',
+  high: '优先核查',
   medium: '需要关注',
   low: '未见公开风险',
-  unknown: '风险信息不完整',
+  unknown: '信息不完整',
 };
 
 interface QuadrantChartProps {
@@ -59,6 +59,8 @@ interface QuadrantChartProps {
   showLegend?: boolean;
   showUnpositioned?: boolean;
   ariaLabel?: string;
+  onSelect?: (id: string) => void;
+  selectedId?: string;
 }
 
 interface QuadrantDatum {
@@ -116,6 +118,8 @@ export function QuadrantChart({
   plugins,
   unpositionedPlugins,
   totalCount,
+  onSelect,
+  selectedId,
   height = 460,
   className,
   showLabels = true,
@@ -154,7 +158,7 @@ export function QuadrantChart({
       itemStyle: {
         color: riskFill(plugin.scores.risk.level),
         borderColor: riskColor(plugin.scores.risk.level),
-        borderWidth: plugin.scores.risk.level === 'high' ? 2.5 : 1.5,
+        borderWidth: selectedId === plugin.id ? 4 : plugin.scores.risk.level === 'high' ? 2.5 : 1.5,
       },
       label: { show: effectiveShowLabels && topIds.has(plugin.id) },
     }));
@@ -354,13 +358,14 @@ export function QuadrantChart({
         },
       ],
     };
-  }, [positioned, ariaLabel, effectiveShowLabels, topIds, reducedMotion, isNarrow]);
+  }, [positioned, ariaLabel, effectiveShowLabels, topIds, reducedMotion, isNarrow, selectedId]);
 
   const chartRef = useEChart(option, {
     click: (raw, chart) => {
       const params = raw as { data?: QuadrantDatum; dataIndex?: number };
       const id = params.data?.id;
       if (!id) return;
+      if (onSelect) { onSelect(id); return; }
       // Touch devices get a tooltip on the first tap and open the detail on the second.
       if (isCoarsePointer && activeId !== id) {
         setActiveId(id);
@@ -385,7 +390,7 @@ export function QuadrantChart({
             <div className="max-w-sm">
               <p className="text-sm leading-6 text-content-secondary">当前没有可定位插件。</p>
               <Link
-                to="/quadrant#unpositioned-plugins"
+                to="/ecosystem#unpositioned-plugins"
                 className="mt-1 inline-flex min-h-9 items-center text-xs text-content-secondary underline underline-offset-4 hover:text-brand-text"
               >
                 查看未定位原因
@@ -421,14 +426,14 @@ export function QuadrantChart({
                 style={{ borderColor: riskColor('high') }}
               />
             </span>
-            高风险信号 · 外环
+            优先核查 · 外环
           </span>
           <span className="inline-flex items-center gap-1.5">
             <span
               className="h-2 w-2 rounded-full border-[1.5px] border-dashed bg-transparent"
               style={{ borderColor: riskColor('unknown') }}
             />
-            风险信息不完整
+            信息不完整
           </span>
           <span className="ml-auto text-content-muted">气泡面积 ≈ Star 量级</span>
         </div>
