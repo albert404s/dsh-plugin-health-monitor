@@ -1,23 +1,23 @@
 {
   "schemaVersion": 1,
-  "runId": "2026-10-20T16:23:11.658Z-81818a34",
-  "lastAttemptAt": "2026-10-20T16:23:11.658Z",
-  "lastSuccessAt": "2026-10-20T16:23:11.658Z",
+  "runId": "2026-10-20T21:16:27.506Z-37fa92a4",
+  "lastAttemptAt": "2026-10-20T21:16:27.506Z",
+  "lastSuccessAt": "2026-10-20T21:16:27.506Z",
   "outcome": "partial",
   "sources": {
     "github": {
       "status": "ok",
-      "fetchedAt": "2026-10-20T16:23:11.658Z",
+      "fetchedAt": "2026-10-20T21:16:27.506Z",
       "message": "20 成功 / 0 失败"
     },
     "npm": {
       "status": "ok",
-      "fetchedAt": "2026-10-20T16:23:11.658Z",
+      "fetchedAt": "2026-10-20T21:16:27.506Z",
       "message": "18/18 个包映射通过，0 个无法映射，0 个不可用，0 个缺少下载数据，0 个请求失败"
     },
     "osv": {
       "status": "ok",
-      "fetchedAt": "2026-10-20T16:23:11.658Z",
+      "fetchedAt": "2026-10-20T21:16:27.506Z",
       "message": "18 个精确版本检查完成，0 个失败"
     }
   },
