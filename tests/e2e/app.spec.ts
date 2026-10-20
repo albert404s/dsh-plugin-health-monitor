@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { chromium, expect, test, type Page } from '@playwright/test';
 
 function trackErrors(page: Page): string[] {
   const errors: string[] = [];
@@ -159,7 +159,7 @@ test('method page remains readable when core data fails',async({page})=>{
 
 for(const width of [390,768,1024,1366,1440,1920]){
   test('responsive pages at '+width+'px have no page overflow',async({page})=>{
-    await page.setViewportSize({width,height:900});
+    await page.setViewportSize({width,height:width===1366?768:width===1920?1080:900});
     for(const path of ['/','/plugins','/ecosystem',compare]){
       await page.goto(path);await expect(page.getByRole('heading',{level:1})).toBeVisible();
       const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
@@ -183,4 +183,33 @@ test('reduced motion skips 3D JS and keeps the static orbital visual',async({pag
   await page.goto('/');await page.waitForTimeout(1000);
   await expect(page.locator('.orbit-brand-scene')).toHaveAttribute('data-mode','poster');
   expect(requests.some(url=>url.includes('orbit-scene.ts')||url.includes('three.js'))).toBe(false);
+});
+
+
+test('WebGL scene starts, releases resources and falls back after context loss',async()=>{
+  const browser=await chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-webgl','--enable-unsafe-swiftshader']});
+  const page=await browser.newPage({viewport:{width:1440,height:900}});
+  await page.goto('http://127.0.0.1:5173/');
+  await expect(page.locator('.orbit-brand-scene')).toHaveAttribute('data-mode','webgl',{timeout:15000});
+  await page.locator('.orbit-scene-canvas canvas').evaluate(canvas=>{
+    canvas.dispatchEvent(new Event('webglcontextlost',{cancelable:true}));
+  });
+  await expect(page.locator('.orbit-brand-scene')).toHaveAttribute('data-mode','poster');
+  await expect(page.locator('#home-title')).toBeVisible();
+  await page.getByRole('navigation',{name:'主导航',exact:true}).getByRole('link',{name:/插件库/}).click();
+  await expect(page.locator('.orbit-scene-canvas')).toHaveCount(0);
+  await browser.close();
+});
+
+test('unavailable WebGL keeps the static scene and the primary chart usable',async({page})=>{
+  await page.addInitScript(()=>{
+    const original=HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext=function(this: HTMLCanvasElement,type: string,...args:unknown[]) {
+      if(type==='webgl2') return null;
+      return Reflect.apply(original,this,[type,...args]);
+    } as typeof original;
+  });
+  await page.goto('/');await page.waitForTimeout(1000);
+  await expect(page.locator('.orbit-brand-scene')).toHaveAttribute('data-mode','poster');
+  await expect(page.getByRole('img',{name:/DSH 插件关注度/})).toBeVisible();
 });

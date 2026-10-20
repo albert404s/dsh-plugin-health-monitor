@@ -235,7 +235,7 @@ export function PluginExplorer({
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
           <p className="flex flex-wrap items-center gap-2">
-            <span className="stamp">03 / INDEX</span>
+            <span className="stamp">02 / LIBRARY</span>
             <span className="text-2xs font-medium text-content-muted">全部插件</span>
           </p>
           <h2
@@ -243,7 +243,7 @@ export function PluginExplorer({
             tabIndex={-1}
             className="mt-1.5 scroll-mt-24 text-2xl font-semibold leading-8 tracking-title text-content-primary lg:text-3xl lg:leading-9"
           >
-            插件库
+            浏览结果
           </h2>
         </div>
         <p className="tnum text-xs text-content-secondary" aria-live="polite">
