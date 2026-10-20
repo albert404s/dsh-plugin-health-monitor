@@ -9,6 +9,7 @@ import { useEChart } from '../../hooks/useEChart';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { chartTheme, quadrantFill, riskColor, riskFill, tooltipChrome } from './chartTheme';
+import { ScatterPulse } from './scatter-pulse';
 
 export const POPULARITY_THRESHOLD = 50;
 export const MAINTENANCE_THRESHOLD = 60;
@@ -176,8 +177,10 @@ export function QuadrantChart({
     };
 
     return {
-      animationDuration: reducedMotion ? 0 : 200,
-      animationEasing: 'cubicOut',
+      animationDuration: reducedMotion ? 0 : 620,
+      animationEasing: 'backOut',
+      animationDurationUpdate: reducedMotion ? 0 : 350,
+      animationEasingUpdate: 'cubicOut',
       backgroundColor: 'transparent',
       aria: {
         enabled: true,
@@ -385,6 +388,7 @@ export function QuadrantChart({
     <div className={className}>
       <div className="relative w-full min-w-0" style={{ height }}>
         <div ref={chartRef} className="h-full w-full" role="img" aria-label={ariaLabel} />
+        <ScatterPulse container={chartRef} plugins={positioned} enabled={!reducedMotion} />
         {positioned.length === 0 ? (
           <div className="absolute inset-0 flex items-center justify-center px-6 text-center">
             <div className="max-w-sm">
@@ -448,7 +452,7 @@ export function QuadrantChart({
         >
           <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-xs">
             <span>{unpositioned.length} 个插件未进入象限</span>
-            <span className="text-content-muted">缺少维护评分或经核验下载量，点击查看原因</span>
+
           </summary>
           <ul className="mt-2 space-y-1.5 text-content-secondary">
             {unpositioned.map((plugin) => (

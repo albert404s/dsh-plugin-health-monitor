@@ -13,6 +13,7 @@ import {
 import { useData } from '../hooks/useData';
 import { SCORE_METHOD_VERSION } from '../lib/types';
 import { formatDateTime } from '../lib/format';
+import { QuietHint } from '../components/quiet-hint';
 import { ExternalTextLink, InlineNotice } from '../components/ui';
 
 const TOC = [
@@ -77,10 +78,7 @@ function MethodSection({
         <span className="index">{sectionNumber}</span>
         <span className="text-2xs font-medium text-content-muted">{sectionLabel.join(' / ')}</span>
       </p>
-      <h2 className="mt-2 text-2xl font-semibold leading-8 tracking-title text-content-primary">{title}</h2>
-      {description ? (
-        <p className="mt-2 max-w-prose text-sm leading-6 text-content-secondary">{description}</p>
-      ) : null}
+      <h2 className="mt-2 text-2xl font-semibold leading-8 tracking-title text-content-primary">{description ? <QuietHint text={description}>{title}</QuietHint> : title}</h2>
       <div className="mt-5 max-w-prose">{children}</div>
     </section>
   );
@@ -125,13 +123,8 @@ export function MethodPage(): JSX.Element {
       <div className="max-w-[48rem]">
         <p className="stamp">METHOD / v{SCORE_METHOD_VERSION}</p>
         <h1 className="mt-2 text-[2rem] font-semibold leading-[1.15] tracking-tightest text-content-primary md:text-4xl lg:text-[2.5rem]">
-          数据与方法
+          <QuietHint text="数据来源、计算方式与局限。">数据与方法</QuietHint>
         </h1>
-        <p className="mt-4 max-w-[34em] text-base leading-7 text-content md:text-lg md:leading-[1.7]">
-          ORBIT 用公开数据帮助阅读 DeepSeek Harness 插件生态。
-          我们不输出“软件质量总分”，而是把<span className="text-content-primary">关注度、维护活动、关注事项、数据完整度</span>
-          拆成可解释、可追溯、可质疑的维度。
-        </p>
         <div className="mt-5 flex flex-wrap items-center gap-2 text-2xs text-content-muted">
           <span className="rounded-chip border border-line bg-surface px-2 py-1 font-mono">方法 v{SCORE_METHOD_VERSION}</span>
           <span className="rounded-chip border border-line bg-surface px-2 py-1 font-mono">数据 schema v1</span>
@@ -162,7 +155,7 @@ export function MethodPage(): JSX.Element {
         </nav>
       </details>
 
-      <details className="panel mt-6 p-5" open><summary className="cursor-pointer text-sm font-semibold text-content-primary">先读这三点，就能开始使用</summary><div className="mt-4 grid gap-5 md:grid-cols-3"><div><h2 className="text-sm font-medium text-brand-text">01 · 看用途</h2><p className="mt-2 text-sm leading-7 text-content-secondary">在插件库按功能筛选，分数不能替代功能适配。</p></div><div><h2 className="text-sm font-medium text-brand-text">02 · 看证据</h2><p className="mt-2 text-sm leading-7 text-content-secondary">维护活跃度描述公开活动；数据缺失不等于零。</p></div><div><h2 className="text-sm font-medium text-brand-text">03 · 再比较</h2><p className="mt-2 text-sm leading-7 text-content-secondary">仅当方法、参与分项和有效权重一致时计算分差。</p></div></div></details>
+      <details className="panel mt-6 p-5"><summary className="cursor-pointer text-sm font-semibold text-content-primary">快速指南</summary><div className="mt-4 grid gap-5 md:grid-cols-3"><div><h2 className="text-sm font-medium text-brand-text">01 · 看用途</h2><p className="mt-2 text-sm leading-7 text-content-secondary">在插件库按功能筛选，分数不能替代功能适配。</p></div><div><h2 className="text-sm font-medium text-brand-text">02 · 看证据</h2><p className="mt-2 text-sm leading-7 text-content-secondary">维护活跃度描述公开活动；数据缺失不等于零。</p></div><div><h2 className="text-sm font-medium text-brand-text">03 · 再比较</h2><p className="mt-2 text-sm leading-7 text-content-secondary">仅当方法、参与分项和有效权重一致时计算分差。</p></div></div></details>
       <div className="mt-8 grid gap-10 lg:grid-cols-[180px_minmax(0,1fr)] lg:gap-8 xl:grid-cols-[200px_minmax(0,1fr)] xl:gap-12">
         <aside className="hidden lg:block">
           <nav className="sticky top-[calc(var(--header-h)+16px)]" aria-label="方法页目录">

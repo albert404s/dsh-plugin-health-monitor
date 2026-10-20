@@ -4,6 +4,7 @@ import { ArrowRight, ArrowLeftRight, Boxes, X } from 'lucide-react';
 import { PluginExplorer } from '../components/PluginExplorer';
 import { useLoadedData } from '../hooks/useData';
 import { buttonClasses } from '../components/ui';
+import { QuietHint } from '../components/quiet-hint';
 
 export function PluginLibraryPage(): JSX.Element {
   const { latest } = useLoadedData();
@@ -15,7 +16,7 @@ export function PluginLibraryPage(): JSX.Element {
   return (
     <div className="orbit-page page-enter">
       <div className="orbit-page-head">
-        <div><div className="orbit-kicker">FIND YOUR NEXT BUILDING BLOCK</div><h1 className="mt-3">插件库</h1><p>搜索功能、筛选维护状态。勾选两个插件，把值得了解的候选放在一起比较。</p></div>
+        <div><div className="orbit-kicker">LIBRARY</div><h1 className="mt-3"><QuietHint text="搜索与筛选插件，勾选两个候选即可对比。">插件库</QuietHint></h1></div>
         <span className="orbit-chip"><Boxes size={14} aria-hidden="true" />{latest.plugins.length} 个已核验插件</span>
       </div>
       <PluginExplorer plugins={latest.plugins} lastSuccessAt={latest.lastSuccessAt} comparedIds={selected} onToggleCompare={toggle} />

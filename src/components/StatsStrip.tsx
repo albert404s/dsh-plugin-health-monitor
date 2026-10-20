@@ -2,7 +2,7 @@ import { Boxes, Database, Download, ShieldAlert, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { LatestData } from '../lib/types';
 import { formatCompact, formatDateTime, formatRelative, isDataStale } from '../lib/format';
-import { DataBand, InfoHint, StatCell } from './ui';
+import { DataBand, StatCell } from './ui';
 
 function sourceLabel(status: string): string {
   if (status === 'ok' || status === 'checked' || status === 'verified') return '正常';
@@ -57,15 +57,7 @@ export function StatsStrip({ data }: { data: LatestData }): JSX.Element {
                   )}
                 </>
               }
-              detail={
-                <span className="inline-flex items-center gap-1">
-                  仅累计经 repository 核对的包
-                  <InfoHint
-                    align="right"
-                    text="只累计 npm registry 的 repository 字段与 GitHub 仓库一致、且下载 API 返回可用值的包。"
-                  />
-                </span>
-              }
+              detail="只累计 npm repository 与 GitHub 仓库一致、且下载 API 可用的包。"
               icon={<Download size={13} />}
             />
           </div>
@@ -76,6 +68,7 @@ export function StatsStrip({ data }: { data: LatestData }): JSX.Element {
           >
             <StatCell
               label="优先核查"
+              insideLink
               value={
                 <span className={stats.highRiskCount > 0 ? 'text-risk-high' : 'text-content-primary'}>
                   {stats.highRiskCount}
@@ -96,15 +89,7 @@ export function StatsStrip({ data }: { data: LatestData }): JSX.Element {
                   <span className="ml-1 text-xs font-medium text-content-muted">/ {stats.pluginCount}</span>
                 </>
               }
-              detail={
-                <span className="inline-flex items-center gap-1">
-                  覆盖 ≥ 6/7 数据域
-                  <InfoHint
-                    align="right"
-                    text="数据域：仓库、提交、Issue、PR、Release、npm、OSV。缺失不代表真实零值。"
-                  />
-                </span>
-              }
+              detail="仓库、提交、Issue、PR、Release、npm、OSV，共七个数据域。缺失不等于零。"
               icon={<Database size={13} />}
             />
           </div>

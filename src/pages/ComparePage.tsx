@@ -24,6 +24,7 @@ import {
 } from '../components/ui';
 import { cn } from '../lib/cn';
 import { comparisonText } from '../lib/comparison';
+import { QuietHint } from '../components/quiet-hint';
 
 interface CompareRow {
   label: string;
@@ -301,11 +302,8 @@ export function ComparePage(): JSX.Element {
         <div>
           <p className="stamp">COMPARE / 03</p>
           <h1 className="mt-2 text-[2rem] font-semibold leading-[1.15] tracking-tightest text-content-primary md:text-4xl lg:text-[2.5rem]">
-            插件对比
+            <QuietHint text="对齐原始指标和评分依据；不同计算口径不计算分差。">插件对比</QuietHint>
           </h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-content-secondary">
-            对齐同一采集窗口，展示可核对的差异；不会基于单一指标评判谁“更好”。
-          </p>
         </div>
         <div className="flex items-center gap-2 text-xs text-content-muted">
           <Scale size={14} aria-hidden="true" /> {plugins.length} 个可比较对象
@@ -418,11 +416,11 @@ export function ComparePage(): JSX.Element {
         </InlineNotice>
       ) : rawA || rawB ? null : (
         <p className="mt-3 text-xs text-content-muted">
-          当前显示示例对比（前两个插件）。可在上方更换，或从插件详情页加入对比。
+          <QuietHint text="默认选择前两个插件，可在上方更换。">示例对比</QuietHint>
         </p>
       )}
 
-      <div
+      {left.scores.completeness.score !== right.scores.completeness.score && <div
         className={cn(
           'mt-4 flex items-start gap-2.5 border px-3 py-2.5 text-xs leading-5',
           left.scores.completeness.score === right.scores.completeness.score
@@ -436,7 +434,7 @@ export function ComparePage(): JSX.Element {
             ? `两侧数据完整度相同（${left.scores.completeness.score}% / ${right.scores.completeness.score}%）。缺失项显示“不可比”，不会被补 0。`
             : `两侧数据完整度不同：${left.name} ${left.scores.completeness.score}% / ${right.name} ${right.scores.completeness.score}%。差异可能来自数据覆盖，而不是真实行为差异；缺失项显示“不可比”，不会被补 0。`}
         </span>
-      </div>
+      </div>}
 
       <section className="mt-6" aria-labelledby="compare-matrix-title">
         <SectionHeading

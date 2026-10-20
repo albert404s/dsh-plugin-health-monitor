@@ -3,6 +3,7 @@ import { ArrowUpRight } from 'lucide-react';
 import type { PluginRecord } from '../lib/types';
 import { formatCompact, formatRelative, formatScore, scoreLabel } from '../lib/format';
 import { cn } from '../lib/cn';
+import { QuietHint } from './quiet-hint';
 import { PluginMonogram, ScoreBar } from './ui';
 
 type Metric = 'popularity' | 'maintenance';
@@ -42,9 +43,8 @@ export function RankList({
             id={`rank-${metric}-title`}
             className="mt-1.5 text-xl font-semibold tracking-title text-content-primary"
           >
-            {title}
+            <QuietHint text={description}>{title}</QuietHint>
           </h3>
-          <p className="mt-1 text-2xs leading-5 text-content-secondary">{description}</p>
         </div>
         <Link
           to={`/plugins?sort=${metric}`}

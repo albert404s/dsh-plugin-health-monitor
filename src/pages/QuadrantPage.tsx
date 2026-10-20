@@ -9,6 +9,7 @@ import { categories } from '../lib/filters';
 import { hasQuadrantData, quadrantOf } from '../lib/scoring';
 import { formatCompact, formatScore, riskLabel, scoreLabel } from '../lib/format';
 import { cn } from '../lib/cn';
+import { QuietHint } from '../components/quiet-hint';
 import {
   CategoryTag,
   PluginMonogram,
@@ -110,11 +111,8 @@ export function QuadrantPage(): JSX.Element {
         <div className="min-w-0">
           <p className="stamp">ECOSYSTEM / 03</p>
           <h1 className="mt-2 text-[2rem] font-semibold leading-[1.15] tracking-tightest text-content-primary md:text-[2.5rem] lg:text-[2.5rem]">
-            生态分布
+            <QuietHint text="关注度 × 维护活跃度；气泡大小表示 Stars。固定 0–100 轴，筛选不会重新缩放。">生态分布</QuietHint>
           </h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-content-secondary">
-            每个点是一个插件；横轴为关注度，纵轴为维护活跃度，气泡面积近似 Star 量级。阈值只用于组织视图，不是质量及格线。
-          </p>
         </div>
         <div className="flex flex-wrap items-center gap-5 border-t border-line pt-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
           <div>
@@ -128,11 +126,9 @@ export function QuadrantPage(): JSX.Element {
             <p className="tnum font-mono text-2xl font-semibold text-content-primary">
               {latest.plugins.length - positioned.length}
             </p>
-            <p className="text-2xs text-content-muted">未定位</p>
+            <QuietHint text="缺少可靠下载或维护证据，展开图下方清单查看原因。" className="text-2xs text-content-muted">未定位</QuietHint>
           </div>
-          <p className="max-w-[14rem] text-xs leading-5 text-content-muted">
-            缺少可靠下载或维护证据的插件不会被强行放入象限。
-          </p>
+
         </div>
       </div>
 
@@ -272,8 +268,7 @@ export function QuadrantPage(): JSX.Element {
               />
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-line px-4 py-2.5 text-2xs text-content-muted md:px-5">
-              <span>点击气泡或列表选择插件 · 从摘要进入详情</span>
-              <span className="text-content-secondary">固定 0–100 轴，筛选不会重新缩放</span>
+              <QuietHint text="点击气泡或右侧列表选择插件，再从摘要进入详情。鼠标靠近时暂停光晕。">图表交互</QuietHint>
             </div>
           </div>
 
@@ -284,9 +279,7 @@ export function QuadrantPage(): JSX.Element {
             <div className="border-b border-line px-4 py-3.5">
               <p className="stamp">CURRENT VIEW</p>
               <h2 className="mt-1 text-lg font-semibold tracking-title text-content-primary">当前视图 · 定位插件</h2>
-              <p className="mt-1 text-2xs leading-5 text-content-secondary">
-                无可靠下载或维护证据不足的插件不在此列表。
-              </p>
+
             </div>
             {selected && filtered.some((plugin) => plugin.id === selected.id) ? <div className="orbit-selected-summary" role="status"><p className="orbit-kicker">已选择插件</p><h3 className="mt-2 text-base font-semibold text-content-primary">{selected.name}</h3><p className="mt-2 text-xs leading-6 text-content-secondary">{selected.curatorNote}</p><p className="mt-2 text-xs text-content-secondary">关注度 {formatScore(selected.scores.popularity.score)} · 维护活跃度 {formatScore(selected.scores.maintenance.score)}</p><Link className="mt-3 inline-flex min-h-9 items-center gap-1 text-sm text-brand-text" to={`/plugins/${encodeURIComponent(selected.id)}`}>查看详情 <ArrowUpRight size={14} aria-hidden="true" /></Link></div> : null}
             {sorted.length === 0 ? (
@@ -375,7 +368,7 @@ export function QuadrantPage(): JSX.Element {
         </div>
       </section>
 
-      <section className="mt-12" aria-labelledby="quadrant-reading-title">
+      <details className="orbit-reading-note mt-6"><summary>读图说明</summary><section className="mt-5" aria-labelledby="quadrant-reading-title">
         <SectionHeading
           eyebrow="HOW TO READ"
           title={<span id="quadrant-reading-title">如何读这张图</span>}
@@ -397,7 +390,7 @@ export function QuadrantPage(): JSX.Element {
             ))}
           </div>
         </div>
-      </section>
+      </section></details>
     </div>
   );
 }

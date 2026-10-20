@@ -1,3 +1,4 @@
+import { QuietHint } from './quiet-hint';
 import { useId, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -83,11 +84,8 @@ export function SectionHeading({
       <div className="min-w-0">
         {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
         <h2 className="mt-1.5 text-2xl font-semibold leading-8 tracking-title text-content-primary lg:text-3xl lg:leading-9">
-          {title}
+          {description ? <QuietHint text={description}>{title}</QuietHint> : title}
         </h2>
-        {description ? (
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-content-secondary">{description}</p>
-        ) : null}
       </div>
       {action ? <div className="shrink-0">{action}</div> : null}
     </div>
@@ -494,23 +492,23 @@ export function StatCell({
   detail,
   icon,
   className,
+  insideLink = false,
 }: {
   label: string;
   value: ReactNode;
   detail?: ReactNode;
   icon?: ReactNode;
   className?: string;
+  insideLink?: boolean;
 }): JSX.Element {
   return (
     <div className={cn('min-w-0 px-4 py-4 md:px-5 md:py-5 xl:py-6', className)}>
       <div className="flex items-center gap-1.5 text-2xs font-medium text-content-secondary">
-        {icon ? <span className="text-content-muted">{icon}</span> : null}
-        {label}
+        <QuietHint text={detail ?? label} focusable={!insideLink} className="gap-1.5">{icon ? <span className="text-content-muted">{icon}</span> : null}{label}</QuietHint>
       </div>
       <div className="readout mt-2.5 text-[2.25rem] md:text-[2.5rem] xl:text-[2.75rem]">
         {value}
       </div>
-      {detail ? <div className="mt-2 text-2xs leading-5 text-content-muted md:text-xs">{detail}</div> : null}
     </div>
   );
 }

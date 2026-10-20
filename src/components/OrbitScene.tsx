@@ -36,10 +36,9 @@ export function OrbitScene(): JSX.Element {
         <ellipse cx="200" cy="70" rx="134" ry="68" fill="url(#orbit-glow)" />
         <g fill="none" stroke="url(#orbit-ring)"><ellipse cx="200" cy="70" rx="144" ry="38" transform="rotate(-16 200 70)" /><ellipse cx="200" cy="70" rx="106" ry="44" transform="rotate(23 200 70)" /><ellipse cx="200" cy="70" rx="80" ry="32" transform="rotate(-56 200 70)" /></g>
         <path d="m200 35 29 19-8 36-35 10-20-30 16-29z M200 35l-14 65m43-46-63 16m16-29 39 49" fill="#173f43" fillOpacity=".7" stroke="#70f0d3" strokeOpacity=".7" />
-        <circle cx="313" cy="37" r="4" fill="#70f0d3" /><circle cx="121" cy="43" r="2.5" fill="#91b4ff" /><path d="M24 122h70m212 0h70" stroke="#223146" /><text x="200" y="126" textAnchor="middle" fontSize="10" fill="#879bb5" letterSpacing="3">ORBITAL OBSERVATORY</text>
+        <circle cx="313" cy="37" r="4" fill="#70f0d3" /><circle cx="121" cy="43" r="2.5" fill="#91b4ff" /><path d="M24 122h70m212 0h70" stroke="#223146" />
       </svg>
       <div ref={host} className="orbit-scene-canvas" aria-hidden="true" />
-      <figcaption>轨道装置 · 装饰示意</figcaption>
     </figure>
   );
 }

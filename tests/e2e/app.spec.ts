@@ -71,7 +71,8 @@ test('ecosystem URL filters survive reload and list selects a readable summary',
   await expect(page).toHaveURL(/focus=hot-healthy/);
   await page.getByLabel('按风险筛选').selectOption('high');
   await page.reload(); await expect(page.getByLabel('按风险筛选')).toHaveValue('high');
-  await expect(page.getByText('固定 0–100 轴，筛选不会重新缩放')).toBeVisible();
+  await page.getByRole('heading',{name:'生态分布',exact:true}).hover();
+  await expect(page.getByRole('tooltip')).toContainText('固定 0–100 轴，筛选不会重新缩放');
   const list=page.getByRole('complementary',{name:'象限内插件列表'});
   await list.locator('ul button').first().click();
   await expect(list.getByRole('status')).toBeVisible();
@@ -154,7 +155,7 @@ test('method page remains readable when core data fails',async({page})=>{
   await page.route('**/data/latest.json',route=>route.fulfill({status:200,json:{schemaVersion:999}}));
   await page.goto('/method');
   await expect(page.getByRole('heading',{level:1})).toHaveText('数据与方法');
-  await expect(page.getByText('先读这三点，就能开始使用')).toBeVisible();
+  await expect(page.getByText('快速指南')).toBeVisible();
 });
 
 for(const width of [390,768,1024,1366,1440,1920]){
@@ -219,4 +220,37 @@ test('download missing days remain gaps instead of zero-valued chart averages',a
   await page.goto('/plugins/dsh-market-dsh-market');
   await expect(page.getByText('灰色/断点=疑似缺失，不按 0 计入均值')).toBeVisible();
   await expect(page.getByText(/周下载窗口包含平台性缺数日/).first()).toBeVisible();
+});
+
+
+test('quiet headings expose supporting text on hover and keyboard focus only',async({page})=>{
+  await page.goto('/');await expect(page.locator('#home-title')).toBeVisible();
+  await expect(page.locator('.orbit-hero-intro')).toHaveCount(0);
+  await expect(page.locator('.orbit-brand-scene figcaption')).toHaveCount(0);
+  await expect(page.locator('.orbit-topbar')).not.toContainText('工作台');
+  const current=page.locator('.orbit-breadcrumb .orbit-quiet-hint');
+  await current.hover();await expect(page.getByRole('tooltip')).toHaveText('生态指标与近期变化');
+  await page.keyboard.press('Escape');await expect(page.getByRole('tooltip')).toHaveCount(0);
+  await page.mouse.move(1,1);await current.focus();
+  await expect(page.getByRole('tooltip')).toBeVisible();
+  await page.keyboard.press('Escape');await expect(page.getByRole('tooltip')).toHaveCount(0);
+  await page.getByRole('navigation',{name:'主导航',exact:true}).getByRole('link',{name:'插件库',exact:true}).click();
+  await expect(page).toHaveURL(/plugins$/);
+  await expect(page.locator('.page-enter')).toHaveCSS('animation-name','orbit-page-in');
+});
+
+test('scatter halos pause before the pointer reaches the chart and resume away from it',async({page})=>{
+  await page.setViewportSize({width:1440,height:900});await page.goto('/ecosystem');
+  await page.mouse.move(2,2);
+  const halo=page.locator('.orbit-scatter-pulse');await expect(halo).toHaveAttribute('data-state','running');
+  const chart=page.getByRole('img',{name:'可筛选的 DSH 插件生态分布散点图'});
+  const bounds=await chart.boundingBox();if(!bounds)throw new Error('missing chart bounds');
+  await page.mouse.move(bounds.x-30,bounds.y+bounds.height/2);
+  await expect(halo).toHaveAttribute('data-state','paused');
+  const ring=halo.locator('circle').first();
+  const frozen=await ring.evaluate(el=>getComputedStyle(el).transform);
+  await page.waitForTimeout(450);
+  expect(await ring.evaluate(el=>getComputedStyle(el).transform)).toBe(frozen);
+  await page.mouse.move(2,2);await expect(halo).toHaveAttribute('data-state','running');
+  await page.emulateMedia({reducedMotion:'reduce'});await expect(halo).toHaveCount(0);
 });
