@@ -21,11 +21,50 @@ export async function readJson<T>(filePath: string): Promise<T | null> {
   }
 }
 
+function isRetryableRenameError(error: unknown): boolean {
+  const code = (error as NodeJS.ErrnoException).code;
+  return code === 'EPERM' || code === 'EBUSY' || code === 'EACCES';
+}
+
 export async function atomicWriteJson(filePath: string, value: unknown): Promise<void> {
   await mkdir(path.dirname(filePath), { recursive: true });
   const temporary = `${filePath}.${process.pid}.${Date.now()}.tmp`;
-  await writeFile(temporary, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
-  await rename(temporary, filePath);
+  const content = `${JSON.stringify(value, null, 2)}\n`;
+  await writeFile(temporary, content, 'utf8');
+
+  // Windows can temporarily lock a file opened by a dev server, virus scanner
+  // or indexer. Retry a few times before falling back to an explicit replace.
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    try {
+      await rename(temporary, filePath);
+      return;
+    } catch (error) {
+      if (!isRetryableRenameError(error) || attempt === 4) {
+        if (!isRetryableRenameError(error)) {
+          await rm(temporary, { force: true });
+          throw error;
+        }
+        break;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 120 * (attempt + 1)));
+    }
+  }
+
+  try {
+    await rm(filePath, { force: true });
+    await rename(temporary, filePath);
+  } catch (error) {
+    // Last resort for Windows locks: overwrite in place. It is less atomic, but
+    // the source data is deterministic JSON and the previous value remains on
+    // disk until this write begins.
+    try {
+      await writeFile(filePath, content, 'utf8');
+      await rm(temporary, { force: true });
+    } catch {
+      await rm(temporary, { force: true });
+      throw error;
+    }
+  }
 }
 
 export function assertLatestData(value: unknown): asserts value is LatestData {
@@ -109,6 +148,7 @@ export async function updateHistory(
     const points = [...(plugins[plugin.id] ?? [])];
     const point: HistoryPoint = {
       t: latest.generatedAt,
+      methodVersion: plugin.scores.maintenance.methodVersion,
       stars: plugin.github.stars,
       downloads: plugin.npm.status === 'verified' ? plugin.npm.downloads30d : null,
       popularity: plugin.scores.popularity.score,
@@ -131,9 +171,15 @@ export async function updateHistory(
       .slice(-400);
   }
 
-  // Remove empty plugin entries but keep history for plugins temporarily removed
-  // from the config, so re-adding a plugin can continue its timeline.
+  // Retain history for plugins temporarily removed from the config, but still
+  // expire old points by the common cutoff and drop empty arrays.
   for (const key of Object.keys(plugins)) {
+    plugins[key] = plugins[key]
+      .filter((item) => {
+        const timestamp = new Date(item.t).getTime();
+        return Number.isFinite(timestamp) && timestamp >= cutoff;
+      })
+      .slice(-400);
     if (plugins[key].length === 0) delete plugins[key];
   }
 

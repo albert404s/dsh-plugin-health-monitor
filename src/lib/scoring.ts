@@ -331,7 +331,11 @@ export function maintenanceScore(plugin: PluginSeed, now: Date): MaintenanceScor
         rawValue: issueRate,
         normalized: issueRate,
         weight: 0.2,
-        included: github.issues.opened90d > 0 && issueRate !== null,
+        included:
+          availability.issues &&
+          !github.issues.truncated &&
+          github.issues.opened90d > 0 &&
+          issueRate !== null,
         sampleSize: github.issues.opened90d,
         explanation:
           '近 90 天创建的非 PR Issue 中，当前已关闭的比例。少于 5 条时降低该分项权重；0 条新 Issue 不扣分，也不代表处理能力强。',
@@ -351,7 +355,8 @@ export function maintenanceScore(plugin: PluginSeed, now: Date): MaintenanceScor
         rawValue: backlogScore,
         normalized: backlogScore,
         weight: 0.1,
-        included: backlogScore !== null,
+        included:
+          availability.issues && !github.issues.openTruncated && backlogScore !== null,
         sampleSize: github.issues.openNow,
         explanation:
           '当前开放 Issue 中创建超过 90 天的比例越低越好。当前没有开放 Issue 时该项不参与计分。',
@@ -364,17 +369,23 @@ export function maintenanceScore(plugin: PluginSeed, now: Date): MaintenanceScor
       component: buildComponent({
         key: 'pullRequests',
         label: '近期 PR 合并率',
-        rawLabel:
-          github.pullRequests.opened90d === 0
+        rawLabel: !github.pullRequests.available
+          ? 'PR 功能不可用'
+          : github.pullRequests.opened90d === 0
             ? '近 90 天无新 PR'
             : `${github.pullRequests.merged90d}/${github.pullRequests.opened90d} 已合并 · ${prRate ?? '—'}%`,
         rawValue: prRate,
         normalized: prRate,
         weight: 0.15,
-        included: github.pullRequests.opened90d > 0 && prRate !== null,
+        included:
+          availability.pullRequests &&
+          github.pullRequests.available &&
+          !github.pullRequests.truncated &&
+          github.pullRequests.opened90d > 0 &&
+          prRate !== null,
         sampleSize: github.pullRequests.opened90d,
         explanation:
-          '近 90 天创建 PR 中已合并的比例。只统计 PR，不把 Issue 混入；少于 3 条时降低权重。',
+          '近 90 天创建 PR 中已合并的比例。只统计 PR，不把 Issue 混入；少于 3 条时降低权重。仓库禁用 PR 时该维度被排除，而不是记 0。',
         evidenceUrl: github.pullRequests.queryUrl,
       }),
     },
@@ -393,7 +404,7 @@ export function maintenanceScore(plugin: PluginSeed, now: Date): MaintenanceScor
         rawValue: releaseDays,
         normalized: releaseScore,
         weight: 0.1,
-        included: releaseScore !== null,
+        included: availability.releases && releaseScore !== null,
         explanation:
           '最近一次 Release 的时间分档。没有 Release 不等于未维护，因此该项仅在存在 Release 时参与。',
         evidenceUrl: github.releasesUrl,
@@ -581,6 +592,7 @@ export function compactHistoryPoint(
 ): import('./types').HistoryPoint {
   return {
     t: timestamp,
+    methodVersion: plugin.scores.maintenance.methodVersion,
     stars: plugin.github.stars,
     downloads: plugin.npm.status === 'verified' ? plugin.npm.downloads30d : null,
     popularity: plugin.scores.popularity.score,

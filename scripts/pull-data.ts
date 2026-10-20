@@ -7,6 +7,13 @@ const ROOT = path.resolve(HERE, '..');
 const REPO = process.env.DATA_REPO_SLUG || 'albert404s/dsh-plugin-health-monitor';
 const BRANCH = process.env.DATA_BRANCH || 'data';
 
+if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(REPO)) {
+  throw new Error('DATA_REPO_SLUG 必须是 owner/repo 形式');
+}
+if (!/^[A-Za-z0-9._/-]+$/.test(BRANCH) || BRANCH.includes('..')) {
+  throw new Error('DATA_BRANCH 含有不安全字符');
+}
+
 async function fetchJson(file: string): Promise<unknown> {
   const url = `https://raw.githubusercontent.com/${REPO}/${BRANCH}/${file}`;
   const response = await fetch(url, {

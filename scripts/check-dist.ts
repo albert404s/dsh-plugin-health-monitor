@@ -3,13 +3,13 @@ import path from 'node:path';
 
 const DIST = path.resolve(process.cwd(), 'dist');
 const TOKEN_PATTERNS = [
-  /\bghp_[A-Za-z0-9]{20,}\b/,
-  /\bgho_[A-Za-z0-9]{20,}\b/,
+  /\bgh[pousr]_[A-Za-z0-9]{20,}\b/,
   /\bgithub_pat_[A-Za-z0-9_]{20,}\b/,
+  /\bnpm_[A-Za-z0-9]{20,}\b/,
   /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/,
-  /\bGITHUB_TOKEN\s*=\s*[^\s'"`]+/,
+  /\b(?:GITHUB_TOKEN|GH_TOKEN|NPM_TOKEN)\s*=\s*[^\s'"`]+/,
+  /\bVITE_[A-Z0-9_]*(?:TOKEN|SECRET|KEY)\b/,
 ];
-const TEXT_EXTENSIONS = new Set(['.html', '.js', '.css', '.json', '.txt', '.svg', '.webmanifest']);
 
 async function walk(directory: string): Promise<string[]> {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -26,9 +26,11 @@ async function main(): Promise<void> {
   const files = await walk(DIST);
   const findings: string[] = [];
   for (const file of files) {
-    if (!TEXT_EXTENSIONS.has(path.extname(file).toLowerCase())) continue;
     const info = await stat(file);
-    if (info.size > 8 * 1024 * 1024) continue;
+    if (info.size > 16 * 1024 * 1024) {
+      findings.push(`${path.relative(DIST, file)} is larger than the 16 MiB scan limit`);
+      continue;
+    }
     const text = await readFile(file, 'utf8');
     for (const pattern of TOKEN_PATTERNS) {
       if (pattern.test(text)) {
@@ -37,12 +39,14 @@ async function main(): Promise<void> {
     }
   }
   if (findings.length > 0) {
-    console.error('[check-dist] potential secret material found:');
+    console.error('[check-dist] potential secret material or unscannable file found:');
     for (const finding of findings) console.error(` - ${finding}`);
     process.exitCode = 1;
     return;
   }
-  console.log(`[check-dist] scanned ${files.length} build files; no token patterns found`);
+  console.log(
+    `[check-dist] scanned all ${files.length} build files; no known token patterns found`,
+  );
 }
 
 main().catch((error) => {

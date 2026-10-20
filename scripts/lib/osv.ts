@@ -24,6 +24,7 @@ interface OsvVulnerability {
 function normalizeSeverity(value: unknown): Vulnerability['severity'] {
   if (typeof value !== 'string') return 'unknown';
   const normalized = value.toLowerCase();
+  if (normalized === 'moderate') return 'medium';
   if (normalized === 'critical' || normalized === 'high' || normalized === 'medium' || normalized === 'low') {
     return normalized;
   }

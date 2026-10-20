@@ -134,10 +134,7 @@ export class JsonClient {
 
         if (!isRetryable || attempt === retries) throw error;
 
-        const backoff = Math.min(30_000, 500 * 2 ** attempt);
-        const jitter = Math.floor(Math.random() * 250);
-        const wait = retryAfterMs !== null && retryAfterMs <= 60_000 ? retryAfterMs : backoff + jitter;
-        if (wait > 65_000) {
+        if (retryAfterMs !== null && retryAfterMs > 60_000) {
           throw new HttpError(
             `Rate limit resets too far in the future for ${url}`,
             response.status,
@@ -145,6 +142,10 @@ export class JsonClient {
             retryAfterMs,
           );
         }
+        const backoff = Math.min(30_000, 500 * 2 ** attempt);
+        const jitter = Math.floor(Math.random() * 250);
+        const wait =
+          retryAfterMs !== null ? Math.max(1_000, retryAfterMs) : backoff + jitter;
         console.warn(
           `[http] ${response.status} ${url} — retry ${attempt + 1}/${retries} in ${Math.round(wait / 1000)}s`,
         );

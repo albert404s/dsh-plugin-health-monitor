@@ -54,6 +54,8 @@ export interface IssueWindow {
 }
 
 export interface PullRequestWindow {
+  /** GitHub Pull Requests 功能是否可用；404 时并不等于“零个 PR”。 */
+  available: boolean;
   opened90d: number;
   merged90d: number;
   mergeRate: number | null;
@@ -275,6 +277,7 @@ export interface LatestData {
 
 export interface HistoryPoint {
   t: string;
+  methodVersion: string;
   stars: number;
   downloads: number | null;
   popularity: number | null;
