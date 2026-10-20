@@ -14,16 +14,23 @@ import { MethodPage } from './pages/MethodPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 function DataReady(): JSX.Element {
-  const { loading, error, refresh } = useData();
-  if (loading) {
+  const { data, loading, error, refresh } = useData();
+  if (loading && !data) {
     return (
       <div className="mx-auto max-w-shell px-4 md:px-6">
         <LoadingState />
       </div>
     );
   }
-  if (error) {
+  if (error && !data) {
     return <ErrorState message={error} onRetry={refresh} />;
+  }
+  if (!data) {
+    return (
+      <div className="mx-auto max-w-shell px-4 md:px-6">
+        <LoadingState />
+      </div>
+    );
   }
   return <Outlet />;
 }

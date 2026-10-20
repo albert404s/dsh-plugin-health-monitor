@@ -4,7 +4,7 @@ import { useData } from '../../hooks/useData';
 import { formatDateTime, formatRelative } from '../../lib/format';
 
 export function DataNotices(): JSX.Element | null {
-  const { data, stale, warnings, refresh } = useData();
+  const { data, stale, warnings, refresh, error } = useData();
   if (!data) return null;
 
   const failed = data.status.outcome === 'failed';
@@ -39,6 +39,25 @@ export function DataNotices(): JSX.Element | null {
     );
   }
 
+  if (error) {
+    return (
+      <div className="border-b border-amber/20 bg-amber/[0.035]">
+        <div className="mx-auto flex max-w-shell flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2 text-[10px] text-amber/90 md:px-6">
+          <AlertTriangle size={11} className="shrink-0" />
+          <span>刷新失败，继续展示上次成功加载的快照。</span>
+          <span className="text-ink-400">{error}</span>
+          <button
+            type="button"
+            onClick={refresh}
+            className="ml-auto inline-flex items-center gap-1 rounded border border-amber/25 px-2 py-1 text-[10px] text-amber/90 transition hover:bg-amber/10"
+          >
+            <RefreshCw size={10} /> 重试
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (partial || warnings.length > 0) {
     return (
       <div className="border-b border-amber/20 bg-amber/[0.035]">
@@ -46,7 +65,7 @@ export function DataNotices(): JSX.Element | null {
           <AlertTriangle size={11} className="shrink-0" />
           <span>部分数据源已降级，缺失项不会被当作 0。</span>
           <span className="text-ink-400">
-            {warnings[0] ?? sourceFailures.slice(0, 2).join(' · ')}
+            {warnings.slice(0, 2).join(' · ') || sourceFailures.slice(0, 2).join(' · ')}
           </span>
           <Link to="/method" className="ml-auto text-ink-400 underline-offset-4 hover:text-ink-200 hover:underline">
             数据状态
