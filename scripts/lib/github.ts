@@ -81,7 +81,11 @@ async function countOpenPullRequests(
     const response = await client.get<GithubPullResponse[]>(
       `https://api.github.com/repos/${repo}/pulls?state=open&per_page=1`,
     );
-    return { count: lastPage(response.headers), ok: true };
+    // An empty array has no Link header. Never turn "zero open PRs" into 1.
+    return {
+      count: response.data.length === 0 ? 0 : lastPage(response.headers),
+      ok: true,
+    };
   } catch {
     return { count: 0, ok: false };
   }
@@ -177,41 +181,60 @@ async function collectPullRequests90d(
   now: Date,
 ): Promise<PullRequestWindow> {
   const cutoff = new Date(now.getTime() - 90 * DAY_MS);
+  const queryUrl = `https://github.com/${repo}/pulls?q=${encodeURIComponent(
+    `is:pr created:>=${isoDate(cutoff)}`,
+  )}`;
   let page = 1;
   let opened90d = 0;
   let merged90d = 0;
   let truncated = false;
   let shouldStop = false;
 
-  while (page <= 5 && !shouldStop) {
-    const response = await client.get<GithubPullResponse[]>(
-      `https://api.github.com/repos/${repo}/pulls?state=all&sort=created&direction=desc&per_page=${PAGE_SIZE}&page=${page}`,
-    );
-    const items = Array.isArray(response.data) ? response.data : [];
-    if (items.length === 0) break;
-    for (const pull of items) {
-      const created = new Date(pull.created_at).getTime();
-      if (created < cutoff.getTime()) {
-        shouldStop = true;
-        continue;
+  try {
+    while (page <= 5 && !shouldStop) {
+      const response = await client.get<GithubPullResponse[]>(
+        `https://api.github.com/repos/${repo}/pulls?state=all&sort=created&direction=desc&per_page=${PAGE_SIZE}&page=${page}`,
+      );
+      const items = Array.isArray(response.data) ? response.data : [];
+      if (items.length === 0) break;
+      for (const pull of items) {
+        const created = new Date(pull.created_at).getTime();
+        if (created < cutoff.getTime()) {
+          shouldStop = true;
+          continue;
+        }
+        opened90d += 1;
+        if (pull.merged_at) merged90d += 1;
       }
-      opened90d += 1;
-      if (pull.merged_at) merged90d += 1;
+      if (items.length < PAGE_SIZE) shouldStop = true;
+      if (page === 5 && items.length === PAGE_SIZE) truncated = true;
+      page += 1;
     }
-    if (items.length < PAGE_SIZE) shouldStop = true;
-    if (page === 5 && items.length === PAGE_SIZE) truncated = true;
-    page += 1;
+  } catch (error) {
+    if (error instanceof HttpError && error.status === 404) {
+      // Repositories can disable Pull Requests. 404 here means "not available",
+      // not "zero PRs", so the score must exclude this dimension.
+      return {
+        available: false,
+        opened90d: 0,
+        merged90d: 0,
+        mergeRate: null,
+        lowSample: true,
+        truncated: false,
+        queryUrl,
+      };
+    }
+    throw error;
   }
 
   return {
+    available: true,
     opened90d,
     merged90d,
     mergeRate: opened90d > 0 ? merged90d / opened90d : null,
     lowSample: opened90d < 3,
     truncated,
-    queryUrl: `https://github.com/${repo}/pulls?q=${encodeURIComponent(
-      `is:pr created:>=${isoDate(cutoff)}`,
-    )}`,
+    queryUrl,
   };
 }
 
@@ -333,6 +356,9 @@ export async function collectGithub(
     longOpen: longOpenResult.longOpen,
     openTruncated: longOpenResult.truncated,
   };
+  if (commits.truncated) {
+    warnings.push('近 30 天提交分页达到上限，提交频率为下限。');
+  }
   if (issuesWindow.truncated) {
     warnings.push('Issue 90 天分页达到上限，关闭率是下限样本。');
   }
@@ -379,7 +405,13 @@ export async function collectGithub(
     commits30dTruncated: commits.truncated,
     issues,
     pullRequests: {
-      ...collectPullRequestsFallback,
+      available: true,
+      opened90d: 0,
+      merged90d: 0,
+      mergeRate: null,
+      lowSample: true,
+      truncated: false,
+      queryUrl: '',
     },
     latestRelease,
     releases90d,
@@ -395,6 +427,11 @@ export async function collectGithub(
   // failures are attributable and can be retried independently.
   const pullRequests = await collectPullRequests90d(client, meta.full_name, now);
   github.pullRequests = pullRequests;
+  if (!pullRequests.available) {
+    warnings.push('仓库未启用 Pull Requests（API 返回 404）；PR 指标不参与评分，也不记为 0。');
+  } else if (pullRequests.truncated) {
+    warnings.push('近 90 天 PR 分页达到上限，合并率为下限样本。');
+  }
 
   return {
     repository,
@@ -403,18 +440,9 @@ export async function collectGithub(
       repository: true,
       commits: Boolean(commits.lastCommitAt) && !commits.truncated,
       issues: !issuesWindow.truncated && longOpenResult.ok && !longOpenResult.truncated,
-      pullRequests: !pullRequests.truncated,
+      pullRequests: pullRequests.available && !pullRequests.truncated,
       releases: releasesOk,
     },
     warnings,
   };
 }
-
-const collectPullRequestsFallback: PullRequestWindow = {
-  opened90d: 0,
-  merged90d: 0,
-  mergeRate: null,
-  lowSample: true,
-  truncated: false,
-  queryUrl: '',
-};

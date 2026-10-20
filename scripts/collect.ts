@@ -39,11 +39,13 @@ const ROOT = path.resolve(HERE, '..');
 interface Options {
   dataDir: string;
   configPath: string;
+  allowGhCliToken: boolean;
 }
 
 function parseArgs(argv: string[]): Options {
   let dataDir = process.env.DATA_DIR || path.join(ROOT, 'public', 'data');
   let configPath = path.join(ROOT, 'config', 'plugins.json');
+  let allowGhCliToken = false;
   for (let index = 0; index < argv.length; index += 1) {
     if (argv[index] === '--data-dir' && argv[index + 1]) {
       dataDir = path.resolve(argv[index + 1]);
@@ -51,27 +53,35 @@ function parseArgs(argv: string[]): Options {
     } else if (argv[index] === '--config' && argv[index + 1]) {
       configPath = path.resolve(argv[index + 1]);
       index += 1;
+    } else if (argv[index] === '--gh-cli-token') {
+      allowGhCliToken = true;
     }
   }
-  return { dataDir, configPath };
+  return { dataDir, configPath, allowGhCliToken };
 }
 
-function resolveGithubToken(): { token: string | null; note: string } {
+function resolveGithubToken(allowGhCliToken: boolean): { token: string | null; note: string } {
   const fromEnv = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
   if (fromEnv) return { token: fromEnv, note: 'using GITHUB_TOKEN/GH_TOKEN from environment' };
+  if (!allowGhCliToken) {
+    return {
+      token: null,
+      note: 'no GitHub token; unauthenticated rate limit is only 60 requests/hour. Use --gh-cli-token to explicitly reuse the local gh login.',
+    };
+  }
   try {
     const token = execFileSync('gh', ['auth', 'token'], {
       encoding: 'utf8',
       timeout: 10_000,
       stdio: ['ignore', 'pipe', 'ignore'],
     }).trim();
-    if (token) return { token, note: 'using local gh auth token' };
+    if (token) return { token, note: 'using local gh auth token (explicit --gh-cli-token)' };
   } catch {
     // Fall through to unauthenticated mode with an explicit warning.
   }
   return {
     token: null,
-    note: 'no GitHub token; unauthenticated rate limit is only 60 requests/hour',
+    note: 'explicit gh CLI token requested but unavailable; unauthenticated mode',
   };
 }
 
@@ -136,8 +146,9 @@ async function main(): Promise<void> {
   const pluginsConfig = await loadConfig(options.configPath);
   const previous = await loadExisting(options.dataDir);
   const previousById = new Map((previous.latest?.plugins ?? []).map((plugin) => [plugin.id, plugin]));
-  const { token, note } = resolveGithubToken();
+  const { token, note } = resolveGithubToken(options.allowGhCliToken);
   console.log(`[collect] ${pluginsConfig.length} plugins; GitHub ${note}`);
+  const deadline = startedAt.getTime() + 20 * 60 * 1000;
 
   const githubClient: JsonClient = createGithubClient(token ?? undefined);
   const npmClient = createNpmClient();
@@ -157,6 +168,26 @@ async function main(): Promise<void> {
 
   for (const config of pluginsConfig) {
     const previousPlugin = previousById.get(config.id);
+    if (Date.now() > deadline) {
+      const message = `全局采集时间预算（20 分钟）已耗尽，${config.id} 沿用上次快照。`;
+      errors.push(message);
+      githubFailed += 1;
+      if (previousPlugin) {
+        const { scores: _previousScores, ...previousSeed } = previousPlugin;
+        records.push({
+          ...previousSeed,
+          id: config.id,
+          category: config.category,
+          installCommand: config.installCommand,
+          curatorNote: config.note,
+          dataStatus: 'stale',
+          warnings: [...previousSeed.warnings, message],
+        });
+        usedFallback += 1;
+      }
+      continue;
+    }
+
     let repository: RepositoryInfo;
     let github: GithubMetrics;
     let availabilityBase: {
@@ -277,9 +308,15 @@ async function main(): Promise<void> {
       };
     }
 
+    const availability: PluginRecord['availability'] = {
+      ...availabilityBase,
+      npm: npm.status === 'verified' && npm.downloads30d !== null,
+      security: security.status === 'checked',
+    };
+    const availableDomains = Object.values(availability).filter(Boolean).length;
     const dataStatus: PluginRecord['dataStatus'] = usedFallbackForPlugin
       ? 'stale'
-      : warnings.length > 0
+      : warnings.length > 0 || availableDomains < 7
         ? 'partial'
         : 'complete';
 
@@ -306,11 +343,7 @@ async function main(): Promise<void> {
         evidenceUrl: compatibilityEvidenceUrl,
         note: '仅展示包声明与公开元数据；本项目未安装、执行或运行时验证被检测插件，因此不构成兼容性保证。',
       },
-      availability: {
-        ...availabilityBase,
-        npm: npm.status === 'verified' && npm.downloads30d !== null,
-        security: security.status === 'checked',
-      },
+      availability,
       dataStatus,
       warnings,
       lastUpdatedAt,
@@ -358,7 +391,10 @@ async function main(): Promise<void> {
   const sources = { github: githubSource, npm: npmSource, osv: osvSource };
 
   const runId = `${startedAt.toISOString()}-${randomUUID().slice(0, 8)}`;
-  const hardFailure = records.length === 0;
+  // GitHub is the identity and activity backbone. If every repository request
+  // fails, keep the last successful latest.json/history untouched even though we
+  // still have stale records in memory. Partial success is allowed to publish.
+  const hardFailure = githubSuccess === 0;
 
   if (hardFailure) {
     const status: StatusFile = {
@@ -373,7 +409,7 @@ async function main(): Promise<void> {
       nextRunHint: 'GitHub Actions 计划每 6 小时运行；失败时保留上一次成功快照。',
     };
     await writeStatus(options.dataDir, status);
-    console.error('[collect] no plugin records were collected; latest snapshot left untouched');
+    console.error('[collect] GitHub collection failed for every repository; latest snapshot left untouched');
     if (!previous.latest) process.exitCode = 1;
     return;
   }

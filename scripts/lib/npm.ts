@@ -37,9 +37,10 @@ export function normalizeRepositoryUrl(input: string | null | undefined): string
   value = value.replace(/^ssh:\/\/git@github\.com\//, 'github.com/');
   value = value.replace(/^https?:\/\/(www\.)?github\.com\//, 'github.com/');
   value = value.replace(/^git:\/\/github\.com\//, 'github.com/');
-  value = value.replace(/\.git$/, '');
-  value = value.replace(/\/+$/, '');
+  value = value.replace(/^github:/, 'github.com/');
   value = value.replace(/#.*$/, '');
+  value = value.replace(/\.git\/?$/, '');
+  value = value.replace(/\/+$/, '');
   return value;
 }
 

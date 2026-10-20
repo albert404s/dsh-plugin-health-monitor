@@ -16,6 +16,10 @@ data-store/
 .env.*
 !.env.example
 
+# local ad-hoc state
+.tmp/
+.tmp-*/
+
 # tests
 coverage/
 playwright-report/
