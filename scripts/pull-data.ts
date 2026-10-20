@@ -1,0 +1,47 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { atomicWriteJson, assertHistory, assertLatestData, assertStatus } from './lib/store';
+
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(HERE, '..');
+const REPO = process.env.DATA_REPO_SLUG || 'albert404s/dsh-plugin-health-monitor';
+const BRANCH = process.env.DATA_BRANCH || 'data';
+
+async function fetchJson(file: string): Promise<unknown> {
+  const url = `https://raw.githubusercontent.com/${REPO}/${BRANCH}/${file}`;
+  const response = await fetch(url, {
+    headers: { 'User-Agent': 'dsh-plugin-health-monitor-data-pull' },
+    signal: AbortSignal.timeout(30_000),
+  });
+  if (!response.ok) {
+    throw new Error(`无法下载 ${url}：HTTP ${response.status}`);
+  }
+  return response.json() as Promise<unknown>;
+}
+
+async function main(): Promise<void> {
+  console.log(`[data:pull] ${REPO}@${BRANCH} → public/data`);
+  const [latest, history, status] = await Promise.all([
+    fetchJson('latest.json'),
+    fetchJson('history.json'),
+    fetchJson('status.json'),
+  ]);
+  assertLatestData(latest);
+  assertHistory(history);
+  assertStatus(status);
+  const destination = path.join(ROOT, 'public', 'data');
+  await Promise.all([
+    atomicWriteJson(path.join(destination, 'latest.json'), latest),
+    atomicWriteJson(path.join(destination, 'history.json'), history),
+    atomicWriteJson(path.join(destination, 'status.json'), status),
+  ]);
+  console.log(`[data:pull] saved ${latest.plugins.length} plugins (snapshot ${latest.lastSuccessAt})`);
+}
+
+main().catch((error) => {
+  console.error('[data:pull] failed:', error);
+  console.error(
+    '[data:pull] 如果远端尚未创建 data 分支，请先运行 npm run collect（需要 GitHub Token）。',
+  );
+  process.exitCode = 1;
+});

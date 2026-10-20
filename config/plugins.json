@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "description": "经人工核验的 DeepSeek Harness 插件清单。npm 字段仅在 GitHub 仓库与 registry 的 repository 字段可对应时填写；采集器每次运行仍会重新核对。",
+  "verifiedAt": "2026-10-20T02:00:00.000Z",
+  "plugins": [
+    {
+      "id": "michengai-dsh-agency-agents",
+      "repo": "MichengAI/dsh-agency-agents",
+      "npm": "@michengai/dsh-agency-agents",
+      "category": "agents",
+      "installCommand": "dsh plugin --profile web add @michengai/dsh-agency-agents@latest",
+      "note": "321 名可召唤领域专家；仓库 README 明确给出 dsh plugin 安装命令。"
+    },
+    {
+      "id": "michengai-dsh-codex-ui",
+      "repo": "MichengAI/dsh-codex-ui",
+      "npm": "@michengai/dsh-codex-ui",
+      "category": "interface",
+      "installCommand": "dsh plugin --profile web add @michengai/dsh-codex-ui@latest",
+      "note": "DSH Web 的 Codex 风格侧栏、会话树与轮次导航。"
+    },
+    {
+      "id": "michengai-dsh-skills-manager",
+      "repo": "MichengAI/dsh-skills-manager",
+      "npm": "@michengai/dsh-skills-manager",
+      "category": "skills",
+      "installCommand": "dsh plugin --profile web add @michengai/dsh-skills-manager@latest",
+      "note": "本机 Agent Skills 的加载与安全管理插件。"
+    },
+    {
+      "id": "michengai-dsh-archive-manager",
+      "repo": "MichengAI/dsh-archive-manager",
+      "npm": "@michengai/dsh-archive-manager",
+      "category": "sessions",
+      "installCommand": "dsh plugin --profile web add @michengai/dsh-archive-manager@latest",
+      "note": "归档会话的查看、恢复与管理。"
+    },
+    {
+      "id": "michengai-dsh-im-connect",
+      "repo": "MichengAI/dsh-im-connect",
+      "npm": "@michengai/dsh-im-connect",
+      "category": "connectivity",
+      "installCommand": "dsh plugin --profile web add @michengai/dsh-im-connect@latest",
+      "note": "将即时通讯平台接入本机 DSH Agent。"
+    },
+    {
+      "id": "michengai-dsh-automation",
+      "repo": "MichengAI/dsh-automation",
+      "npm": "@michengai/dsh-automation",
+      "category": "automation",
+      "installCommand": "dsh plugin --profile web add @michengai/dsh-automation@latest",
+      "note": "在独立 DSH Session 中按计划执行编码任务。"
+    },
+    {
+      "id": "michengai-dsh-btw",
+      "repo": "MichengAI/dsh-btw",
+      "npm": "@michengai/dsh-btw",
+      "category": "workflow",
+      "installCommand": "dsh plugin --profile web add @michengai/dsh-btw@latest",
+      "note": "基于当前上下文的只读旁问，不执行工具。"
+    },
+    {
+      "id": "bowenliang123-dsh-context",
+      "repo": "bowenliang123/dsh-context",
+      "npm": "dsh-context",
+      "category": "context",
+      "installCommand": "dsh plugin --profile web add dsh-context",
+      "note": "上下文可视化、组成分析与压缩演进查看。"
+    },
+    {
+      "id": "dsh-market-dsh-market",
+      "repo": "dsh-market/dsh-market",
+      "npm": "dshmarket",
+      "category": "discovery",
+      "installCommand": "dsh plugin --profile web add dshmarket",
+      "note": "DSH 内的可视化插件市场，支持浏览、搜索与一键安装。"
+    },
+    {
+      "id": "ccch1mneyyy-dsh-tui",
+      "repo": "ccch1mneyyy/dsh-TUI",
+      "npm": "@deepseek-harness-tui/dsh-tui",
+      "category": "interface",
+      "installCommand": "npm install -g @deepseek-ai/dsh @deepseek-harness-tui/dsh-tui",
+      "note": "独立的 DSH TUI 插件，仓库 README 使用 npm 全局安装。"
+    },
+    {
+      "id": "omdsh-dev-dsh-better-sidebar",
+      "repo": "omdsh-dev/DSH-better-sidebar",
+      "npm": "dsh-better-sidebar",
+      "category": "interface",
+      "installCommand": "dsh plugin --profile web add dsh-better-sidebar@latest",
+      "note": "可扩展侧边栏底座，内置文件、终端、Git 与子 Agent 页面。"
+    },
+    {
+      "id": "liustack-modlens",
+      "repo": "liustack/modlens",
+      "npm": "@liustack/modlens",
+      "category": "vision",
+      "installCommand": "npx -y @deepseek-ai/dsh plugin --profile web add @liustack/modlens@latest",
+      "note": "为纯文本模型提供图片视觉解析能力的 DSH 插件。"
+    },
+    {
+      "id": "meteornox-deepseek-balance-whale-widget",
+      "repo": "MeteorNOX/DeepSeek-Balance-Whale-Widget",
+      "npm": "dsh-whale-widget",
+      "category": "monitoring",
+      "installCommand": "dsh plugin --profile web add dsh-whale-widget",
+      "note": "DSH Web 右下角余额、用量与自定义气泡挂件。"
+    },
+    {
+      "id": "t-auto-dsh-ops",
+      "repo": "T-Auto/dsh-ops",
+      "npm": "dsh-ops",
+      "category": "operations",
+      "installCommand": "npx --yes dsh-ops@latest install --profile web",
+      "note": "DSH 底层操作工具插件，仓库 README 提供独立安装器。"
+    },
+    {
+      "id": "shaobeichen-dsh-pocket",
+      "repo": "shaobeichen/dsh-pocket",
+      "npm": "dsh-pocket",
+      "category": "remote",
+      "installCommand": "dsh plugin --profile web add dsh-pocket",
+      "note": "手机扫码访问本机 DSH Web 的远程访问插件。"
+    },
+    {
+      "id": "dream-num-dsh-univer-office",
+      "repo": "dream-num/dsh-univer-office",
+      "npm": "dsh-univer-office",
+      "category": "office",
+      "installCommand": "dsh plugin --profile web add dsh-univer-office",
+      "note": "在 DSH 中提供表格、文档、幻灯片与关系表能力。"
+    },
+    {
+      "id": "ychris12138-dsh-usage-stats",
+      "repo": "Ychris12138/dsh-usage-stats",
+      "npm": "@ychris12138/dsh-usage-stats",
+      "category": "monitoring",
+      "installCommand": "dsh plugin --profile web add \"@ychris12138/dsh-usage-stats@0.3.5\"",
+      "note": "供应商余额、订阅配额与 Token 用量分析。"
+    },
+    {
+      "id": "hkkz9522-dsh-session-manager",
+      "repo": "hkkz9522/dsh-session-manager",
+      "npm": "dsh-session-manager",
+      "category": "sessions",
+      "installCommand": "dsh plugin --profile web add npm:dsh-session-manager",
+      "note": "会话与工作区管理插件。npm 包名对应的 registry repository 指向本仓库。"
+    },
+    {
+      "id": "toolclub-dsh-agent-team-gui",
+      "repo": "toolclub/dsh-agent-team-gui",
+      "npm": null,
+      "category": "agents",
+      "installCommand": "dsh plugin --profile web add https://github.com/toolclub/dsh-agent-team-gui/releases/download/v1.3.0/dsh-agent-team-gui-1.3.0.tgz",
+      "note": "通过 GitHub Release 的 .tgz 分发，npm registry 无同名包，因此不展示 npm 下载量。"
+    },
+    {
+      "id": "yjh051108-dsh-routing-suite",
+      "repo": "yjh051108/dsh-routing-suite",
+      "npm": null,
+      "category": "automation",
+      "installCommand": "dsh plugin --profile web add github:yjh051108/dsh-routing-suite",
+      "note": "由私有 injector 包与路由预设组成，通过 GitHub 分发；无可核验的公开 npm 下载统计。"
+    }
+  ]
+}

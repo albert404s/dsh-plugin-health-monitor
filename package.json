@@ -1,0 +1,44 @@
+{
+  "name": "dsh-plugin-health-monitor",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "DSH 插件生命体征：DeepSeek Harness 插件人气、维护健康度、风险与数据完整度的独立分析站",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsx scripts/prepare-data.ts && vite build && tsx scripts/postbuild.ts",
+    "preview": "vite preview --port 4173",
+    "collect": "tsx scripts/collect.ts",
+    "data:pull": "tsx scripts/pull-data.ts",
+    "prepare:data": "tsx scripts/prepare-data.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "check:dist": "tsx scripts/check-dist.ts"
+  },
+  "dependencies": {
+    "echarts": "^5.6.0",
+    "lucide-react": "^0.468.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5",
+    "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=22.19"
+  }
+}
