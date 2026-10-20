@@ -17,7 +17,7 @@
 | ![生态分布](docs/screenshots/quadrant-desktop.png) | ![插件对比](docs/screenshots/compare-desktop.png) |
 | ![插件详情](docs/screenshots/detail-desktop.png) | ![插件库](docs/screenshots/library-desktop.png) |
 
-> 界面截图来自本仓库真实快照。当前本地改造没有推送；使用和验收说明见 [ORBIT 交付说明](docs/ORBIT-DELIVERY.md)，评分评估见 [修订规范](docs/SCORING-REVIEW.md)。
+> 界面截图来自本仓库真实快照。ORBIT 版本使用和验收说明见 [ORBIT 交付说明](docs/ORBIT-DELIVERY.md)，评分评估见 [修订规范](docs/SCORING-REVIEW.md)。
 
 ## 快速开始
 
@@ -181,7 +181,7 @@ tests/e2e/     Playwright 浏览器验收
 - 390、768、1024、1366×768、1440×900、1920×1080 检查无页面横向溢出。
 - 必要 JS/CSS gzip 为 **约 345 KB**；独立 3D 为 136,283 字节，低于必要首屏 450 KB 目标。
 - 同一快照重放评分不一致记录为 0。当前未运行新一轮完整真实 API 采集；采集衔接由模拟 API、存储回退测试和真实快照重放验证。
-- 当前仅本地分支和提交；没有推送、PR 或团队主分支合并。
+- ORBIT 版本通过普通 Git 提交更新到 main；此前版本保留在提交历史中，main 推送后由 GitHub Actions 自动部署。
 
 截图位于 docs/screenshots/；本机完整验收记录还保存在项目父目录“ORBIT-验收”。
 
