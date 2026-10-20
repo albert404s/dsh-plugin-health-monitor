@@ -1,29 +1,29 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-20T10:57:19.453Z",
-  "lastAttemptAt": "2026-10-20T10:57:19.453Z",
-  "lastSuccessAt": "2026-10-20T10:57:19.453Z",
-  "runId": "2026-10-20T10:57:19.453Z-27da663c",
+  "generatedAt": "2026-10-20T16:23:11.658Z",
+  "lastAttemptAt": "2026-10-20T16:23:11.658Z",
+  "lastSuccessAt": "2026-10-20T16:23:11.658Z",
+  "runId": "2026-10-20T16:23:11.658Z-81818a34",
   "sources": {
     "github": {
       "status": "ok",
-      "fetchedAt": "2026-10-20T10:57:19.453Z",
+      "fetchedAt": "2026-10-20T16:23:11.658Z",
       "message": "20 成功 / 0 失败"
     },
     "npm": {
       "status": "ok",
-      "fetchedAt": "2026-10-20T10:57:19.453Z",
+      "fetchedAt": "2026-10-20T16:23:11.658Z",
       "message": "18/18 个包映射通过，0 个无法映射，0 个不可用，0 个缺少下载数据，0 个请求失败"
     },
     "osv": {
       "status": "ok",
-      "fetchedAt": "2026-10-20T10:57:19.453Z",
+      "fetchedAt": "2026-10-20T16:23:11.658Z",
       "message": "18 个精确版本检查完成，0 个失败"
     }
   },
   "stats": {
     "pluginCount": 20,
-    "totalStars": 43559,
+    "totalStars": 43833,
     "totalDownloads": 2633323,
     "maintainedCount": 19,
     "highRiskCount": 3,
@@ -34,14 +34,14 @@
   "plugins": [
     {
       "id": "michengai-dsh-agency-agents",
-      "repo": "MichengAI/dsh-agency-agents",
+      "repo": "michengai/dsh-agency-agents",
       "name": "dsh-agency-agents",
       "category": "agents",
       "installCommand": "dsh plugin --profile web add @michengai/dsh-agency-agents@latest",
       "curatorNote": "321 名可召唤领域专家；仓库 README 明确给出 dsh plugin 安装命令。",
       "repository": {
-        "fullName": "MichengAI/dsh-agency-agents",
-        "url": "https://github.com/MichengAI/dsh-agency-agents",
+        "fullName": "michengai/dsh-agency-agents",
+        "url": "https://github.com/michengai/dsh-agency-agents",
         "description": "DSH Agency Agents — 为 DeepSeek Harness 提供 321 名可召唤的专业智能体 · 321 summonable domain experts for DeepSeek Harness",
         "homepageUrl": "https://dsh-codex-desktop.micheng.dev",
         "topics": [
@@ -53,26 +53,26 @@
         ],
         "language": "TypeScript",
         "license": "Apache-2.0",
-        "createdAt": "2026-08-15T08:59:02Z",
-        "pushedAt": "2026-10-19T13:42:49Z",
+        "createdAt": "2026-08-15T08:59:02.000Z",
+        "pushedAt": "2026-10-20T13:47:39.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 155,
+        "stars": 156,
         "forks": 13,
-        "openIssues": 2,
+        "openIssues": 1,
         "openPullRequests": 0,
-        "commits30d": 128,
+        "commits30d": 130,
         "commits30dTruncated": false,
         "issues": {
           "opened90d": 26,
-          "closed90d": 24,
-          "closureRate": 0.9230769230769231,
+          "closed90d": 25,
+          "closureRate": 0.9615384615384616,
           "lowSample": false,
           "truncated": false,
           "longOpen": 0,
-          "openNow": 2,
+          "openNow": 1,
           "openTruncated": false,
           "queryUrl": "https://github.com/MichengAI/dsh-agency-agents/issues?q=is%3Aissue%20created%3A%3E%3D2026-07-22"
         },
@@ -86,14 +86,14 @@
           "queryUrl": "https://github.com/MichengAI/dsh-agency-agents/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-22"
         },
         "latestRelease": {
-          "version": "v1.2.8",
-          "tagName": "v1.2.8",
-          "publishedAt": "2026-10-19T13:44:58Z",
-          "url": "https://github.com/MichengAI/dsh-agency-agents/releases/tag/v1.2.8"
+          "version": "v1.2.9",
+          "tagName": "v1.2.9",
+          "publishedAt": "2026-10-20T13:50:13.000Z",
+          "url": "https://github.com/MichengAI/dsh-agency-agents/releases/tag/v1.2.9"
         },
-        "releases90d": 56,
-        "lastCommitAt": "2026-10-19T13:42:40Z",
-        "lastCommitUrl": "https://github.com/MichengAI/dsh-agency-agents/commit/9d117b0112d40fabf2958c168acbda0fe9ee21b3",
+        "releases90d": 57,
+        "lastCommitAt": "2026-10-20T13:46:56.000Z",
+        "lastCommitUrl": "https://github.com/MichengAI/dsh-agency-agents/commit/4504e593e52286045c62a424d70423350d461d5b",
         "commitsUrl": "https://github.com/MichengAI/dsh-agency-agents/commits/main",
         "issuesUrl": "https://github.com/MichengAI/dsh-agency-agents/issues",
         "pullsUrl": "https://github.com/MichengAI/dsh-agency-agents/pulls",
@@ -102,8 +102,8 @@
       "npm": {
         "status": "verified",
         "packageName": "@michengai/dsh-agency-agents",
-        "latestVersion": "1.2.8",
-        "publishedAt": "2026-10-19T13:46:23.377Z",
+        "latestVersion": "1.2.9",
+        "publishedAt": "2026-10-20T13:54:14.839Z",
         "downloads30d": 147552,
         "downloads7d": null,
         "previous7d": null,
@@ -230,29 +230,158 @@
             "downloads": 3716
           }
         ],
+        "quality": {
+          "rawDaily": [
+            {
+              "downloads": 9271,
+              "day": "2026-09-19"
+            },
+            {
+              "downloads": 9416,
+              "day": "2026-09-20"
+            },
+            {
+              "downloads": 18901,
+              "day": "2026-09-21"
+            },
+            {
+              "downloads": 19031,
+              "day": "2026-09-22"
+            },
+            {
+              "downloads": 19044,
+              "day": "2026-09-23"
+            },
+            {
+              "downloads": 19266,
+              "day": "2026-09-24"
+            },
+            {
+              "downloads": 18959,
+              "day": "2026-09-25"
+            },
+            {
+              "downloads": 640,
+              "day": "2026-09-26"
+            },
+            {
+              "downloads": 640,
+              "day": "2026-09-27"
+            },
+            {
+              "downloads": 1177,
+              "day": "2026-09-28"
+            },
+            {
+              "downloads": 1043,
+              "day": "2026-09-29"
+            },
+            {
+              "downloads": 2088,
+              "day": "2026-09-30"
+            },
+            {
+              "downloads": 1095,
+              "day": "2026-10-01"
+            },
+            {
+              "downloads": 808,
+              "day": "2026-10-02"
+            },
+            {
+              "downloads": 768,
+              "day": "2026-10-03"
+            },
+            {
+              "downloads": 747,
+              "day": "2026-10-04"
+            },
+            {
+              "downloads": 1151,
+              "day": "2026-10-05"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-06"
+            },
+            {
+              "downloads": 1915,
+              "day": "2026-10-07"
+            },
+            {
+              "downloads": 2281,
+              "day": "2026-10-08"
+            },
+            {
+              "downloads": 1486,
+              "day": "2026-10-09"
+            },
+            {
+              "downloads": 2815,
+              "day": "2026-10-10"
+            },
+            {
+              "downloads": 1903,
+              "day": "2026-10-11"
+            },
+            {
+              "downloads": 3553,
+              "day": "2026-10-12"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-13"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-14"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-15"
+            },
+            {
+              "downloads": 2910,
+              "day": "2026-10-16"
+            },
+            {
+              "downloads": 2928,
+              "day": "2026-10-17"
+            },
+            {
+              "downloads": 3716,
+              "day": "2026-10-18"
+            }
+          ],
+          "conflictDates": [],
+          "invalidCount": 0,
+          "notes": [],
+          "windowStart": "2026-09-19",
+          "windowEnd": "2026-10-18"
+        },
         "repositoryUrl": "git+https://github.com/MichengAI/dsh-agency-agents.git",
         "registryUrl": "https://www.npmjs.com/package/@michengai/dsh-agency-agents",
         "mappingEvidence": "npm registry repository=git+https://github.com/MichengAI/dsh-agency-agents.git ↔ GitHub MichengAI/dsh-agency-agents",
         "enginesNode": "^22.19.0 || >=24.0.0",
         "dshPeerRange": "0.2.0-rc.1 || 0.2.0-rc.2 || 0.2.1-rc.1 || 0.2.1-rc.2",
-        "fetchedAt": "2026-10-20T10:57:19.453Z",
-        "reason": "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "fetchedAt": "2026-10-20T16:23:11.658Z",
+        "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
         "status": "checked",
         "exactMatch": true,
         "packageName": "@michengai/dsh-agency-agents",
-        "version": "1.2.8",
+        "version": "1.2.9",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-20T10:57:19.453Z",
+        "checkedAt": "2026-10-20T16:23:11.658Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=%40michengai%2Fdsh-agency-agents"
       },
       "compatibility": {
         "nodeEngine": "^22.19.0 || >=24.0.0",
         "dshPeerRange": "0.2.0-rc.1 || 0.2.0-rc.2 || 0.2.1-rc.1 || 0.2.1-rc.2",
-        "npmVersion": "1.2.8",
-        "evidenceUrl": "https://www.npmjs.com/package/@michengai/dsh-agency-agents/v/1.2.8",
+        "npmVersion": "1.2.9",
+        "evidenceUrl": "https://www.npmjs.com/package/@michengai/dsh-agency-agents/v/1.2.9",
         "note": "仅展示包声明与公开元数据；本项目未安装、执行或运行时验证被检测插件，因此不构成兼容性保证。"
       },
       "availability": {
@@ -266,12 +395,12 @@
       },
       "dataStatus": "partial",
       "warnings": [
-        "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-20T10:57:19.453Z",
+      "lastUpdatedAt": "2026-10-20T16:23:11.658Z",
       "scores": {
         "popularity": {
-          "score": 52.1,
+          "score": 51.9,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -279,16 +408,16 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "155 stars",
-              "rawValue": 155,
-              "normalized": 33.5,
+              "rawLabel": "156 stars",
+              "rawValue": 156,
+              "normalized": 33,
               "weight": 0.45,
               "effectiveWeight": 0.45,
-              "contribution": 15.1,
+              "contribution": 14.9,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
-              "evidenceUrl": "https://github.com/MichengAI/dsh-agency-agents"
+              "evidenceUrl": "https://github.com/michengai/dsh-agency-agents"
             },
             {
               "key": "downloads",
@@ -310,34 +439,34 @@
           "methodVersion": "1.1.0"
         },
         "maintenance": {
-          "score": 97.8,
+          "score": 99,
           "status": "scored",
           "confidence": "medium",
-          "coverage": 0.79,
+          "coverage": 0.77,
           "components": [
             {
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "0 天前",
-              "rawValue": 0.8851788541666666,
+              "rawValue": 0.10851456018518518,
               "normalized": 100,
               "weight": 0.3,
-              "effectiveWeight": 0.38,
-              "contribution": 38,
+              "effectiveWeight": 0.39,
+              "contribution": 39,
               "included": true,
               "sampleSize": null,
               "explanation": "距最近一次非合并提交的天数。使用提交记录的实际 committed date，而不是仓库 pushed_at。",
-              "evidenceUrl": "https://github.com/MichengAI/dsh-agency-agents/commit/9d117b0112d40fabf2958c168acbda0fe9ee21b3"
+              "evidenceUrl": "https://github.com/MichengAI/dsh-agency-agents/commit/4504e593e52286045c62a424d70423350d461d5b"
             },
             {
               "key": "commitCadence",
               "label": "近 30 天提交频率",
-              "rawLabel": "128 次",
-              "rawValue": 128,
+              "rawLabel": "130 次",
+              "rawValue": 130,
               "normalized": 100,
               "weight": 0.15,
-              "effectiveWeight": 0.19,
-              "contribution": 19,
+              "effectiveWeight": 0.195,
+              "contribution": 19.5,
               "included": true,
               "sampleSize": null,
               "explanation": "近 30 天非合并提交次数的分档映射。达到分页上限时按已取得的提交数作下限计分；提交多只说明活动频繁，不代表代码质量更高。",
@@ -346,12 +475,12 @@
             {
               "key": "issueHandling",
               "label": "近期 Issue 关闭率",
-              "rawLabel": "24/26 已关闭 · 92.3%",
-              "rawValue": 92.3,
-              "normalized": 92.3,
+              "rawLabel": "25/26 已关闭 · 96.2%",
+              "rawValue": 96.2,
+              "normalized": 96.2,
               "weight": 0.2,
-              "effectiveWeight": 0.253,
-              "contribution": 23.4,
+              "effectiveWeight": 0.26,
+              "contribution": 25,
               "included": true,
               "sampleSize": 26,
               "explanation": "近 90 天创建的非 PR Issue 中，当前已关闭的比例。少于 5 条时降低该分项权重；0 条新 Issue 不扣分，也不代表处理能力强。",
@@ -360,12 +489,12 @@
             {
               "key": "issueBacklog",
               "label": "开放 Issue 积压",
-              "rawLabel": "2 条开放 / 90 天新开 26 条",
-              "rawValue": 0.07692307692307693,
-              "normalized": 92.3,
+              "rawLabel": "1 条开放 / 90 天新开 26 条",
+              "rawValue": 0.038461538461538464,
+              "normalized": 96.2,
               "weight": 0.1,
-              "effectiveWeight": 0.051,
-              "contribution": 4.7,
+              "effectiveWeight": 0.026,
+              "contribution": 2.5,
               "included": true,
               "sampleSize": 26,
               "explanation": "当前开放 Issue 数相对近 90 天新开 Issue 数的比例越低越好。该比例不依赖仓库是否已满 90 天；当前无开放 Issue 时不参与计分。",
@@ -389,11 +518,11 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "0 天前",
-              "rawValue": 0.8835816319444444,
+              "rawValue": 0.1062344675925926,
               "normalized": 100,
               "weight": 0.1,
-              "effectiveWeight": 0.127,
-              "contribution": 12.7,
+              "effectiveWeight": 0.13,
+              "contribution": 13,
               "included": true,
               "sampleSize": null,
               "explanation": "最近一次 Release 的时间分档。没有 Release 不等于未维护，因此该项仅在存在 Release 时参与。",
@@ -427,14 +556,14 @@
     },
     {
       "id": "michengai-dsh-codex-ui",
-      "repo": "MichengAI/dsh-codex-ui",
+      "repo": "michengai/dsh-codex-ui",
       "name": "dsh-codex-ui",
       "category": "interface",
       "installCommand": "dsh plugin --profile web add @michengai/dsh-codex-ui@latest",
       "curatorNote": "DSH Web 的 Codex 风格侧栏、会话树与轮次导航。",
       "repository": {
-        "fullName": "MichengAI/dsh-codex-ui",
-        "url": "https://github.com/MichengAI/dsh-codex-ui",
+        "fullName": "michengai/dsh-codex-ui",
+        "url": "https://github.com/michengai/dsh-codex-ui",
         "description": "DSH Codex UI — 为 DeepSeek Harness Web 提供 Codex 风格侧栏、工作区会话树、全局搜索和轮次导航 · A Codex-style sidebar, workspace session tree, global search, and turn navigation for DSH Web",
         "homepageUrl": "https://dsh-codex-desktop.micheng.dev",
         "topics": [
@@ -446,8 +575,8 @@
         ],
         "language": "TypeScript",
         "license": "Apache-2.0",
-        "createdAt": "2026-08-14T15:58:13Z",
-        "pushedAt": "2026-10-20T09:44:36Z",
+        "createdAt": "2026-08-14T15:58:13.000Z",
+        "pushedAt": "2026-10-20T09:44:36.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
@@ -481,11 +610,11 @@
         "latestRelease": {
           "version": "v1.1.45",
           "tagName": "v1.1.45",
-          "publishedAt": "2026-10-20T09:39:26Z",
+          "publishedAt": "2026-10-20T09:39:26.000Z",
           "url": "https://github.com/MichengAI/dsh-codex-ui/releases/tag/v1.1.45"
         },
         "releases90d": 83,
-        "lastCommitAt": "2026-10-20T09:44:26Z",
+        "lastCommitAt": "2026-10-20T09:44:26.000Z",
         "lastCommitUrl": "https://github.com/MichengAI/dsh-codex-ui/commit/3752bbf631948e8025f5f9870f7096c059f187c3",
         "commitsUrl": "https://github.com/MichengAI/dsh-codex-ui/commits/main",
         "issuesUrl": "https://github.com/MichengAI/dsh-codex-ui/issues",
@@ -623,13 +752,142 @@
             "downloads": 2357
           }
         ],
+        "quality": {
+          "rawDaily": [
+            {
+              "downloads": 10275,
+              "day": "2026-09-19"
+            },
+            {
+              "downloads": 10302,
+              "day": "2026-09-20"
+            },
+            {
+              "downloads": 24648,
+              "day": "2026-09-21"
+            },
+            {
+              "downloads": 24968,
+              "day": "2026-09-22"
+            },
+            {
+              "downloads": 24750,
+              "day": "2026-09-23"
+            },
+            {
+              "downloads": 24906,
+              "day": "2026-09-24"
+            },
+            {
+              "downloads": 24906,
+              "day": "2026-09-25"
+            },
+            {
+              "downloads": 554,
+              "day": "2026-09-26"
+            },
+            {
+              "downloads": 1171,
+              "day": "2026-09-27"
+            },
+            {
+              "downloads": 1086,
+              "day": "2026-09-28"
+            },
+            {
+              "downloads": 1093,
+              "day": "2026-09-29"
+            },
+            {
+              "downloads": 1725,
+              "day": "2026-09-30"
+            },
+            {
+              "downloads": 855,
+              "day": "2026-10-01"
+            },
+            {
+              "downloads": 31767,
+              "day": "2026-10-02"
+            },
+            {
+              "downloads": 24947,
+              "day": "2026-10-03"
+            },
+            {
+              "downloads": 25524,
+              "day": "2026-10-04"
+            },
+            {
+              "downloads": 1116,
+              "day": "2026-10-05"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-06"
+            },
+            {
+              "downloads": 1733,
+              "day": "2026-10-07"
+            },
+            {
+              "downloads": 2355,
+              "day": "2026-10-08"
+            },
+            {
+              "downloads": 1495,
+              "day": "2026-10-09"
+            },
+            {
+              "downloads": 2075,
+              "day": "2026-10-10"
+            },
+            {
+              "downloads": 1792,
+              "day": "2026-10-11"
+            },
+            {
+              "downloads": 2721,
+              "day": "2026-10-12"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-13"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-14"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-15"
+            },
+            {
+              "downloads": 1885,
+              "day": "2026-10-16"
+            },
+            {
+              "downloads": 1573,
+              "day": "2026-10-17"
+            },
+            {
+              "downloads": 2357,
+              "day": "2026-10-18"
+            }
+          ],
+          "conflictDates": [],
+          "invalidCount": 0,
+          "notes": [],
+          "windowStart": "2026-09-19",
+          "windowEnd": "2026-10-18"
+        },
         "repositoryUrl": "git+https://github.com/MichengAI/dsh-codex-ui.git",
         "registryUrl": "https://www.npmjs.com/package/@michengai/dsh-codex-ui",
         "mappingEvidence": "npm registry repository=git+https://github.com/MichengAI/dsh-codex-ui.git ↔ GitHub MichengAI/dsh-codex-ui",
         "enginesNode": "^22.19.0 || >=24.0.0",
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-20T10:57:19.453Z",
-        "reason": "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "fetchedAt": "2026-10-20T16:23:11.658Z",
+        "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
         "status": "checked",
@@ -637,7 +895,7 @@
         "packageName": "@michengai/dsh-codex-ui",
         "version": "1.1.45",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-20T10:57:19.453Z",
+        "checkedAt": "2026-10-20T16:23:11.658Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=%40michengai%2Fdsh-codex-ui"
       },
@@ -659,12 +917,12 @@
       },
       "dataStatus": "partial",
       "warnings": [
-        "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-20T10:57:19.453Z",
+      "lastUpdatedAt": "2026-10-20T16:23:11.658Z",
       "scores": {
         "popularity": {
-          "score": 59.7,
+          "score": 59.5,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -674,14 +932,14 @@
               "label": "GitHub Stars",
               "rawLabel": "178 stars",
               "rawValue": 178,
-              "normalized": 35.8,
+              "normalized": 35.3,
               "weight": 0.45,
               "effectiveWeight": 0.45,
-              "contribution": 16.1,
+              "contribution": 15.9,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
-              "evidenceUrl": "https://github.com/MichengAI/dsh-codex-ui"
+              "evidenceUrl": "https://github.com/michengai/dsh-codex-ui"
             },
             {
               "key": "downloads",
@@ -712,7 +970,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "0 天前",
-              "rawValue": 0.05061866898148148,
+              "rawValue": 0.276917337962963,
               "normalized": 100,
               "weight": 0.3,
               "effectiveWeight": 0.326,
@@ -782,7 +1040,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "0 天前",
-              "rawValue": 0.0540908912037037,
+              "rawValue": 0.2803895601851852,
               "normalized": 100,
               "weight": 0.1,
               "effectiveWeight": 0.109,
@@ -818,14 +1076,14 @@
     },
     {
       "id": "michengai-dsh-skills-manager",
-      "repo": "MichengAI/dsh-skills-manager",
+      "repo": "michengai/dsh-skills-manager",
       "name": "dsh-skills-manager",
       "category": "skills",
       "installCommand": "dsh plugin --profile web add @michengai/dsh-skills-manager@latest",
       "curatorNote": "本机 Agent Skills 的加载与安全管理插件。",
       "repository": {
-        "fullName": "MichengAI/dsh-skills-manager",
-        "url": "https://github.com/MichengAI/dsh-skills-manager",
+        "fullName": "michengai/dsh-skills-manager",
+        "url": "https://github.com/michengai/dsh-skills-manager",
         "description": "DSH Skills Manager — 在 DeepSeek Harness 中统一加载并安全管理本机 Agent Skills · Load and safely manage local Agent Skills in DSH",
         "homepageUrl": "https://dsh-codex-desktop.micheng.dev",
         "topics": [
@@ -837,26 +1095,26 @@
         ],
         "language": "JavaScript",
         "license": "Apache-2.0",
-        "createdAt": "2026-08-15T05:54:34Z",
-        "pushedAt": "2026-10-19T04:50:33Z",
+        "createdAt": "2026-08-15T05:54:34.000Z",
+        "pushedAt": "2026-10-19T04:50:33.000Z",
         "archived": false,
         "defaultBranch": "master"
       },
       "github": {
-        "stars": 261,
+        "stars": 265,
         "forks": 17,
-        "openIssues": 1,
+        "openIssues": 2,
         "openPullRequests": 0,
         "commits30d": 129,
         "commits30dTruncated": false,
         "issues": {
-          "opened90d": 40,
+          "opened90d": 41,
           "closed90d": 39,
-          "closureRate": 0.975,
+          "closureRate": 0.9512195121951219,
           "lowSample": false,
           "truncated": false,
           "longOpen": 0,
-          "openNow": 1,
+          "openNow": 2,
           "openTruncated": false,
           "queryUrl": "https://github.com/MichengAI/dsh-skills-manager/issues?q=is%3Aissue%20created%3A%3E%3D2026-07-22"
         },
@@ -872,11 +1130,11 @@
         "latestRelease": {
           "version": "v1.2.8",
           "tagName": "v1.2.8",
-          "publishedAt": "2026-10-19T04:56:00Z",
+          "publishedAt": "2026-10-19T04:56:00.000Z",
           "url": "https://github.com/MichengAI/dsh-skills-manager/releases/tag/v1.2.8"
         },
         "releases90d": 62,
-        "lastCommitAt": "2026-10-19T04:50:18Z",
+        "lastCommitAt": "2026-10-19T04:50:18.000Z",
         "lastCommitUrl": "https://github.com/MichengAI/dsh-skills-manager/commit/434e166fc1af6a8bcee4f6b22a3851e037fa90b7",
         "commitsUrl": "https://github.com/MichengAI/dsh-skills-manager/commits/master",
         "issuesUrl": "https://github.com/MichengAI/dsh-skills-manager/issues",
@@ -1014,13 +1272,142 @@
             "downloads": 7105
           }
         ],
+        "quality": {
+          "rawDaily": [
+            {
+              "downloads": 8460,
+              "day": "2026-09-19"
+            },
+            {
+              "downloads": 8593,
+              "day": "2026-09-20"
+            },
+            {
+              "downloads": 18826,
+              "day": "2026-09-21"
+            },
+            {
+              "downloads": 18031,
+              "day": "2026-09-22"
+            },
+            {
+              "downloads": 18181,
+              "day": "2026-09-23"
+            },
+            {
+              "downloads": 18185,
+              "day": "2026-09-24"
+            },
+            {
+              "downloads": 18133,
+              "day": "2026-09-25"
+            },
+            {
+              "downloads": 733,
+              "day": "2026-09-26"
+            },
+            {
+              "downloads": 659,
+              "day": "2026-09-27"
+            },
+            {
+              "downloads": 1421,
+              "day": "2026-09-28"
+            },
+            {
+              "downloads": 1470,
+              "day": "2026-09-29"
+            },
+            {
+              "downloads": 2855,
+              "day": "2026-09-30"
+            },
+            {
+              "downloads": 1398,
+              "day": "2026-10-01"
+            },
+            {
+              "downloads": 1041,
+              "day": "2026-10-02"
+            },
+            {
+              "downloads": 832,
+              "day": "2026-10-03"
+            },
+            {
+              "downloads": 1345,
+              "day": "2026-10-04"
+            },
+            {
+              "downloads": 1168,
+              "day": "2026-10-05"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-06"
+            },
+            {
+              "downloads": 2076,
+              "day": "2026-10-07"
+            },
+            {
+              "downloads": 55444,
+              "day": "2026-10-08"
+            },
+            {
+              "downloads": 1453,
+              "day": "2026-10-09"
+            },
+            {
+              "downloads": 2089,
+              "day": "2026-10-10"
+            },
+            {
+              "downloads": 3069,
+              "day": "2026-10-11"
+            },
+            {
+              "downloads": 6342,
+              "day": "2026-10-12"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-13"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-14"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-15"
+            },
+            {
+              "downloads": 5720,
+              "day": "2026-10-16"
+            },
+            {
+              "downloads": 7523,
+              "day": "2026-10-17"
+            },
+            {
+              "downloads": 7105,
+              "day": "2026-10-18"
+            }
+          ],
+          "conflictDates": [],
+          "invalidCount": 0,
+          "notes": [],
+          "windowStart": "2026-09-19",
+          "windowEnd": "2026-10-18"
+        },
         "repositoryUrl": "git+https://github.com/MichengAI/dsh-skills-manager.git",
         "registryUrl": "https://www.npmjs.com/package/@michengai/dsh-skills-manager",
         "mappingEvidence": "npm registry repository=git+https://github.com/MichengAI/dsh-skills-manager.git ↔ GitHub MichengAI/dsh-skills-manager",
         "enginesNode": "^22.19.0 || >=24.0.0",
         "dshPeerRange": "0.2.0-rc.1 || 0.2.0-rc.2 || 0.2.1-rc.1 || 0.2.1-rc.2",
-        "fetchedAt": "2026-10-20T10:57:19.453Z",
-        "reason": "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "fetchedAt": "2026-10-20T16:23:11.658Z",
+        "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
         "status": "checked",
@@ -1028,7 +1415,7 @@
         "packageName": "@michengai/dsh-skills-manager",
         "version": "1.2.8",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-20T10:57:19.453Z",
+        "checkedAt": "2026-10-20T16:23:11.658Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=%40michengai%2Fdsh-skills-manager"
       },
@@ -1050,12 +1437,12 @@
       },
       "dataStatus": "partial",
       "warnings": [
-        "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-20T10:57:19.453Z",
+      "lastUpdatedAt": "2026-10-20T16:23:11.658Z",
       "scores": {
         "popularity": {
-          "score": 60.4,
+          "score": 60.3,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -1063,16 +1450,16 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "261 stars",
-              "rawValue": 261,
-              "normalized": 42.3,
+              "rawLabel": "265 stars",
+              "rawValue": 265,
+              "normalized": 42.1,
               "weight": 0.45,
               "effectiveWeight": 0.45,
-              "contribution": 19,
+              "contribution": 18.9,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
-              "evidenceUrl": "https://github.com/MichengAI/dsh-skills-manager"
+              "evidenceUrl": "https://github.com/michengai/dsh-skills-manager"
             },
             {
               "key": "downloads",
@@ -1094,20 +1481,20 @@
           "methodVersion": "1.1.0"
         },
         "maintenance": {
-          "score": 87.2,
+          "score": 86.7,
           "status": "scored",
           "confidence": "high",
-          "coverage": 0.92,
+          "coverage": 0.94,
           "components": [
             {
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "1 天前",
-              "rawValue": 1.2548779282407407,
+              "rawValue": 1.4811765972222222,
               "normalized": 100,
               "weight": 0.3,
-              "effectiveWeight": 0.326,
-              "contribution": 32.6,
+              "effectiveWeight": 0.319,
+              "contribution": 31.9,
               "included": true,
               "sampleSize": null,
               "explanation": "距最近一次非合并提交的天数。使用提交记录的实际 committed date，而不是仓库 pushed_at。",
@@ -1120,8 +1507,8 @@
               "rawValue": 129,
               "normalized": 100,
               "weight": 0.15,
-              "effectiveWeight": 0.163,
-              "contribution": 16.3,
+              "effectiveWeight": 0.16,
+              "contribution": 16,
               "included": true,
               "sampleSize": null,
               "explanation": "近 30 天非合并提交次数的分档映射。达到分页上限时按已取得的提交数作下限计分；提交多只说明活动频繁，不代表代码质量更高。",
@@ -1130,28 +1517,28 @@
             {
               "key": "issueHandling",
               "label": "近期 Issue 关闭率",
-              "rawLabel": "39/40 已关闭 · 97.5%",
-              "rawValue": 97.5,
-              "normalized": 97.5,
+              "rawLabel": "39/41 已关闭 · 95.1%",
+              "rawValue": 95.1,
+              "normalized": 95.1,
               "weight": 0.2,
-              "effectiveWeight": 0.217,
-              "contribution": 21.2,
+              "effectiveWeight": 0.213,
+              "contribution": 20.2,
               "included": true,
-              "sampleSize": 40,
+              "sampleSize": 41,
               "explanation": "近 90 天创建的非 PR Issue 中，当前已关闭的比例。少于 5 条时降低该分项权重；0 条新 Issue 不扣分，也不代表处理能力强。",
               "evidenceUrl": "https://github.com/MichengAI/dsh-skills-manager/issues?q=is%3Aissue%20created%3A%3E%3D2026-07-22"
             },
             {
               "key": "issueBacklog",
               "label": "开放 Issue 积压",
-              "rawLabel": "1 条开放 / 90 天新开 40 条",
-              "rawValue": 0.025,
-              "normalized": 97.5,
+              "rawLabel": "2 条开放 / 90 天新开 41 条",
+              "rawValue": 0.04878048780487805,
+              "normalized": 95.1,
               "weight": 0.1,
-              "effectiveWeight": 0.022,
-              "contribution": 2.1,
+              "effectiveWeight": 0.043,
+              "contribution": 4,
               "included": true,
-              "sampleSize": 40,
+              "sampleSize": 41,
               "explanation": "当前开放 Issue 数相对近 90 天新开 Issue 数的比例越低越好。该比例不依赖仓库是否已满 90 天；当前无开放 Issue 时不参与计分。",
               "evidenceUrl": "https://github.com/MichengAI/dsh-skills-manager/issues"
             },
@@ -1162,8 +1549,8 @@
               "rawValue": 25,
               "normalized": 25,
               "weight": 0.15,
-              "effectiveWeight": 0.163,
-              "contribution": 4.1,
+              "effectiveWeight": 0.16,
+              "contribution": 4,
               "included": true,
               "sampleSize": 8,
               "explanation": "近 90 天创建 PR 中已合并的比例。只统计 PR，不把 Issue 混入；少于 3 条时降低权重。仓库禁用 PR 时该维度被排除，而不是记 0。",
@@ -1173,11 +1560,11 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "1 天前",
-              "rawValue": 1.2509195949074075,
+              "rawValue": 1.4772182638888889,
               "normalized": 100,
               "weight": 0.1,
-              "effectiveWeight": 0.109,
-              "contribution": 10.9,
+              "effectiveWeight": 0.106,
+              "contribution": 10.6,
               "included": true,
               "sampleSize": null,
               "explanation": "最近一次 Release 的时间分档。没有 Release 不等于未维护，因此该项仅在存在 Release 时参与。",
@@ -1209,14 +1596,14 @@
     },
     {
       "id": "michengai-dsh-archive-manager",
-      "repo": "MichengAI/dsh-archive-manager",
+      "repo": "michengai/dsh-archive-manager",
       "name": "dsh-archive-manager",
       "category": "sessions",
       "installCommand": "dsh plugin --profile web add @michengai/dsh-archive-manager@latest",
       "curatorNote": "归档会话的查看、恢复与管理。",
       "repository": {
-        "fullName": "MichengAI/dsh-archive-manager",
-        "url": "https://github.com/MichengAI/dsh-archive-manager",
+        "fullName": "michengai/dsh-archive-manager",
+        "url": "https://github.com/michengai/dsh-archive-manager",
         "description": "DSH Archive Manager — 在 DeepSeek Harness 中安全查看、恢复和管理已归档会话 · Safely view, restore, and manage archived sessions in DSH",
         "homepageUrl": "https://dsh-codex-desktop.micheng.dev",
         "topics": [
@@ -1228,17 +1615,17 @@
         ],
         "language": "JavaScript",
         "license": "Apache-2.0",
-        "createdAt": "2026-08-16T02:35:05Z",
-        "pushedAt": "2026-10-19T12:14:07Z",
+        "createdAt": "2026-08-16T02:35:05.000Z",
+        "pushedAt": "2026-10-19T12:14:07.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 179,
+        "stars": 180,
         "forks": 10,
         "openIssues": 0,
         "openPullRequests": 0,
-        "commits30d": 117,
+        "commits30d": 114,
         "commits30dTruncated": false,
         "issues": {
           "opened90d": 63,
@@ -1263,11 +1650,11 @@
         "latestRelease": {
           "version": "v1.1.6",
           "tagName": "v1.1.6",
-          "publishedAt": "2026-10-19T12:18:33Z",
+          "publishedAt": "2026-10-19T12:18:33.000Z",
           "url": "https://github.com/MichengAI/dsh-archive-manager/releases/tag/v1.1.6"
         },
         "releases90d": 63,
-        "lastCommitAt": "2026-10-19T12:13:59Z",
+        "lastCommitAt": "2026-10-19T12:13:59.000Z",
         "lastCommitUrl": "https://github.com/MichengAI/dsh-archive-manager/commit/ba4c99e7388e61c13ec2c5733225357e1c199c0f",
         "commitsUrl": "https://github.com/MichengAI/dsh-archive-manager/commits/main",
         "issuesUrl": "https://github.com/MichengAI/dsh-archive-manager/issues",
@@ -1405,13 +1792,142 @@
             "downloads": 5856
           }
         ],
+        "quality": {
+          "rawDaily": [
+            {
+              "downloads": 8526,
+              "day": "2026-09-19"
+            },
+            {
+              "downloads": 8598,
+              "day": "2026-09-20"
+            },
+            {
+              "downloads": 23766,
+              "day": "2026-09-21"
+            },
+            {
+              "downloads": 23018,
+              "day": "2026-09-22"
+            },
+            {
+              "downloads": 23399,
+              "day": "2026-09-23"
+            },
+            {
+              "downloads": 23189,
+              "day": "2026-09-24"
+            },
+            {
+              "downloads": 23159,
+              "day": "2026-09-25"
+            },
+            {
+              "downloads": 757,
+              "day": "2026-09-26"
+            },
+            {
+              "downloads": 1247,
+              "day": "2026-09-27"
+            },
+            {
+              "downloads": 1797,
+              "day": "2026-09-28"
+            },
+            {
+              "downloads": 1586,
+              "day": "2026-09-29"
+            },
+            {
+              "downloads": 3453,
+              "day": "2026-09-30"
+            },
+            {
+              "downloads": 2044,
+              "day": "2026-10-01"
+            },
+            {
+              "downloads": 1423,
+              "day": "2026-10-02"
+            },
+            {
+              "downloads": 1109,
+              "day": "2026-10-03"
+            },
+            {
+              "downloads": 1036,
+              "day": "2026-10-04"
+            },
+            {
+              "downloads": 1046,
+              "day": "2026-10-05"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-06"
+            },
+            {
+              "downloads": 2571,
+              "day": "2026-10-07"
+            },
+            {
+              "downloads": 3662,
+              "day": "2026-10-08"
+            },
+            {
+              "downloads": 2704,
+              "day": "2026-10-09"
+            },
+            {
+              "downloads": 2182,
+              "day": "2026-10-10"
+            },
+            {
+              "downloads": 1820,
+              "day": "2026-10-11"
+            },
+            {
+              "downloads": 4016,
+              "day": "2026-10-12"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-13"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-14"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-15"
+            },
+            {
+              "downloads": 4003,
+              "day": "2026-10-16"
+            },
+            {
+              "downloads": 3308,
+              "day": "2026-10-17"
+            },
+            {
+              "downloads": 5856,
+              "day": "2026-10-18"
+            }
+          ],
+          "conflictDates": [],
+          "invalidCount": 0,
+          "notes": [],
+          "windowStart": "2026-09-19",
+          "windowEnd": "2026-10-18"
+        },
         "repositoryUrl": "git+https://github.com/MichengAI/dsh-archive-manager.git",
         "registryUrl": "https://www.npmjs.com/package/@michengai/dsh-archive-manager",
         "mappingEvidence": "npm registry repository=git+https://github.com/MichengAI/dsh-archive-manager.git ↔ GitHub MichengAI/dsh-archive-manager",
         "enginesNode": "^22.19.0 || >=24.0.0",
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-20T10:57:19.453Z",
-        "reason": "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "fetchedAt": "2026-10-20T16:23:11.658Z",
+        "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
         "status": "checked",
@@ -1419,7 +1935,7 @@
         "packageName": "@michengai/dsh-archive-manager",
         "version": "1.1.6",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-20T10:57:19.453Z",
+        "checkedAt": "2026-10-20T16:23:11.658Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=%40michengai%2Fdsh-archive-manager"
       },
@@ -1441,12 +1957,12 @@
       },
       "dataStatus": "partial",
       "warnings": [
-        "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-20T10:57:19.453Z",
+      "lastUpdatedAt": "2026-10-20T16:23:11.658Z",
       "scores": {
         "popularity": {
-          "score": 55.5,
+          "score": 55.3,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -1454,16 +1970,16 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "179 stars",
-              "rawValue": 179,
-              "normalized": 35.9,
+              "rawLabel": "180 stars",
+              "rawValue": 180,
+              "normalized": 35.5,
               "weight": 0.45,
               "effectiveWeight": 0.45,
-              "contribution": 16.2,
+              "contribution": 16,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
-              "evidenceUrl": "https://github.com/MichengAI/dsh-archive-manager"
+              "evidenceUrl": "https://github.com/michengai/dsh-archive-manager"
             },
             {
               "key": "downloads",
@@ -1493,8 +2009,8 @@
             {
               "key": "commitRecency",
               "label": "最近代码提交",
-              "rawLabel": "0 天前",
-              "rawValue": 0.9467645023148148,
+              "rawLabel": "1 天前",
+              "rawValue": 1.1730631712962962,
               "normalized": 100,
               "weight": 0.3,
               "effectiveWeight": 0.333,
@@ -1507,8 +2023,8 @@
             {
               "key": "commitCadence",
               "label": "近 30 天提交频率",
-              "rawLabel": "117 次",
-              "rawValue": 117,
+              "rawLabel": "114 次",
+              "rawValue": 114,
               "normalized": 100,
               "weight": 0.15,
               "effectiveWeight": 0.167,
@@ -1563,8 +2079,8 @@
             {
               "key": "release",
               "label": "最近版本发布",
-              "rawLabel": "0 天前",
-              "rawValue": 0.9435932060185185,
+              "rawLabel": "1 天前",
+              "rawValue": 1.169891875,
               "normalized": 100,
               "weight": 0.1,
               "effectiveWeight": 0.111,
@@ -1600,14 +2116,14 @@
     },
     {
       "id": "michengai-dsh-im-connect",
-      "repo": "MichengAI/dsh-im-connect",
+      "repo": "michengai/dsh-im-connect",
       "name": "dsh-im-connect",
       "category": "connectivity",
       "installCommand": "dsh plugin --profile web add @michengai/dsh-im-connect@latest",
       "curatorNote": "将即时通讯平台接入本机 DSH Agent。",
       "repository": {
-        "fullName": "MichengAI/dsh-im-connect",
-        "url": "https://github.com/MichengAI/dsh-im-connect",
+        "fullName": "michengai/dsh-im-connect",
+        "url": "https://github.com/michengai/dsh-im-connect",
         "description": "DSH IM Connect — 将主流即时通讯平台接入本机 DeepSeek Harness · Connect major messaging platforms to local DeepSeek Harness agents",
         "homepageUrl": "https://dsh-codex-desktop.micheng.dev",
         "topics": [
@@ -1619,34 +2135,34 @@
         ],
         "language": "JavaScript",
         "license": "Apache-2.0",
-        "createdAt": "2026-08-16T08:47:06Z",
-        "pushedAt": "2026-10-20T09:52:56Z",
+        "createdAt": "2026-08-16T08:47:06.000Z",
+        "pushedAt": "2026-10-20T09:52:56.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 74,
+        "stars": 75,
         "forks": 15,
-        "openIssues": 1,
+        "openIssues": 2,
         "openPullRequests": 0,
         "commits30d": 162,
         "commits30dTruncated": false,
         "issues": {
-          "opened90d": 32,
+          "opened90d": 33,
           "closed90d": 31,
-          "closureRate": 0.96875,
+          "closureRate": 0.9393939393939394,
           "lowSample": false,
           "truncated": false,
           "longOpen": 0,
-          "openNow": 1,
+          "openNow": 2,
           "openTruncated": false,
           "queryUrl": "https://github.com/MichengAI/dsh-im-connect/issues?q=is%3Aissue%20created%3A%3E%3D2026-07-22"
         },
         "pullRequests": {
           "available": true,
-          "opened90d": 9,
+          "opened90d": 10,
           "merged90d": 6,
-          "mergeRate": 0.6666666666666666,
+          "mergeRate": 0.6,
           "lowSample": false,
           "truncated": false,
           "queryUrl": "https://github.com/MichengAI/dsh-im-connect/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-22"
@@ -1654,11 +2170,11 @@
         "latestRelease": {
           "version": "v1.0.10",
           "tagName": "v1.0.10",
-          "publishedAt": "2026-10-20T09:54:49Z",
+          "publishedAt": "2026-10-20T09:54:49.000Z",
           "url": "https://github.com/MichengAI/dsh-im-connect/releases/tag/v1.0.10"
         },
         "releases90d": 65,
-        "lastCommitAt": "2026-10-20T09:51:09Z",
+        "lastCommitAt": "2026-10-20T09:51:09.000Z",
         "lastCommitUrl": "https://github.com/MichengAI/dsh-im-connect/commit/a3c4e436b20a2246cc699dc89a5a5e8120f8a89f",
         "commitsUrl": "https://github.com/MichengAI/dsh-im-connect/commits/main",
         "issuesUrl": "https://github.com/MichengAI/dsh-im-connect/issues",
@@ -1796,13 +2312,142 @@
             "downloads": 3331
           }
         ],
+        "quality": {
+          "rawDaily": [
+            {
+              "downloads": 8168,
+              "day": "2026-09-19"
+            },
+            {
+              "downloads": 8226,
+              "day": "2026-09-20"
+            },
+            {
+              "downloads": 18223,
+              "day": "2026-09-21"
+            },
+            {
+              "downloads": 18293,
+              "day": "2026-09-22"
+            },
+            {
+              "downloads": 18490,
+              "day": "2026-09-23"
+            },
+            {
+              "downloads": 18694,
+              "day": "2026-09-24"
+            },
+            {
+              "downloads": 18437,
+              "day": "2026-09-25"
+            },
+            {
+              "downloads": 395,
+              "day": "2026-09-26"
+            },
+            {
+              "downloads": 510,
+              "day": "2026-09-27"
+            },
+            {
+              "downloads": 1323,
+              "day": "2026-09-28"
+            },
+            {
+              "downloads": 817,
+              "day": "2026-09-29"
+            },
+            {
+              "downloads": 2102,
+              "day": "2026-09-30"
+            },
+            {
+              "downloads": 1397,
+              "day": "2026-10-01"
+            },
+            {
+              "downloads": 1231,
+              "day": "2026-10-02"
+            },
+            {
+              "downloads": 886,
+              "day": "2026-10-03"
+            },
+            {
+              "downloads": 1167,
+              "day": "2026-10-04"
+            },
+            {
+              "downloads": 921,
+              "day": "2026-10-05"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-06"
+            },
+            {
+              "downloads": 1662,
+              "day": "2026-10-07"
+            },
+            {
+              "downloads": 2414,
+              "day": "2026-10-08"
+            },
+            {
+              "downloads": 1834,
+              "day": "2026-10-09"
+            },
+            {
+              "downloads": 1754,
+              "day": "2026-10-10"
+            },
+            {
+              "downloads": 1686,
+              "day": "2026-10-11"
+            },
+            {
+              "downloads": 2786,
+              "day": "2026-10-12"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-13"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-14"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-15"
+            },
+            {
+              "downloads": 1997,
+              "day": "2026-10-16"
+            },
+            {
+              "downloads": 2187,
+              "day": "2026-10-17"
+            },
+            {
+              "downloads": 3331,
+              "day": "2026-10-18"
+            }
+          ],
+          "conflictDates": [],
+          "invalidCount": 0,
+          "notes": [],
+          "windowStart": "2026-09-19",
+          "windowEnd": "2026-10-18"
+        },
         "repositoryUrl": "git+https://github.com/MichengAI/dsh-im-connect.git",
         "registryUrl": "https://www.npmjs.com/package/@michengai/dsh-im-connect",
         "mappingEvidence": "npm registry repository=git+https://github.com/MichengAI/dsh-im-connect.git ↔ GitHub MichengAI/dsh-im-connect",
         "enginesNode": "^22.19.0 || >=24.0.0",
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-20T10:57:19.453Z",
-        "reason": "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "fetchedAt": "2026-10-20T16:23:11.658Z",
+        "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
         "status": "checked",
@@ -1810,7 +2455,7 @@
         "packageName": "@michengai/dsh-im-connect",
         "version": "1.0.10",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-20T10:57:19.453Z",
+        "checkedAt": "2026-10-20T16:23:11.658Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=%40michengai%2Fdsh-im-connect"
       },
@@ -1832,12 +2477,12 @@
       },
       "dataStatus": "partial",
       "warnings": [
-        "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-20T10:57:19.453Z",
+      "lastUpdatedAt": "2026-10-20T16:23:11.658Z",
       "scores": {
         "popularity": {
-          "score": 45.7,
+          "score": 45.4,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -1845,16 +2490,16 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "74 stars",
-              "rawValue": 74,
-              "normalized": 21,
+              "rawLabel": "75 stars",
+              "rawValue": 75,
+              "normalized": 20.5,
               "weight": 0.45,
               "effectiveWeight": 0.45,
-              "contribution": 9.5,
+              "contribution": 9.2,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
-              "evidenceUrl": "https://github.com/MichengAI/dsh-im-connect"
+              "evidenceUrl": "https://github.com/michengai/dsh-im-connect"
             },
             {
               "key": "downloads",
@@ -1876,20 +2521,20 @@
           "methodVersion": "1.1.0"
         },
         "maintenance": {
-          "score": 93.9,
+          "score": 92.1,
           "status": "scored",
           "confidence": "high",
-          "coverage": 0.92,
+          "coverage": 0.94,
           "components": [
             {
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "0 天前",
-              "rawValue": 0.04595431712962963,
+              "rawValue": 0.2722529861111111,
               "normalized": 100,
               "weight": 0.3,
-              "effectiveWeight": 0.326,
-              "contribution": 32.6,
+              "effectiveWeight": 0.319,
+              "contribution": 31.9,
               "included": true,
               "sampleSize": null,
               "explanation": "距最近一次非合并提交的天数。使用提交记录的实际 committed date，而不是仓库 pushed_at。",
@@ -1902,8 +2547,8 @@
               "rawValue": 162,
               "normalized": 100,
               "weight": 0.15,
-              "effectiveWeight": 0.163,
-              "contribution": 16.3,
+              "effectiveWeight": 0.16,
+              "contribution": 16,
               "included": true,
               "sampleSize": null,
               "explanation": "近 30 天非合并提交次数的分档映射。达到分页上限时按已取得的提交数作下限计分；提交多只说明活动频繁，不代表代码质量更高。",
@@ -1912,42 +2557,42 @@
             {
               "key": "issueHandling",
               "label": "近期 Issue 关闭率",
-              "rawLabel": "31/32 已关闭 · 96.9%",
-              "rawValue": 96.9,
-              "normalized": 96.9,
+              "rawLabel": "31/33 已关闭 · 93.9%",
+              "rawValue": 93.9,
+              "normalized": 93.9,
               "weight": 0.2,
-              "effectiveWeight": 0.217,
-              "contribution": 21.1,
+              "effectiveWeight": 0.213,
+              "contribution": 20,
               "included": true,
-              "sampleSize": 32,
+              "sampleSize": 33,
               "explanation": "近 90 天创建的非 PR Issue 中，当前已关闭的比例。少于 5 条时降低该分项权重；0 条新 Issue 不扣分，也不代表处理能力强。",
               "evidenceUrl": "https://github.com/MichengAI/dsh-im-connect/issues?q=is%3Aissue%20created%3A%3E%3D2026-07-22"
             },
             {
               "key": "issueBacklog",
               "label": "开放 Issue 积压",
-              "rawLabel": "1 条开放 / 90 天新开 32 条",
-              "rawValue": 0.03125,
-              "normalized": 96.9,
+              "rawLabel": "2 条开放 / 90 天新开 33 条",
+              "rawValue": 0.06060606060606061,
+              "normalized": 93.9,
               "weight": 0.1,
-              "effectiveWeight": 0.022,
-              "contribution": 2.1,
+              "effectiveWeight": 0.043,
+              "contribution": 4,
               "included": true,
-              "sampleSize": 32,
+              "sampleSize": 33,
               "explanation": "当前开放 Issue 数相对近 90 天新开 Issue 数的比例越低越好。该比例不依赖仓库是否已满 90 天；当前无开放 Issue 时不参与计分。",
               "evidenceUrl": "https://github.com/MichengAI/dsh-im-connect/issues"
             },
             {
               "key": "pullRequests",
               "label": "近期 PR 合并率",
-              "rawLabel": "6/9 已合并 · 66.7%",
-              "rawValue": 66.7,
-              "normalized": 66.7,
+              "rawLabel": "6/10 已合并 · 60%",
+              "rawValue": 60,
+              "normalized": 60,
               "weight": 0.15,
-              "effectiveWeight": 0.163,
-              "contribution": 10.9,
+              "effectiveWeight": 0.16,
+              "contribution": 9.6,
               "included": true,
-              "sampleSize": 9,
+              "sampleSize": 10,
               "explanation": "近 90 天创建 PR 中已合并的比例。只统计 PR，不把 Issue 混入；少于 3 条时降低权重。仓库禁用 PR 时该维度被排除，而不是记 0。",
               "evidenceUrl": "https://github.com/MichengAI/dsh-im-connect/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-22"
             },
@@ -1955,11 +2600,11 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "0 天前",
-              "rawValue": 0.04340802083333333,
+              "rawValue": 0.2697066898148148,
               "normalized": 100,
               "weight": 0.1,
-              "effectiveWeight": 0.109,
-              "contribution": 10.9,
+              "effectiveWeight": 0.106,
+              "contribution": 10.6,
               "included": true,
               "sampleSize": null,
               "explanation": "最近一次 Release 的时间分档。没有 Release 不等于未维护，因此该项仅在存在 Release 时参与。",
@@ -1991,14 +2636,14 @@
     },
     {
       "id": "michengai-dsh-automation",
-      "repo": "MichengAI/dsh-automation",
+      "repo": "michengai/dsh-automation",
       "name": "dsh-automation",
       "category": "automation",
       "installCommand": "dsh plugin --profile web add @michengai/dsh-automation@latest",
       "curatorNote": "在独立 DSH Session 中按计划执行编码任务。",
       "repository": {
-        "fullName": "MichengAI/dsh-automation",
-        "url": "https://github.com/MichengAI/dsh-automation",
+        "fullName": "michengai/dsh-automation",
+        "url": "https://github.com/michengai/dsh-automation",
         "description": "DSH Automation — 在独立 DSH Session 中按计划执行和管理编码任务 · Schedule and manage coding tasks in isolated DSH sessions",
         "homepageUrl": "https://dsh-codex-desktop.micheng.dev",
         "topics": [
@@ -2010,8 +2655,8 @@
         ],
         "language": "JavaScript",
         "license": "Apache-2.0",
-        "createdAt": "2026-08-16T10:18:26Z",
-        "pushedAt": "2026-10-20T08:25:34Z",
+        "createdAt": "2026-08-16T10:18:26.000Z",
+        "pushedAt": "2026-10-20T08:25:34.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
@@ -2045,11 +2690,11 @@
         "latestRelease": {
           "version": "v1.0.5",
           "tagName": "v1.0.5",
-          "publishedAt": "2026-10-20T08:17:17Z",
+          "publishedAt": "2026-10-20T08:17:17.000Z",
           "url": "https://github.com/MichengAI/dsh-automation/releases/tag/v1.0.5"
         },
         "releases90d": 59,
-        "lastCommitAt": "2026-10-20T08:25:31Z",
+        "lastCommitAt": "2026-10-20T08:25:31.000Z",
         "lastCommitUrl": "https://github.com/MichengAI/dsh-automation/commit/c6d3e74d777d4e6bba320159acbe9b87bdafa4cf",
         "commitsUrl": "https://github.com/MichengAI/dsh-automation/commits/main",
         "issuesUrl": "https://github.com/MichengAI/dsh-automation/issues",
@@ -2187,13 +2832,142 @@
             "downloads": 1784
           }
         ],
+        "quality": {
+          "rawDaily": [
+            {
+              "downloads": 7183,
+              "day": "2026-09-19"
+            },
+            {
+              "downloads": 7183,
+              "day": "2026-09-20"
+            },
+            {
+              "downloads": 17257,
+              "day": "2026-09-21"
+            },
+            {
+              "downloads": 17392,
+              "day": "2026-09-22"
+            },
+            {
+              "downloads": 17800,
+              "day": "2026-09-23"
+            },
+            {
+              "downloads": 17670,
+              "day": "2026-09-24"
+            },
+            {
+              "downloads": 17532,
+              "day": "2026-09-25"
+            },
+            {
+              "downloads": 316,
+              "day": "2026-09-26"
+            },
+            {
+              "downloads": 286,
+              "day": "2026-09-27"
+            },
+            {
+              "downloads": 661,
+              "day": "2026-09-28"
+            },
+            {
+              "downloads": 666,
+              "day": "2026-09-29"
+            },
+            {
+              "downloads": 925,
+              "day": "2026-09-30"
+            },
+            {
+              "downloads": 538,
+              "day": "2026-10-01"
+            },
+            {
+              "downloads": 455,
+              "day": "2026-10-02"
+            },
+            {
+              "downloads": 361,
+              "day": "2026-10-03"
+            },
+            {
+              "downloads": 397,
+              "day": "2026-10-04"
+            },
+            {
+              "downloads": 410,
+              "day": "2026-10-05"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-06"
+            },
+            {
+              "downloads": 974,
+              "day": "2026-10-07"
+            },
+            {
+              "downloads": 1439,
+              "day": "2026-10-08"
+            },
+            {
+              "downloads": 956,
+              "day": "2026-10-09"
+            },
+            {
+              "downloads": 942,
+              "day": "2026-10-10"
+            },
+            {
+              "downloads": 791,
+              "day": "2026-10-11"
+            },
+            {
+              "downloads": 1579,
+              "day": "2026-10-12"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-13"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-14"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-15"
+            },
+            {
+              "downloads": 1133,
+              "day": "2026-10-16"
+            },
+            {
+              "downloads": 1164,
+              "day": "2026-10-17"
+            },
+            {
+              "downloads": 1784,
+              "day": "2026-10-18"
+            }
+          ],
+          "conflictDates": [],
+          "invalidCount": 0,
+          "notes": [],
+          "windowStart": "2026-09-19",
+          "windowEnd": "2026-10-18"
+        },
         "repositoryUrl": "git+https://github.com/MichengAI/dsh-automation.git",
         "registryUrl": "https://www.npmjs.com/package/@michengai/dsh-automation",
         "mappingEvidence": "npm registry repository=git+https://github.com/MichengAI/dsh-automation.git ↔ GitHub MichengAI/dsh-automation",
         "enginesNode": "^22.19.0 || >=24.0.0",
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-20T10:57:19.453Z",
-        "reason": "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "fetchedAt": "2026-10-20T16:23:11.658Z",
+        "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
         "status": "checked",
@@ -2201,7 +2975,7 @@
         "packageName": "@michengai/dsh-automation",
         "version": "1.0.5",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-20T10:57:19.453Z",
+        "checkedAt": "2026-10-20T16:23:11.658Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=%40michengai%2Fdsh-automation"
       },
@@ -2223,12 +2997,12 @@
       },
       "dataStatus": "partial",
       "warnings": [
-        "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-20T10:57:19.453Z",
+      "lastUpdatedAt": "2026-10-20T16:23:11.658Z",
       "scores": {
         "popularity": {
-          "score": 37.5,
+          "score": 37.2,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -2238,14 +3012,14 @@
               "label": "GitHub Stars",
               "rawLabel": "33 stars",
               "rawValue": 33,
-              "normalized": 7.4,
+              "normalized": 6.7,
               "weight": 0.45,
               "effectiveWeight": 0.45,
-              "contribution": 3.3,
+              "contribution": 3,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
-              "evidenceUrl": "https://github.com/MichengAI/dsh-automation"
+              "evidenceUrl": "https://github.com/michengai/dsh-automation"
             },
             {
               "key": "downloads",
@@ -2276,7 +3050,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "0 天前",
-              "rawValue": 0.10542190972222222,
+              "rawValue": 0.3317205787037037,
               "normalized": 100,
               "weight": 0.3,
               "effectiveWeight": 0.333,
@@ -2346,7 +3120,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "0 天前",
-              "rawValue": 0.11113950231481481,
+              "rawValue": 0.3374381712962963,
               "normalized": 100,
               "weight": 0.1,
               "effectiveWeight": 0.111,
@@ -2382,14 +3156,14 @@
     },
     {
       "id": "michengai-dsh-btw",
-      "repo": "MichengAI/dsh-btw",
+      "repo": "michengai/dsh-btw",
       "name": "dsh-btw",
       "category": "workflow",
       "installCommand": "dsh plugin --profile web add @michengai/dsh-btw@latest",
       "curatorNote": "基于当前上下文的只读旁问，不执行工具。",
       "repository": {
-        "fullName": "MichengAI/dsh-btw",
-        "url": "https://github.com/MichengAI/dsh-btw",
+        "fullName": "michengai/dsh-btw",
+        "url": "https://github.com/michengai/dsh-btw",
         "description": "DSH 一次性只读旁问插件：基于当前上下文回答，独立气泡，不执行工具 · One-shot read-only side-ask plugin: answers from current context in an independent bubble, no tool execution",
         "homepageUrl": "https://dsh-codex-desktop.micheng.dev",
         "topics": [
@@ -2401,13 +3175,13 @@
         ],
         "language": "JavaScript",
         "license": "Apache-2.0",
-        "createdAt": "2026-09-06T06:32:00Z",
-        "pushedAt": "2026-10-17T09:06:53Z",
+        "createdAt": "2026-09-06T06:32:00.000Z",
+        "pushedAt": "2026-10-17T09:06:53.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 21,
+        "stars": 22,
         "forks": 3,
         "openIssues": 1,
         "openPullRequests": 0,
@@ -2436,11 +3210,11 @@
         "latestRelease": {
           "version": "v1.0.0",
           "tagName": "v1.0.0",
-          "publishedAt": "2026-10-17T09:07:52Z",
+          "publishedAt": "2026-10-17T09:07:52.000Z",
           "url": "https://github.com/MichengAI/dsh-btw/releases/tag/v1.0.0"
         },
         "releases90d": 25,
-        "lastCommitAt": "2026-10-17T08:51:52Z",
+        "lastCommitAt": "2026-10-17T08:51:52.000Z",
         "lastCommitUrl": "https://github.com/MichengAI/dsh-btw/commit/24285a1dbbae648da497cc9694d98fe63fb67020",
         "commitsUrl": "https://github.com/MichengAI/dsh-btw/commits/main",
         "issuesUrl": "https://github.com/MichengAI/dsh-btw/issues",
@@ -2578,13 +3352,142 @@
             "downloads": 1481
           }
         ],
+        "quality": {
+          "rawDaily": [
+            {
+              "downloads": 3602,
+              "day": "2026-09-19"
+            },
+            {
+              "downloads": 3632,
+              "day": "2026-09-20"
+            },
+            {
+              "downloads": 138,
+              "day": "2026-09-21"
+            },
+            {
+              "downloads": 27301,
+              "day": "2026-09-22"
+            },
+            {
+              "downloads": 13786,
+              "day": "2026-09-23"
+            },
+            {
+              "downloads": 13933,
+              "day": "2026-09-24"
+            },
+            {
+              "downloads": 13753,
+              "day": "2026-09-25"
+            },
+            {
+              "downloads": 294,
+              "day": "2026-09-26"
+            },
+            {
+              "downloads": 326,
+              "day": "2026-09-27"
+            },
+            {
+              "downloads": 770,
+              "day": "2026-09-28"
+            },
+            {
+              "downloads": 644,
+              "day": "2026-09-29"
+            },
+            {
+              "downloads": 1027,
+              "day": "2026-09-30"
+            },
+            {
+              "downloads": 493,
+              "day": "2026-10-01"
+            },
+            {
+              "downloads": 423,
+              "day": "2026-10-02"
+            },
+            {
+              "downloads": 354,
+              "day": "2026-10-03"
+            },
+            {
+              "downloads": 346,
+              "day": "2026-10-04"
+            },
+            {
+              "downloads": 392,
+              "day": "2026-10-05"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-06"
+            },
+            {
+              "downloads": 1073,
+              "day": "2026-10-07"
+            },
+            {
+              "downloads": 966,
+              "day": "2026-10-08"
+            },
+            {
+              "downloads": 642,
+              "day": "2026-10-09"
+            },
+            {
+              "downloads": 1171,
+              "day": "2026-10-10"
+            },
+            {
+              "downloads": 914,
+              "day": "2026-10-11"
+            },
+            {
+              "downloads": 1596,
+              "day": "2026-10-12"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-13"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-14"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-15"
+            },
+            {
+              "downloads": 1263,
+              "day": "2026-10-16"
+            },
+            {
+              "downloads": 1461,
+              "day": "2026-10-17"
+            },
+            {
+              "downloads": 1481,
+              "day": "2026-10-18"
+            }
+          ],
+          "conflictDates": [],
+          "invalidCount": 0,
+          "notes": [],
+          "windowStart": "2026-09-19",
+          "windowEnd": "2026-10-18"
+        },
         "repositoryUrl": "git+https://github.com/MichengAI/dsh-btw.git",
         "registryUrl": "https://www.npmjs.com/package/@michengai/dsh-btw",
         "mappingEvidence": "npm registry repository=git+https://github.com/MichengAI/dsh-btw.git ↔ GitHub MichengAI/dsh-btw",
         "enginesNode": ">=22",
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-20T10:57:19.453Z",
-        "reason": "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "fetchedAt": "2026-10-20T16:23:11.658Z",
+        "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
         "status": "checked",
@@ -2592,7 +3495,7 @@
         "packageName": "@michengai/dsh-btw",
         "version": "1.0.0",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-20T10:57:19.453Z",
+        "checkedAt": "2026-10-20T16:23:11.658Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=%40michengai%2Fdsh-btw"
       },
@@ -2614,9 +3517,9 @@
       },
       "dataStatus": "partial",
       "warnings": [
-        "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-20T10:57:19.453Z",
+      "lastUpdatedAt": "2026-10-20T16:23:11.658Z",
       "scores": {
         "popularity": {
           "score": 31.1,
@@ -2627,8 +3530,8 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "21 stars",
-              "rawValue": 21,
+              "rawLabel": "22 stars",
+              "rawValue": 22,
               "normalized": 0,
               "weight": 0.45,
               "effectiveWeight": 0.45,
@@ -2636,7 +3539,7 @@
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
-              "evidenceUrl": "https://github.com/MichengAI/dsh-btw"
+              "evidenceUrl": "https://github.com/michengai/dsh-btw"
             },
             {
               "key": "downloads",
@@ -2667,7 +3570,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "3 天前",
-              "rawValue": 3.087123298611111,
+              "rawValue": 3.3134219675925927,
               "normalized": 100,
               "weight": 0.3,
               "effectiveWeight": 0.366,
@@ -2737,7 +3640,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "3 天前",
-              "rawValue": 3.0760121875,
+              "rawValue": 3.3023108564814816,
               "normalized": 100,
               "weight": 0.1,
               "effectiveWeight": 0.122,
@@ -2793,17 +3696,17 @@
         ],
         "language": "TypeScript",
         "license": "Apache-2.0",
-        "createdAt": "2026-08-14T08:23:28Z",
-        "pushedAt": "2026-10-20T02:40:35Z",
+        "createdAt": "2026-08-14T08:23:28.000Z",
+        "pushedAt": "2026-10-20T02:40:35.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 2386,
+        "stars": 2400,
         "forks": 78,
         "openIssues": 4,
         "openPullRequests": 0,
-        "commits30d": 354,
+        "commits30d": 349,
         "commits30dTruncated": false,
         "issues": {
           "opened90d": 117,
@@ -2828,11 +3731,11 @@
         "latestRelease": {
           "version": "v0.73.3",
           "tagName": "v0.73.3",
-          "publishedAt": "2026-10-19T00:06:29Z",
+          "publishedAt": "2026-10-19T00:06:29.000Z",
           "url": "https://github.com/bowenliang123/dsh-context/releases/tag/v0.73.3"
         },
         "releases90d": 100,
-        "lastCommitAt": "2026-10-20T02:35:19Z",
+        "lastCommitAt": "2026-10-20T02:35:19.000Z",
         "lastCommitUrl": "https://github.com/bowenliang123/dsh-context/commit/1bc481c8f1d73b65d2710ede2b0dd3f6af7c5c6d",
         "commitsUrl": "https://github.com/bowenliang123/dsh-context/commits/main",
         "issuesUrl": "https://github.com/bowenliang123/dsh-context/issues",
@@ -2970,13 +3873,142 @@
             "downloads": 12026
           }
         ],
+        "quality": {
+          "rawDaily": [
+            {
+              "downloads": 3178,
+              "day": "2026-09-19"
+            },
+            {
+              "downloads": 4789,
+              "day": "2026-09-20"
+            },
+            {
+              "downloads": 4878,
+              "day": "2026-09-21"
+            },
+            {
+              "downloads": 4939,
+              "day": "2026-09-22"
+            },
+            {
+              "downloads": 4604,
+              "day": "2026-09-23"
+            },
+            {
+              "downloads": 4223,
+              "day": "2026-09-24"
+            },
+            {
+              "downloads": 4223,
+              "day": "2026-09-25"
+            },
+            {
+              "downloads": 3323,
+              "day": "2026-09-26"
+            },
+            {
+              "downloads": 4241,
+              "day": "2026-09-27"
+            },
+            {
+              "downloads": 6468,
+              "day": "2026-09-28"
+            },
+            {
+              "downloads": 6090,
+              "day": "2026-09-29"
+            },
+            {
+              "downloads": 8770,
+              "day": "2026-09-30"
+            },
+            {
+              "downloads": 5396,
+              "day": "2026-10-01"
+            },
+            {
+              "downloads": 3469,
+              "day": "2026-10-02"
+            },
+            {
+              "downloads": 4405,
+              "day": "2026-10-03"
+            },
+            {
+              "downloads": 4401,
+              "day": "2026-10-04"
+            },
+            {
+              "downloads": 4453,
+              "day": "2026-10-05"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-06"
+            },
+            {
+              "downloads": 5140,
+              "day": "2026-10-07"
+            },
+            {
+              "downloads": 7514,
+              "day": "2026-10-08"
+            },
+            {
+              "downloads": 8472,
+              "day": "2026-10-09"
+            },
+            {
+              "downloads": 8600,
+              "day": "2026-10-10"
+            },
+            {
+              "downloads": 9837,
+              "day": "2026-10-11"
+            },
+            {
+              "downloads": 12582,
+              "day": "2026-10-12"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-13"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-14"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-15"
+            },
+            {
+              "downloads": 8340,
+              "day": "2026-10-16"
+            },
+            {
+              "downloads": 10414,
+              "day": "2026-10-17"
+            },
+            {
+              "downloads": 12026,
+              "day": "2026-10-18"
+            }
+          ],
+          "conflictDates": [],
+          "invalidCount": 0,
+          "notes": [],
+          "windowStart": "2026-09-19",
+          "windowEnd": "2026-10-18"
+        },
         "repositoryUrl": "git+https://github.com/bowenliang123/dsh-context.git",
         "registryUrl": "https://www.npmjs.com/package/dsh-context",
         "mappingEvidence": "npm registry repository=git+https://github.com/bowenliang123/dsh-context.git ↔ GitHub bowenliang123/dsh-context",
         "enginesNode": "^22.19.0 || >=24.0.0",
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-20T10:57:19.453Z",
-        "reason": "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "fetchedAt": "2026-10-20T16:23:11.658Z",
+        "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
         "status": "checked",
@@ -2984,7 +4016,7 @@
         "packageName": "dsh-context",
         "version": "0.73.3",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-20T10:57:19.453Z",
+        "checkedAt": "2026-10-20T16:23:11.658Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=dsh-context"
       },
@@ -3006,9 +4038,9 @@
       },
       "dataStatus": "partial",
       "warnings": [
-        "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-20T10:57:19.453Z",
+      "lastUpdatedAt": "2026-10-20T16:23:11.658Z",
       "scores": {
         "popularity": {
           "score": 74.3,
@@ -3019,9 +4051,9 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "2,386 stars",
-              "rawValue": 2386,
-              "normalized": 80.1,
+              "rawLabel": "2,400 stars",
+              "rawValue": 2400,
+              "normalized": 79.9,
               "weight": 0.45,
               "effectiveWeight": 0.45,
               "contribution": 36,
@@ -3059,7 +4091,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "0 天前",
-              "rawValue": 0.34861635416666664,
+              "rawValue": 0.5749150231481481,
               "normalized": 100,
               "weight": 0.3,
               "effectiveWeight": 0.306,
@@ -3072,8 +4104,8 @@
             {
               "key": "commitCadence",
               "label": "近 30 天提交频率",
-              "rawLabel": "354 次",
-              "rawValue": 354,
+              "rawLabel": "349 次",
+              "rawValue": 349,
               "normalized": 100,
               "weight": 0.15,
               "effectiveWeight": 0.153,
@@ -3129,7 +4161,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "1 天前",
-              "rawValue": 1.451972835648148,
+              "rawValue": 1.6782715046296297,
               "normalized": 100,
               "weight": 0.1,
               "effectiveWeight": 0.102,
@@ -3182,17 +4214,17 @@
         ],
         "language": "TypeScript",
         "license": "MIT",
-        "createdAt": "2026-08-14T04:58:15Z",
-        "pushedAt": "2026-10-19T18:21:34Z",
+        "createdAt": "2026-08-14T04:58:15.000Z",
+        "pushedAt": "2026-10-20T14:43:28.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 7637,
-        "forks": 301,
+        "stars": 7730,
+        "forks": 302,
         "openIssues": 39,
         "openPullRequests": 7,
-        "commits30d": 360,
+        "commits30d": 362,
         "commits30dTruncated": false,
         "issues": {
           "opened90d": 490,
@@ -3207,9 +4239,9 @@
         },
         "pullRequests": {
           "available": true,
-          "opened90d": 450,
-          "merged90d": 366,
-          "mergeRate": 0.8133333333333334,
+          "opened90d": 453,
+          "merged90d": 369,
+          "mergeRate": 0.8145695364238411,
           "lowSample": false,
           "truncated": false,
           "queryUrl": "https://github.com/dsh-market/dsh-market/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-22"
@@ -3217,12 +4249,12 @@
         "latestRelease": {
           "version": "dshmarket 1.66.44",
           "tagName": "v1.66.44",
-          "publishedAt": "2026-10-19T18:22:11Z",
+          "publishedAt": "2026-10-19T18:22:11.000Z",
           "url": "https://github.com/dsh-market/dsh-market/releases/tag/v1.66.44"
         },
         "releases90d": 100,
-        "lastCommitAt": "2026-10-19T18:21:19Z",
-        "lastCommitUrl": "https://github.com/dsh-market/dsh-market/commit/f1f58bd29767cb4e122057cc5b4b6d481833ba58",
+        "lastCommitAt": "2026-10-20T14:43:26.000Z",
+        "lastCommitUrl": "https://github.com/dsh-market/dsh-market/commit/fc6a837602eab6708df23e9a49fb2b8b4c069676",
         "commitsUrl": "https://github.com/dsh-market/dsh-market/commits/main",
         "issuesUrl": "https://github.com/dsh-market/dsh-market/issues",
         "pullsUrl": "https://github.com/dsh-market/dsh-market/pulls",
@@ -3359,13 +4391,142 @@
             "downloads": 51858
           }
         ],
+        "quality": {
+          "rawDaily": [
+            {
+              "downloads": 17165,
+              "day": "2026-09-19"
+            },
+            {
+              "downloads": 22058,
+              "day": "2026-09-20"
+            },
+            {
+              "downloads": 21280,
+              "day": "2026-09-21"
+            },
+            {
+              "downloads": 21728,
+              "day": "2026-09-22"
+            },
+            {
+              "downloads": 21955,
+              "day": "2026-09-23"
+            },
+            {
+              "downloads": 23756,
+              "day": "2026-09-24"
+            },
+            {
+              "downloads": 17335,
+              "day": "2026-09-25"
+            },
+            {
+              "downloads": 17441,
+              "day": "2026-09-26"
+            },
+            {
+              "downloads": 16583,
+              "day": "2026-09-27"
+            },
+            {
+              "downloads": 24310,
+              "day": "2026-09-28"
+            },
+            {
+              "downloads": 28723,
+              "day": "2026-09-29"
+            },
+            {
+              "downloads": 37057,
+              "day": "2026-09-30"
+            },
+            {
+              "downloads": 22980,
+              "day": "2026-10-01"
+            },
+            {
+              "downloads": 19001,
+              "day": "2026-10-02"
+            },
+            {
+              "downloads": 13039,
+              "day": "2026-10-03"
+            },
+            {
+              "downloads": 11206,
+              "day": "2026-10-04"
+            },
+            {
+              "downloads": 12761,
+              "day": "2026-10-05"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-06"
+            },
+            {
+              "downloads": 16509,
+              "day": "2026-10-07"
+            },
+            {
+              "downloads": 32950,
+              "day": "2026-10-08"
+            },
+            {
+              "downloads": 25973,
+              "day": "2026-10-09"
+            },
+            {
+              "downloads": 25311,
+              "day": "2026-10-10"
+            },
+            {
+              "downloads": 24863,
+              "day": "2026-10-11"
+            },
+            {
+              "downloads": 34436,
+              "day": "2026-10-12"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-13"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-14"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-15"
+            },
+            {
+              "downloads": 33114,
+              "day": "2026-10-16"
+            },
+            {
+              "downloads": 44181,
+              "day": "2026-10-17"
+            },
+            {
+              "downloads": 51858,
+              "day": "2026-10-18"
+            }
+          ],
+          "conflictDates": [],
+          "invalidCount": 0,
+          "notes": [],
+          "windowStart": "2026-09-19",
+          "windowEnd": "2026-10-18"
+        },
         "repositoryUrl": "git+https://github.com/dsh-market/dsh-market.git",
         "registryUrl": "https://www.npmjs.com/package/dshmarket",
         "mappingEvidence": "npm registry repository=git+https://github.com/dsh-market/dsh-market.git ↔ GitHub dsh-market/dsh-market",
         "enginesNode": null,
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-20T10:57:19.453Z",
-        "reason": "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "fetchedAt": "2026-10-20T16:23:11.658Z",
+        "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
         "status": "checked",
@@ -3373,7 +4534,7 @@
         "packageName": "dshmarket",
         "version": "1.66.44",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-20T10:57:19.453Z",
+        "checkedAt": "2026-10-20T16:23:11.658Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=dshmarket"
       },
@@ -3395,9 +4556,9 @@
       },
       "dataStatus": "partial",
       "warnings": [
-        "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-20T10:57:19.453Z",
+      "lastUpdatedAt": "2026-10-20T16:23:11.658Z",
       "scores": {
         "popularity": {
           "score": 100,
@@ -3408,8 +4569,8 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "7,637 stars",
-              "rawValue": 7637,
+              "rawLabel": "7,730 stars",
+              "rawValue": 7730,
               "normalized": 100,
               "weight": 0.45,
               "effectiveWeight": 0.45,
@@ -3448,7 +4609,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "0 天前",
-              "rawValue": 0.6916719097222223,
+              "rawValue": 0.06927844907407407,
               "normalized": 100,
               "weight": 0.3,
               "effectiveWeight": 0.3,
@@ -3456,13 +4617,13 @@
               "included": true,
               "sampleSize": null,
               "explanation": "距最近一次非合并提交的天数。使用提交记录的实际 committed date，而不是仓库 pushed_at。",
-              "evidenceUrl": "https://github.com/dsh-market/dsh-market/commit/f1f58bd29767cb4e122057cc5b4b6d481833ba58"
+              "evidenceUrl": "https://github.com/dsh-market/dsh-market/commit/fc6a837602eab6708df23e9a49fb2b8b4c069676"
             },
             {
               "key": "commitCadence",
               "label": "近 30 天提交频率",
-              "rawLabel": "360 次",
-              "rawValue": 360,
+              "rawLabel": "362 次",
+              "rawValue": 362,
               "normalized": 100,
               "weight": 0.15,
               "effectiveWeight": 0.15,
@@ -3503,14 +4664,14 @@
             {
               "key": "pullRequests",
               "label": "近期 PR 合并率",
-              "rawLabel": "366/450 已合并 · 81.3%",
-              "rawValue": 81.3,
-              "normalized": 81.3,
+              "rawLabel": "369/453 已合并 · 81.5%",
+              "rawValue": 81.5,
+              "normalized": 81.5,
               "weight": 0.15,
               "effectiveWeight": 0.15,
               "contribution": 12.2,
               "included": true,
-              "sampleSize": 450,
+              "sampleSize": 453,
               "explanation": "近 90 天创建 PR 中已合并的比例。只统计 PR，不把 Issue 混入；少于 3 条时降低权重。仓库禁用 PR 时该维度被排除，而不是记 0。",
               "evidenceUrl": "https://github.com/dsh-market/dsh-market/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-22"
             },
@@ -3518,7 +4679,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "0 天前",
-              "rawValue": 0.6910700578703703,
+              "rawValue": 0.9173687268518519,
               "normalized": 100,
               "weight": 0.1,
               "effectiveWeight": 0.1,
@@ -3554,14 +4715,14 @@
     },
     {
       "id": "ccch1mneyyy-dsh-tui",
-      "repo": "ccch1mneyyy/dsh-TUI",
+      "repo": "ccch1mneyyy/dsh-tui",
       "name": "dsh-TUI",
       "category": "interface",
       "installCommand": "npm install -g @deepseek-ai/dsh @deepseek-harness-tui/dsh-tui",
       "curatorNote": "独立的 DSH TUI 插件，仓库 README 使用 npm 全局安装。",
       "repository": {
-        "fullName": "ccch1mneyyy/dsh-TUI",
-        "url": "https://github.com/ccch1mneyyy/dsh-TUI",
+        "fullName": "ccch1mneyyy/dsh-tui",
+        "url": "https://github.com/ccch1mneyyy/dsh-tui",
         "description": "DSH's officially top-recommended TUI plugin — high performance, low overhead, cute pixel whale, smooth mouse interaction. One-command install via npm. / DSH 官方首推的 TUI 插件，高性能低占用，可爱像素鲸鱼，流畅鼠标交互，npm 一键安装",
         "homepageUrl": "https://dshtui.com/",
         "topics": [
@@ -3577,34 +4738,34 @@
         ],
         "language": "TypeScript",
         "license": "MIT",
-        "createdAt": "2026-08-13T12:49:31Z",
-        "pushedAt": "2026-10-20T10:52:29Z",
+        "createdAt": "2026-08-13T12:49:31.000Z",
+        "pushedAt": "2026-10-20T15:53:36.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 5011,
-        "forks": 272,
-        "openIssues": 100,
-        "openPullRequests": 3,
-        "commits30d": 692,
+        "stars": 5028,
+        "forks": 274,
+        "openIssues": 102,
+        "openPullRequests": 11,
+        "commits30d": 690,
         "commits30dTruncated": false,
         "issues": {
-          "opened90d": 663,
-          "closed90d": 563,
-          "closureRate": 0.8491704374057315,
+          "opened90d": 666,
+          "closed90d": 564,
+          "closureRate": 0.8468468468468469,
           "lowSample": false,
           "truncated": false,
           "longOpen": 0,
-          "openNow": 100,
+          "openNow": 102,
           "openTruncated": false,
           "queryUrl": "https://github.com/ccch1mneyyy/dsh-TUI/issues?q=is%3Aissue%20created%3A%3E%3D2026-07-22"
         },
         "pullRequests": {
           "available": true,
-          "opened90d": 903,
-          "merged90d": 686,
-          "mergeRate": 0.7596899224806202,
+          "opened90d": 913,
+          "merged90d": 687,
+          "mergeRate": 0.7524644030668127,
           "lowSample": false,
           "truncated": false,
           "queryUrl": "https://github.com/ccch1mneyyy/dsh-TUI/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-22"
@@ -3612,12 +4773,12 @@
         "latestRelease": {
           "version": "v0.16.1 — 独立入口启动回归与更新包体修复",
           "tagName": "v0.16.1",
-          "publishedAt": "2026-10-17T21:33:29Z",
+          "publishedAt": "2026-10-17T21:33:29.000Z",
           "url": "https://github.com/ccch1mneyyy/dsh-TUI/releases/tag/v0.16.1"
         },
         "releases90d": 33,
-        "lastCommitAt": "2026-10-20T06:17:48Z",
-        "lastCommitUrl": "https://github.com/ccch1mneyyy/dsh-TUI/commit/75954c04c3bdd43010f24d7f1d58ac5f3d94472f",
+        "lastCommitAt": "2026-10-20T14:45:49.000Z",
+        "lastCommitUrl": "https://github.com/ccch1mneyyy/dsh-TUI/commit/0f788537f45a8dd3968b47eb97885f0921e910e3",
         "commitsUrl": "https://github.com/ccch1mneyyy/dsh-TUI/commits/main",
         "issuesUrl": "https://github.com/ccch1mneyyy/dsh-TUI/issues",
         "pullsUrl": "https://github.com/ccch1mneyyy/dsh-TUI/pulls",
@@ -3754,13 +4915,142 @@
             "downloads": 3453
           }
         ],
+        "quality": {
+          "rawDaily": [
+            {
+              "downloads": 842,
+              "day": "2026-09-19"
+            },
+            {
+              "downloads": 1181,
+              "day": "2026-09-20"
+            },
+            {
+              "downloads": 953,
+              "day": "2026-09-21"
+            },
+            {
+              "downloads": 911,
+              "day": "2026-09-22"
+            },
+            {
+              "downloads": 893,
+              "day": "2026-09-23"
+            },
+            {
+              "downloads": 1107,
+              "day": "2026-09-24"
+            },
+            {
+              "downloads": 1169,
+              "day": "2026-09-25"
+            },
+            {
+              "downloads": 2014,
+              "day": "2026-09-26"
+            },
+            {
+              "downloads": 3070,
+              "day": "2026-09-27"
+            },
+            {
+              "downloads": 2440,
+              "day": "2026-09-28"
+            },
+            {
+              "downloads": 2874,
+              "day": "2026-09-29"
+            },
+            {
+              "downloads": 3201,
+              "day": "2026-09-30"
+            },
+            {
+              "downloads": 1757,
+              "day": "2026-10-01"
+            },
+            {
+              "downloads": 1536,
+              "day": "2026-10-02"
+            },
+            {
+              "downloads": 1130,
+              "day": "2026-10-03"
+            },
+            {
+              "downloads": 1583,
+              "day": "2026-10-04"
+            },
+            {
+              "downloads": 1548,
+              "day": "2026-10-05"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-06"
+            },
+            {
+              "downloads": 1838,
+              "day": "2026-10-07"
+            },
+            {
+              "downloads": 2739,
+              "day": "2026-10-08"
+            },
+            {
+              "downloads": 2065,
+              "day": "2026-10-09"
+            },
+            {
+              "downloads": 1919,
+              "day": "2026-10-10"
+            },
+            {
+              "downloads": 1480,
+              "day": "2026-10-11"
+            },
+            {
+              "downloads": 1853,
+              "day": "2026-10-12"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-13"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-14"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-15"
+            },
+            {
+              "downloads": 1935,
+              "day": "2026-10-16"
+            },
+            {
+              "downloads": 3126,
+              "day": "2026-10-17"
+            },
+            {
+              "downloads": 3453,
+              "day": "2026-10-18"
+            }
+          ],
+          "conflictDates": [],
+          "invalidCount": 0,
+          "notes": [],
+          "windowStart": "2026-09-19",
+          "windowEnd": "2026-10-18"
+        },
         "repositoryUrl": "git+https://github.com/ccch1mneyyy/dsh-TUI.git",
         "registryUrl": "https://www.npmjs.com/package/@deepseek-harness-tui/dsh-tui",
         "mappingEvidence": "npm registry repository=git+https://github.com/ccch1mneyyy/dsh-TUI.git ↔ GitHub ccch1mneyyy/dsh-TUI",
         "enginesNode": "^22.19 || >=24",
         "dshPeerRange": "^0.1.0-rc.6 || ^0.1.1-rc.1 || 0.1.2-alpha.3 || 0.1.2-alpha.4 || 0.1.2-alpha.5 || 0.1.2-rc.1 || 0.1.3-alpha.2 || 0.1.5-alpha.1 || 0.1.5-alpha.2 || 0.1.5-rc.1 || 0.1.7-rc.1 || 0.1.7-rc.2 || 0.2.0-rc.1 || 0.2.0-rc.2 || 0.2.1-rc.2",
-        "fetchedAt": "2026-10-20T10:57:19.453Z",
-        "reason": "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "fetchedAt": "2026-10-20T16:23:11.658Z",
+        "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
         "status": "checked",
@@ -3768,7 +5058,7 @@
         "packageName": "@deepseek-harness-tui/dsh-tui",
         "version": "0.16.1",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-20T10:57:19.453Z",
+        "checkedAt": "2026-10-20T16:23:11.658Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=%40deepseek-harness-tui%2Fdsh-tui"
       },
@@ -3790,12 +5080,12 @@
       },
       "dataStatus": "partial",
       "warnings": [
-        "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-20T10:57:19.453Z",
+      "lastUpdatedAt": "2026-10-20T16:23:11.658Z",
       "scores": {
         "popularity": {
-          "score": 65,
+          "score": 64.9,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -3803,16 +5093,16 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "5,011 stars",
-              "rawValue": 5011,
-              "normalized": 92.8,
+              "rawLabel": "5,028 stars",
+              "rawValue": 5028,
+              "normalized": 92.6,
               "weight": 0.45,
               "effectiveWeight": 0.45,
-              "contribution": 41.8,
+              "contribution": 41.7,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
-              "evidenceUrl": "https://github.com/ccch1mneyyy/dsh-TUI"
+              "evidenceUrl": "https://github.com/ccch1mneyyy/dsh-tui"
             },
             {
               "key": "downloads",
@@ -3834,7 +5124,7 @@
           "methodVersion": "1.1.0"
         },
         "maintenance": {
-          "score": 91.9,
+          "score": 91.7,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -3843,7 +5133,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "0 天前",
-              "rawValue": 0.19411403935185184,
+              "rawValue": 0.06762335648148148,
               "normalized": 100,
               "weight": 0.3,
               "effectiveWeight": 0.3,
@@ -3851,13 +5141,13 @@
               "included": true,
               "sampleSize": null,
               "explanation": "距最近一次非合并提交的天数。使用提交记录的实际 committed date，而不是仓库 pushed_at。",
-              "evidenceUrl": "https://github.com/ccch1mneyyy/dsh-TUI/commit/75954c04c3bdd43010f24d7f1d58ac5f3d94472f"
+              "evidenceUrl": "https://github.com/ccch1mneyyy/dsh-TUI/commit/0f788537f45a8dd3968b47eb97885f0921e910e3"
             },
             {
               "key": "commitCadence",
               "label": "近 30 天提交频率",
-              "rawLabel": "692 次",
-              "rawValue": 692,
+              "rawLabel": "690 次",
+              "rawValue": 690,
               "normalized": 100,
               "weight": 0.15,
               "effectiveWeight": 0.15,
@@ -3870,42 +5160,42 @@
             {
               "key": "issueHandling",
               "label": "近期 Issue 关闭率",
-              "rawLabel": "563/663 已关闭 · 84.9%",
-              "rawValue": 84.9,
-              "normalized": 84.9,
+              "rawLabel": "564/666 已关闭 · 84.7%",
+              "rawValue": 84.7,
+              "normalized": 84.7,
               "weight": 0.2,
               "effectiveWeight": 0.2,
-              "contribution": 17,
+              "contribution": 16.9,
               "included": true,
-              "sampleSize": 663,
+              "sampleSize": 666,
               "explanation": "近 90 天创建的非 PR Issue 中，当前已关闭的比例。少于 5 条时降低该分项权重；0 条新 Issue 不扣分，也不代表处理能力强。",
               "evidenceUrl": "https://github.com/ccch1mneyyy/dsh-TUI/issues?q=is%3Aissue%20created%3A%3E%3D2026-07-22"
             },
             {
               "key": "issueBacklog",
               "label": "开放 Issue 积压",
-              "rawLabel": "100 条开放 / 90 天新开 663 条",
-              "rawValue": 0.15082956259426847,
-              "normalized": 84.9,
+              "rawLabel": "102 条开放 / 90 天新开 666 条",
+              "rawValue": 0.15315315315315314,
+              "normalized": 84.7,
               "weight": 0.1,
               "effectiveWeight": 0.1,
               "contribution": 8.5,
               "included": true,
-              "sampleSize": 663,
+              "sampleSize": 666,
               "explanation": "当前开放 Issue 数相对近 90 天新开 Issue 数的比例越低越好。该比例不依赖仓库是否已满 90 天；当前无开放 Issue 时不参与计分。",
               "evidenceUrl": "https://github.com/ccch1mneyyy/dsh-TUI/issues"
             },
             {
               "key": "pullRequests",
               "label": "近期 PR 合并率",
-              "rawLabel": "686/903 已合并 · 76%",
-              "rawValue": 76,
-              "normalized": 76,
+              "rawLabel": "687/913 已合并 · 75.2%",
+              "rawValue": 75.2,
+              "normalized": 75.2,
               "weight": 0.15,
               "effectiveWeight": 0.15,
-              "contribution": 11.4,
+              "contribution": 11.3,
               "included": true,
-              "sampleSize": 903,
+              "sampleSize": 913,
               "explanation": "近 90 天创建 PR 中已合并的比例。只统计 PR，不把 Issue 混入；少于 3 条时降低权重。仓库禁用 PR 时该维度被排除，而不是记 0。",
               "evidenceUrl": "https://github.com/ccch1mneyyy/dsh-TUI/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-22"
             },
@@ -3913,7 +5203,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "2 天前",
-              "rawValue": 2.5582228356481482,
+              "rawValue": 2.7845215046296294,
               "normalized": 100,
               "weight": 0.1,
               "effectiveWeight": 0.1,
@@ -3936,7 +5226,7 @@
               "code": "open-issues-high",
               "level": "high",
               "title": "开放 Issue 积压",
-              "detail": "当前有 100 条开放 Issue，约为近 90 天新开 Issue 数的 15%。这是需要阅读的维护信号，不等于代码质量差。",
+              "detail": "当前有 102 条开放 Issue，约为近 90 天新开 Issue 数的 15%。这是需要阅读的维护信号，不等于代码质量差。",
               "evidenceUrl": "https://github.com/ccch1mneyyy/dsh-TUI/issues"
             }
           ],
@@ -3957,14 +5247,14 @@
     },
     {
       "id": "omdsh-dev-dsh-better-sidebar",
-      "repo": "omdsh-dev/DSH-better-sidebar",
+      "repo": "omdsh-dev/dsh-better-sidebar",
       "name": "DSH-better-sidebar",
       "category": "interface",
       "installCommand": "dsh plugin --profile web add dsh-better-sidebar@latest",
       "curatorNote": "可扩展侧边栏底座，内置文件、终端、Git 与子 Agent 页面。",
       "repository": {
-        "fullName": "omdsh-dev/DSH-better-sidebar",
-        "url": "https://github.com/omdsh-dev/DSH-better-sidebar",
+        "fullName": "omdsh-dev/dsh-better-sidebar",
+        "url": "https://github.com/omdsh-dev/dsh-better-sidebar",
         "description": "开放的侧边栏底座，支持三方拓展注册新侧边栏页面。内置文件渲染编辑/终端/侧边对话/Git/子代理页面 ｜ Open sidebar foundation, supports third-party extensions to register new sidebar pages. Built-in file rendering/editing, terminal, side chat, Git, and sub-agent pages.",
         "homepageUrl": null,
         "topics": [
@@ -3977,34 +5267,34 @@
         ],
         "language": "TypeScript",
         "license": "MIT",
-        "createdAt": "2026-08-07T16:04:00Z",
-        "pushedAt": "2026-10-17T16:15:27Z",
+        "createdAt": "2026-08-07T16:04:00.000Z",
+        "pushedAt": "2026-10-17T16:15:27.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 4342,
+        "stars": 4352,
         "forks": 417,
-        "openIssues": 142,
-        "openPullRequests": 71,
+        "openIssues": 144,
+        "openPullRequests": 73,
         "commits30d": 349,
         "commits30dTruncated": false,
         "issues": {
-          "opened90d": 446,
+          "opened90d": 448,
           "closed90d": 304,
-          "closureRate": 0.6816143497757847,
+          "closureRate": 0.6785714285714286,
           "lowSample": false,
           "truncated": false,
           "longOpen": 0,
-          "openNow": 142,
+          "openNow": 144,
           "openTruncated": false,
           "queryUrl": "https://github.com/omdsh-dev/DSH-better-sidebar/issues?q=is%3Aissue%20created%3A%3E%3D2026-07-22"
         },
         "pullRequests": {
           "available": true,
-          "opened90d": 566,
+          "opened90d": 569,
           "merged90d": 288,
-          "mergeRate": 0.508833922261484,
+          "mergeRate": 0.5061511423550088,
           "lowSample": false,
           "truncated": false,
           "queryUrl": "https://github.com/omdsh-dev/DSH-better-sidebar/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-22"
@@ -4012,11 +5302,11 @@
         "latestRelease": {
           "version": "v0.28.0 — Git 工作台与提交图 / Git Workbench & Commit Graph",
           "tagName": "v0.28.0",
-          "publishedAt": "2026-10-17T06:23:55Z",
+          "publishedAt": "2026-10-17T06:23:55.000Z",
           "url": "https://github.com/omdsh-dev/DSH-better-sidebar/releases/tag/v0.28.0"
         },
         "releases90d": 34,
-        "lastCommitAt": "2026-10-17T06:03:22Z",
+        "lastCommitAt": "2026-10-17T06:03:22.000Z",
         "lastCommitUrl": "https://github.com/omdsh-dev/DSH-better-sidebar/commit/66c91091bc3b41f1a43433b660d6a067563ae540",
         "commitsUrl": "https://github.com/omdsh-dev/DSH-better-sidebar/commits/main",
         "issuesUrl": "https://github.com/omdsh-dev/DSH-better-sidebar/issues",
@@ -4154,13 +5444,142 @@
             "downloads": 12992
           }
         ],
+        "quality": {
+          "rawDaily": [
+            {
+              "downloads": 7000,
+              "day": "2026-09-19"
+            },
+            {
+              "downloads": 8472,
+              "day": "2026-09-20"
+            },
+            {
+              "downloads": 7900,
+              "day": "2026-09-21"
+            },
+            {
+              "downloads": 7307,
+              "day": "2026-09-22"
+            },
+            {
+              "downloads": 7068,
+              "day": "2026-09-23"
+            },
+            {
+              "downloads": 8180,
+              "day": "2026-09-24"
+            },
+            {
+              "downloads": 6491,
+              "day": "2026-09-25"
+            },
+            {
+              "downloads": 6179,
+              "day": "2026-09-26"
+            },
+            {
+              "downloads": 6642,
+              "day": "2026-09-27"
+            },
+            {
+              "downloads": 11849,
+              "day": "2026-09-28"
+            },
+            {
+              "downloads": 11624,
+              "day": "2026-09-29"
+            },
+            {
+              "downloads": 12008,
+              "day": "2026-09-30"
+            },
+            {
+              "downloads": 6741,
+              "day": "2026-10-01"
+            },
+            {
+              "downloads": 5729,
+              "day": "2026-10-02"
+            },
+            {
+              "downloads": 5146,
+              "day": "2026-10-03"
+            },
+            {
+              "downloads": 4709,
+              "day": "2026-10-04"
+            },
+            {
+              "downloads": 5549,
+              "day": "2026-10-05"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-06"
+            },
+            {
+              "downloads": 5479,
+              "day": "2026-10-07"
+            },
+            {
+              "downloads": 8615,
+              "day": "2026-10-08"
+            },
+            {
+              "downloads": 8570,
+              "day": "2026-10-09"
+            },
+            {
+              "downloads": 13068,
+              "day": "2026-10-10"
+            },
+            {
+              "downloads": 10064,
+              "day": "2026-10-11"
+            },
+            {
+              "downloads": 11818,
+              "day": "2026-10-12"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-13"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-14"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-15"
+            },
+            {
+              "downloads": 11495,
+              "day": "2026-10-16"
+            },
+            {
+              "downloads": 13414,
+              "day": "2026-10-17"
+            },
+            {
+              "downloads": 12992,
+              "day": "2026-10-18"
+            }
+          ],
+          "conflictDates": [],
+          "invalidCount": 0,
+          "notes": [],
+          "windowStart": "2026-09-19",
+          "windowEnd": "2026-10-18"
+        },
         "repositoryUrl": "https://github.com/omdsh-dev/DSH-better-sidebar",
         "registryUrl": "https://www.npmjs.com/package/dsh-better-sidebar",
         "mappingEvidence": "npm registry repository=https://github.com/omdsh-dev/DSH-better-sidebar ↔ GitHub omdsh-dev/DSH-better-sidebar",
         "enginesNode": ">=20",
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-20T10:57:19.453Z",
-        "reason": "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "fetchedAt": "2026-10-20T16:23:11.658Z",
+        "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
         "status": "checked",
@@ -4168,7 +5587,7 @@
         "packageName": "dsh-better-sidebar",
         "version": "0.28.0",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-20T10:57:19.453Z",
+        "checkedAt": "2026-10-20T16:23:11.658Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=dsh-better-sidebar"
       },
@@ -4190,12 +5609,12 @@
       },
       "dataStatus": "partial",
       "warnings": [
-        "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-20T10:57:19.453Z",
+      "lastUpdatedAt": "2026-10-20T16:23:11.658Z",
       "scores": {
         "popularity": {
-          "score": 82.7,
+          "score": 82.6,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -4203,16 +5622,16 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "4,342 stars",
-              "rawValue": 4342,
-              "normalized": 90.3,
+              "rawLabel": "4,352 stars",
+              "rawValue": 4352,
+              "normalized": 90.1,
               "weight": 0.45,
               "effectiveWeight": 0.45,
-              "contribution": 40.6,
+              "contribution": 40.5,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
-              "evidenceUrl": "https://github.com/omdsh-dev/DSH-better-sidebar"
+              "evidenceUrl": "https://github.com/omdsh-dev/dsh-better-sidebar"
             },
             {
               "key": "downloads",
@@ -4243,7 +5662,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "3 天前",
-              "rawValue": 3.2041371875,
+              "rawValue": 3.4304358564814814,
               "normalized": 100,
               "weight": 0.3,
               "effectiveWeight": 0.3,
@@ -4270,42 +5689,42 @@
             {
               "key": "issueHandling",
               "label": "近期 Issue 关闭率",
-              "rawLabel": "304/446 已关闭 · 68.2%",
-              "rawValue": 68.2,
-              "normalized": 68.2,
+              "rawLabel": "304/448 已关闭 · 67.9%",
+              "rawValue": 67.9,
+              "normalized": 67.9,
               "weight": 0.2,
               "effectiveWeight": 0.2,
               "contribution": 13.6,
               "included": true,
-              "sampleSize": 446,
+              "sampleSize": 448,
               "explanation": "近 90 天创建的非 PR Issue 中，当前已关闭的比例。少于 5 条时降低该分项权重；0 条新 Issue 不扣分，也不代表处理能力强。",
               "evidenceUrl": "https://github.com/omdsh-dev/DSH-better-sidebar/issues?q=is%3Aissue%20created%3A%3E%3D2026-07-22"
             },
             {
               "key": "issueBacklog",
               "label": "开放 Issue 积压",
-              "rawLabel": "142 条开放 / 90 天新开 446 条",
-              "rawValue": 0.3183856502242152,
-              "normalized": 68.2,
+              "rawLabel": "144 条开放 / 90 天新开 448 条",
+              "rawValue": 0.32142857142857145,
+              "normalized": 67.9,
               "weight": 0.1,
               "effectiveWeight": 0.1,
               "contribution": 6.8,
               "included": true,
-              "sampleSize": 446,
+              "sampleSize": 448,
               "explanation": "当前开放 Issue 数相对近 90 天新开 Issue 数的比例越低越好。该比例不依赖仓库是否已满 90 天；当前无开放 Issue 时不参与计分。",
               "evidenceUrl": "https://github.com/omdsh-dev/DSH-better-sidebar/issues"
             },
             {
               "key": "pullRequests",
               "label": "近期 PR 合并率",
-              "rawLabel": "288/566 已合并 · 50.9%",
-              "rawValue": 50.9,
-              "normalized": 50.9,
+              "rawLabel": "288/569 已合并 · 50.6%",
+              "rawValue": 50.6,
+              "normalized": 50.6,
               "weight": 0.15,
               "effectiveWeight": 0.15,
               "contribution": 7.6,
               "included": true,
-              "sampleSize": 566,
+              "sampleSize": 569,
               "explanation": "近 90 天创建 PR 中已合并的比例。只统计 PR，不把 Issue 混入；少于 3 条时降低权重。仓库禁用 PR 时该维度被排除，而不是记 0。",
               "evidenceUrl": "https://github.com/omdsh-dev/DSH-better-sidebar/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-22"
             },
@@ -4313,7 +5732,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "3 天前",
-              "rawValue": 3.1898663541666665,
+              "rawValue": 3.416165023148148,
               "normalized": 100,
               "weight": 0.1,
               "effectiveWeight": 0.1,
@@ -4336,7 +5755,7 @@
               "code": "open-issues-high",
               "level": "high",
               "title": "开放 Issue 积压",
-              "detail": "当前有 142 条开放 Issue，约为近 90 天新开 Issue 数的 32%。这是需要阅读的维护信号，不等于代码质量差。",
+              "detail": "当前有 144 条开放 Issue，约为近 90 天新开 Issue 数的 32%。这是需要阅读的维护信号，不等于代码质量差。",
               "evidenceUrl": "https://github.com/omdsh-dev/DSH-better-sidebar/issues"
             }
           ],
@@ -4391,13 +5810,13 @@
         ],
         "language": "TypeScript",
         "license": "MIT",
-        "createdAt": "2026-02-22T07:12:00Z",
-        "pushedAt": "2026-10-15T19:22:02Z",
+        "createdAt": "2026-02-22T07:12:00.000Z",
+        "pushedAt": "2026-10-15T19:22:02.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 4350,
+        "stars": 4361,
         "forks": 133,
         "openIssues": 3,
         "openPullRequests": 0,
@@ -4426,11 +5845,11 @@
         "latestRelease": {
           "version": "v3.27.1",
           "tagName": "v3.27.1",
-          "publishedAt": "2026-10-15T19:20:25Z",
+          "publishedAt": "2026-10-15T19:20:25.000Z",
           "url": "https://github.com/liustack/modlens/releases/tag/v3.27.1"
         },
         "releases90d": 91,
-        "lastCommitAt": "2026-10-15T19:19:34Z",
+        "lastCommitAt": "2026-10-15T19:19:34.000Z",
         "lastCommitUrl": "https://github.com/liustack/modlens/commit/aa108d1796e3c4b5a6790516e2fcde87a35b189f",
         "commitsUrl": "https://github.com/liustack/modlens/commits/main",
         "issuesUrl": "https://github.com/liustack/modlens/issues",
@@ -4568,13 +5987,142 @@
             "downloads": 5887
           }
         ],
+        "quality": {
+          "rawDaily": [
+            {
+              "downloads": 3486,
+              "day": "2026-09-19"
+            },
+            {
+              "downloads": 3841,
+              "day": "2026-09-20"
+            },
+            {
+              "downloads": 3314,
+              "day": "2026-09-21"
+            },
+            {
+              "downloads": 3158,
+              "day": "2026-09-22"
+            },
+            {
+              "downloads": 3916,
+              "day": "2026-09-23"
+            },
+            {
+              "downloads": 3840,
+              "day": "2026-09-24"
+            },
+            {
+              "downloads": 2801,
+              "day": "2026-09-25"
+            },
+            {
+              "downloads": 2516,
+              "day": "2026-09-26"
+            },
+            {
+              "downloads": 2722,
+              "day": "2026-09-27"
+            },
+            {
+              "downloads": 3403,
+              "day": "2026-09-28"
+            },
+            {
+              "downloads": 3482,
+              "day": "2026-09-29"
+            },
+            {
+              "downloads": 4791,
+              "day": "2026-09-30"
+            },
+            {
+              "downloads": 3430,
+              "day": "2026-10-01"
+            },
+            {
+              "downloads": 2954,
+              "day": "2026-10-02"
+            },
+            {
+              "downloads": 2488,
+              "day": "2026-10-03"
+            },
+            {
+              "downloads": 3662,
+              "day": "2026-10-04"
+            },
+            {
+              "downloads": 3707,
+              "day": "2026-10-05"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-06"
+            },
+            {
+              "downloads": 3957,
+              "day": "2026-10-07"
+            },
+            {
+              "downloads": 4824,
+              "day": "2026-10-08"
+            },
+            {
+              "downloads": 4308,
+              "day": "2026-10-09"
+            },
+            {
+              "downloads": 4483,
+              "day": "2026-10-10"
+            },
+            {
+              "downloads": 4315,
+              "day": "2026-10-11"
+            },
+            {
+              "downloads": 5265,
+              "day": "2026-10-12"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-13"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-14"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-15"
+            },
+            {
+              "downloads": 6528,
+              "day": "2026-10-16"
+            },
+            {
+              "downloads": 5646,
+              "day": "2026-10-17"
+            },
+            {
+              "downloads": 5887,
+              "day": "2026-10-18"
+            }
+          ],
+          "conflictDates": [],
+          "invalidCount": 0,
+          "notes": [],
+          "windowStart": "2026-09-19",
+          "windowEnd": "2026-10-18"
+        },
         "repositoryUrl": "git+https://github.com/liustack/modlens.git",
         "registryUrl": "https://www.npmjs.com/package/@liustack/modlens",
         "mappingEvidence": "npm registry repository=git+https://github.com/liustack/modlens.git ↔ GitHub liustack/modlens",
         "enginesNode": ">=22.19",
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-20T10:57:19.453Z",
-        "reason": "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "fetchedAt": "2026-10-20T16:23:11.658Z",
+        "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
         "status": "checked",
@@ -4582,7 +6130,7 @@
         "packageName": "@liustack/modlens",
         "version": "3.27.1",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-20T10:57:19.453Z",
+        "checkedAt": "2026-10-20T16:23:11.658Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=%40liustack%2Fmodlens"
       },
@@ -4606,12 +6154,12 @@
       "warnings": [
         "开放 PR 计数失败，openIssues 可能包含 PR。",
         "仓库未启用 Pull Requests（API 返回 404）；PR 指标不参与评分，也不记为 0。",
-        "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-20T10:57:19.453Z",
+      "lastUpdatedAt": "2026-10-20T16:23:11.658Z",
       "scores": {
         "popularity": {
-          "score": 73.2,
+          "score": 73.1,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -4619,12 +6167,12 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "4,350 stars",
-              "rawValue": 4350,
-              "normalized": 90.4,
+              "rawLabel": "4,361 stars",
+              "rawValue": 4361,
+              "normalized": 90.2,
               "weight": 0.45,
               "effectiveWeight": 0.45,
-              "contribution": 40.7,
+              "contribution": 40.6,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
@@ -4659,7 +6207,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "4 天前",
-              "rawValue": 4.651220520833333,
+              "rawValue": 4.877519189814815,
               "normalized": 100,
               "weight": 0.3,
               "effectiveWeight": 0.37,
@@ -4729,7 +6277,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "4 天前",
-              "rawValue": 4.650630243055556,
+              "rawValue": 4.876928912037037,
               "normalized": 100,
               "weight": 0.1,
               "effectiveWeight": 0.123,
@@ -4773,14 +6321,14 @@
     },
     {
       "id": "meteornox-deepseek-balance-whale-widget",
-      "repo": "MeteorNOX/DeepSeek-Balance-Whale-Widget",
+      "repo": "meteornox/deepseek-balance-whale-widget",
       "name": "DeepSeek-Balance-Whale-Widget",
       "category": "monitoring",
       "installCommand": "dsh plugin --profile web add dsh-whale-widget",
       "curatorNote": "DSH Web 右下角余额、用量与自定义气泡挂件。",
       "repository": {
-        "fullName": "MeteorNOX/DeepSeek-Balance-Whale-Widget",
-        "url": "https://github.com/MeteorNOX/DeepSeek-Balance-Whale-Widget",
+        "fullName": "meteornox/deepseek-balance-whale-widget",
+        "url": "https://github.com/meteornox/deepseek-balance-whale-widget",
         "description": "DeepSeek Harness（DSH）一只住在 DSH 界面右下角的小鲸鱼娘，帮你盯着DeepSeek账户余额。QQ弹弹，支持拖拽吸附、左吸附翻转、数字滚动动画，随界面自动启用，建议直接喊来你的dsh安装",
         "homepageUrl": null,
         "topics": [
@@ -4796,13 +6344,13 @@
         ],
         "language": "JavaScript",
         "license": "MIT",
-        "createdAt": "2026-08-18T03:13:51Z",
-        "pushedAt": "2026-10-11T12:25:55Z",
+        "createdAt": "2026-08-18T03:13:51.000Z",
+        "pushedAt": "2026-10-11T12:25:55.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 5492,
+        "stars": 5537,
         "forks": 192,
         "openIssues": 73,
         "openPullRequests": 38,
@@ -4831,11 +6379,11 @@
         "latestRelease": {
           "version": "v0.4.2",
           "tagName": "v0.4.2",
-          "publishedAt": "2026-10-11T12:25:56Z",
+          "publishedAt": "2026-10-11T12:25:56.000Z",
           "url": "https://github.com/MeteorNOX/DeepSeek-Balance-Whale-Widget/releases/tag/v0.4.2"
         },
         "releases90d": 37,
-        "lastCommitAt": "2026-10-11T12:25:06Z",
+        "lastCommitAt": "2026-10-11T12:25:06.000Z",
         "lastCommitUrl": "https://github.com/MeteorNOX/DeepSeek-Balance-Whale-Widget/commit/5247dd6813d6e4430728f39ccc63d43cda046022",
         "commitsUrl": "https://github.com/MeteorNOX/DeepSeek-Balance-Whale-Widget/commits/main",
         "issuesUrl": "https://github.com/MeteorNOX/DeepSeek-Balance-Whale-Widget/issues",
@@ -4973,13 +6521,142 @@
             "downloads": 13763
           }
         ],
+        "quality": {
+          "rawDaily": [
+            {
+              "downloads": 4539,
+              "day": "2026-09-19"
+            },
+            {
+              "downloads": 3961,
+              "day": "2026-09-20"
+            },
+            {
+              "downloads": 3572,
+              "day": "2026-09-21"
+            },
+            {
+              "downloads": 3838,
+              "day": "2026-09-22"
+            },
+            {
+              "downloads": 3973,
+              "day": "2026-09-23"
+            },
+            {
+              "downloads": 3278,
+              "day": "2026-09-24"
+            },
+            {
+              "downloads": 4775,
+              "day": "2026-09-25"
+            },
+            {
+              "downloads": 4757,
+              "day": "2026-09-26"
+            },
+            {
+              "downloads": 4390,
+              "day": "2026-09-27"
+            },
+            {
+              "downloads": 5188,
+              "day": "2026-09-28"
+            },
+            {
+              "downloads": 9465,
+              "day": "2026-09-29"
+            },
+            {
+              "downloads": 12532,
+              "day": "2026-09-30"
+            },
+            {
+              "downloads": 7853,
+              "day": "2026-10-01"
+            },
+            {
+              "downloads": 7634,
+              "day": "2026-10-02"
+            },
+            {
+              "downloads": 8254,
+              "day": "2026-10-03"
+            },
+            {
+              "downloads": 6394,
+              "day": "2026-10-04"
+            },
+            {
+              "downloads": 6445,
+              "day": "2026-10-05"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-06"
+            },
+            {
+              "downloads": 7356,
+              "day": "2026-10-07"
+            },
+            {
+              "downloads": 9707,
+              "day": "2026-10-08"
+            },
+            {
+              "downloads": 8779,
+              "day": "2026-10-09"
+            },
+            {
+              "downloads": 9198,
+              "day": "2026-10-10"
+            },
+            {
+              "downloads": 16339,
+              "day": "2026-10-11"
+            },
+            {
+              "downloads": 18953,
+              "day": "2026-10-12"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-13"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-14"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-15"
+            },
+            {
+              "downloads": 10752,
+              "day": "2026-10-16"
+            },
+            {
+              "downloads": 12100,
+              "day": "2026-10-17"
+            },
+            {
+              "downloads": 13763,
+              "day": "2026-10-18"
+            }
+          ],
+          "conflictDates": [],
+          "invalidCount": 0,
+          "notes": [],
+          "windowStart": "2026-09-19",
+          "windowEnd": "2026-10-18"
+        },
         "repositoryUrl": "git+https://github.com/MeteorNOX/DeepSeek-Balance-Whale-Widget.git",
         "registryUrl": "https://www.npmjs.com/package/dsh-whale-widget",
         "mappingEvidence": "npm registry repository=git+https://github.com/MeteorNOX/DeepSeek-Balance-Whale-Widget.git ↔ GitHub MeteorNOX/DeepSeek-Balance-Whale-Widget",
         "enginesNode": null,
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-20T10:57:19.453Z",
-        "reason": "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "fetchedAt": "2026-10-20T16:23:11.658Z",
+        "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
         "status": "checked",
@@ -4987,7 +6664,7 @@
         "packageName": "dsh-whale-widget",
         "version": "0.4.2",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-20T10:57:19.453Z",
+        "checkedAt": "2026-10-20T16:23:11.658Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=dsh-whale-widget"
       },
@@ -5009,12 +6686,12 @@
       },
       "dataStatus": "partial",
       "warnings": [
-        "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-20T10:57:19.453Z",
+      "lastUpdatedAt": "2026-10-20T16:23:11.658Z",
       "scores": {
         "popularity": {
-          "score": 83.6,
+          "score": 83.5,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -5022,16 +6699,16 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "5,492 stars",
-              "rawValue": 5492,
-              "normalized": 94.4,
+              "rawLabel": "5,537 stars",
+              "rawValue": 5537,
+              "normalized": 94.3,
               "weight": 0.45,
               "effectiveWeight": 0.45,
-              "contribution": 42.5,
+              "contribution": 42.4,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
-              "evidenceUrl": "https://github.com/MeteorNOX/DeepSeek-Balance-Whale-Widget"
+              "evidenceUrl": "https://github.com/meteornox/deepseek-balance-whale-widget"
             },
             {
               "key": "downloads",
@@ -5061,8 +6738,8 @@
             {
               "key": "commitRecency",
               "label": "最近代码提交",
-              "rawLabel": "8 天前",
-              "rawValue": 8.939044594907408,
+              "rawLabel": "9 天前",
+              "rawValue": 9.16534326388889,
               "normalized": 92,
               "weight": 0.3,
               "effectiveWeight": 0.3,
@@ -5131,8 +6808,8 @@
             {
               "key": "release",
               "label": "最近版本发布",
-              "rawLabel": "8 天前",
-              "rawValue": 8.938465891203704,
+              "rawLabel": "9 天前",
+              "rawValue": 9.164764560185185,
               "normalized": 100,
               "weight": 0.1,
               "effectiveWeight": 0.1,
@@ -5176,14 +6853,14 @@
     },
     {
       "id": "t-auto-dsh-ops",
-      "repo": "T-Auto/dsh-ops",
+      "repo": "t-auto/dsh-ops",
       "name": "dsh-ops",
       "category": "operations",
       "installCommand": "npx --yes dsh-ops@latest install --profile web",
       "curatorNote": "DSH 底层操作工具插件，仓库 README 提供独立安装器。",
       "repository": {
-        "fullName": "T-Auto/dsh-ops",
-        "url": "https://github.com/T-Auto/dsh-ops",
+        "fullName": "t-auto/dsh-ops",
+        "url": "https://github.com/t-auto/dsh-ops",
         "description": "A toolkit for low-level operations in DSH, designed to reduce token usage and task execution time / DSH 底层操作工具插件，旨在减少 Token 消耗与任务耗时",
         "homepageUrl": null,
         "topics": [
@@ -5193,34 +6870,34 @@
         ],
         "language": "JavaScript",
         "license": null,
-        "createdAt": "2026-10-08T07:09:25Z",
-        "pushedAt": "2026-10-20T09:02:55Z",
+        "createdAt": "2026-10-08T07:09:25.000Z",
+        "pushedAt": "2026-10-20T09:02:55.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 3404,
+        "stars": 3463,
         "forks": 95,
-        "openIssues": 47,
-        "openPullRequests": 16,
+        "openIssues": 49,
+        "openPullRequests": 18,
         "commits30d": 433,
         "commits30dTruncated": false,
         "issues": {
-          "opened90d": 158,
+          "opened90d": 160,
           "closed90d": 111,
-          "closureRate": 0.7025316455696202,
+          "closureRate": 0.69375,
           "lowSample": false,
           "truncated": false,
           "longOpen": 0,
-          "openNow": 47,
+          "openNow": 49,
           "openTruncated": false,
           "queryUrl": "https://github.com/T-Auto/dsh-ops/issues?q=is%3Aissue%20created%3A%3E%3D2026-07-22"
         },
         "pullRequests": {
           "available": true,
-          "opened90d": 167,
+          "opened90d": 169,
           "merged90d": 123,
-          "mergeRate": 0.7365269461077845,
+          "mergeRate": 0.727810650887574,
           "lowSample": false,
           "truncated": false,
           "queryUrl": "https://github.com/T-Auto/dsh-ops/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-22"
@@ -5228,11 +6905,11 @@
         "latestRelease": {
           "version": "v0.4.1",
           "tagName": "v0.4.1",
-          "publishedAt": "2026-10-20T09:15:19Z",
+          "publishedAt": "2026-10-20T09:15:19.000Z",
           "url": "https://github.com/T-Auto/dsh-ops/releases/tag/v0.4.1"
         },
         "releases90d": 13,
-        "lastCommitAt": "2026-10-20T08:44:54Z",
+        "lastCommitAt": "2026-10-20T08:44:54.000Z",
         "lastCommitUrl": "https://github.com/T-Auto/dsh-ops/commit/3a98557ab8142ba4136aa6e13004c6577e3881db",
         "commitsUrl": "https://github.com/T-Auto/dsh-ops/commits/main",
         "issuesUrl": "https://github.com/T-Auto/dsh-ops/issues",
@@ -5242,8 +6919,8 @@
       "npm": {
         "status": "verified",
         "packageName": "dsh-ops",
-        "latestVersion": "0.4.0",
-        "publishedAt": "2026-10-20T06:00:55.508Z",
+        "latestVersion": "0.4.1",
+        "publishedAt": "2026-10-20T12:40:20.285Z",
         "downloads30d": 22879,
         "downloads7d": null,
         "previous7d": null,
@@ -5370,29 +7047,158 @@
             "downloads": 4656
           }
         ],
+        "quality": {
+          "rawDaily": [
+            {
+              "downloads": 0,
+              "day": "2026-09-19"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-09-20"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-09-21"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-09-22"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-09-23"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-09-24"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-09-25"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-09-26"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-09-27"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-09-28"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-09-29"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-09-30"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-01"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-02"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-03"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-04"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-05"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-06"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-07"
+            },
+            {
+              "downloads": 705,
+              "day": "2026-10-08"
+            },
+            {
+              "downloads": 572,
+              "day": "2026-10-09"
+            },
+            {
+              "downloads": 2221,
+              "day": "2026-10-10"
+            },
+            {
+              "downloads": 2789,
+              "day": "2026-10-11"
+            },
+            {
+              "downloads": 3357,
+              "day": "2026-10-12"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-13"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-14"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-15"
+            },
+            {
+              "downloads": 4872,
+              "day": "2026-10-16"
+            },
+            {
+              "downloads": 3707,
+              "day": "2026-10-17"
+            },
+            {
+              "downloads": 4656,
+              "day": "2026-10-18"
+            }
+          ],
+          "conflictDates": [],
+          "invalidCount": 0,
+          "notes": [],
+          "windowStart": "2026-09-19",
+          "windowEnd": "2026-10-18"
+        },
         "repositoryUrl": "git+https://github.com/T-Auto/dsh-ops.git",
         "registryUrl": "https://www.npmjs.com/package/dsh-ops",
         "mappingEvidence": "npm registry repository=git+https://github.com/T-Auto/dsh-ops.git ↔ GitHub T-Auto/dsh-ops",
         "enginesNode": "^22.19 || >=24",
         "dshPeerRange": "^0.2.0-rc.2",
-        "fetchedAt": "2026-10-20T10:57:19.453Z",
-        "reason": "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "fetchedAt": "2026-10-20T16:23:11.658Z",
+        "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
         "status": "checked",
         "exactMatch": true,
         "packageName": "dsh-ops",
-        "version": "0.4.0",
+        "version": "0.4.1",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-20T10:57:19.453Z",
+        "checkedAt": "2026-10-20T16:23:11.658Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=dsh-ops"
       },
       "compatibility": {
         "nodeEngine": "^22.19 || >=24",
         "dshPeerRange": "^0.2.0-rc.2",
-        "npmVersion": "0.4.0",
-        "evidenceUrl": "https://www.npmjs.com/package/dsh-ops/v/0.4.0",
+        "npmVersion": "0.4.1",
+        "evidenceUrl": "https://www.npmjs.com/package/dsh-ops/v/0.4.1",
         "note": "仅展示包声明与公开元数据；本项目未安装、执行或运行时验证被检测插件，因此不构成兼容性保证。"
       },
       "availability": {
@@ -5406,9 +7212,9 @@
       },
       "dataStatus": "partial",
       "warnings": [
-        "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-20T10:57:19.453Z",
+      "lastUpdatedAt": "2026-10-20T16:23:11.658Z",
       "scores": {
         "popularity": {
           "score": 52.7,
@@ -5419,8 +7225,8 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "3,404 stars",
-              "rawValue": 3404,
+              "rawLabel": "3,463 stars",
+              "rawValue": 3463,
               "normalized": 86.2,
               "weight": 0.45,
               "effectiveWeight": 0.45,
@@ -5428,7 +7234,7 @@
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
-              "evidenceUrl": "https://github.com/T-Auto/dsh-ops"
+              "evidenceUrl": "https://github.com/t-auto/dsh-ops"
             },
             {
               "key": "downloads",
@@ -5450,7 +7256,7 @@
           "methodVersion": "1.1.0"
         },
         "maintenance": {
-          "score": 87.2,
+          "score": 86.7,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -5459,7 +7265,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "0 天前",
-              "rawValue": 0.09196126157407407,
+              "rawValue": 0.31825993055555557,
               "normalized": 100,
               "weight": 0.3,
               "effectiveWeight": 0.3,
@@ -5486,42 +7292,42 @@
             {
               "key": "issueHandling",
               "label": "近期 Issue 关闭率",
-              "rawLabel": "111/158 已关闭 · 70.3%",
-              "rawValue": 70.3,
-              "normalized": 70.3,
+              "rawLabel": "111/160 已关闭 · 69.4%",
+              "rawValue": 69.4,
+              "normalized": 69.4,
               "weight": 0.2,
               "effectiveWeight": 0.2,
-              "contribution": 14.1,
+              "contribution": 13.9,
               "included": true,
-              "sampleSize": 158,
+              "sampleSize": 160,
               "explanation": "近 90 天创建的非 PR Issue 中，当前已关闭的比例。少于 5 条时降低该分项权重；0 条新 Issue 不扣分，也不代表处理能力强。",
               "evidenceUrl": "https://github.com/T-Auto/dsh-ops/issues?q=is%3Aissue%20created%3A%3E%3D2026-07-22"
             },
             {
               "key": "issueBacklog",
               "label": "开放 Issue 积压",
-              "rawLabel": "47 条开放 / 90 天新开 158 条",
-              "rawValue": 0.2974683544303797,
-              "normalized": 70.3,
+              "rawLabel": "49 条开放 / 90 天新开 160 条",
+              "rawValue": 0.30625,
+              "normalized": 69.4,
               "weight": 0.1,
               "effectiveWeight": 0.1,
-              "contribution": 7,
+              "contribution": 6.9,
               "included": true,
-              "sampleSize": 158,
+              "sampleSize": 160,
               "explanation": "当前开放 Issue 数相对近 90 天新开 Issue 数的比例越低越好。该比例不依赖仓库是否已满 90 天；当前无开放 Issue 时不参与计分。",
               "evidenceUrl": "https://github.com/T-Auto/dsh-ops/issues"
             },
             {
               "key": "pullRequests",
               "label": "近期 PR 合并率",
-              "rawLabel": "123/167 已合并 · 73.7%",
-              "rawValue": 73.7,
-              "normalized": 73.7,
+              "rawLabel": "123/169 已合并 · 72.8%",
+              "rawValue": 72.8,
+              "normalized": 72.8,
               "weight": 0.15,
               "effectiveWeight": 0.15,
-              "contribution": 11.1,
+              "contribution": 10.9,
               "included": true,
-              "sampleSize": 167,
+              "sampleSize": 169,
               "explanation": "近 90 天创建 PR 中已合并的比例。只统计 PR，不把 Issue 混入；少于 3 条时降低权重。仓库禁用 PR 时该维度被排除，而不是记 0。",
               "evidenceUrl": "https://github.com/T-Auto/dsh-ops/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-22"
             },
@@ -5529,7 +7335,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "0 天前",
-              "rawValue": 0.0708385763888889,
+              "rawValue": 0.2971372453703704,
               "normalized": 100,
               "weight": 0.1,
               "effectiveWeight": 0.1,
@@ -5590,16 +7396,16 @@
         ],
         "language": "JavaScript",
         "license": "GPL-2.0",
-        "createdAt": "2026-08-15T09:36:29Z",
-        "pushedAt": "2026-10-17T09:48:40Z",
+        "createdAt": "2026-08-15T09:36:29.000Z",
+        "pushedAt": "2026-10-17T09:48:40.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 1946,
-        "forks": 82,
+        "stars": 1961,
+        "forks": 83,
         "openIssues": 2,
-        "openPullRequests": 1,
+        "openPullRequests": 2,
         "commits30d": 14,
         "commits30dTruncated": false,
         "issues": {
@@ -5615,9 +7421,9 @@
         },
         "pullRequests": {
           "available": true,
-          "opened90d": 48,
+          "opened90d": 49,
           "merged90d": 27,
-          "mergeRate": 0.5625,
+          "mergeRate": 0.5510204081632653,
           "lowSample": false,
           "truncated": false,
           "queryUrl": "https://github.com/shaobeichen/dsh-pocket/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-22"
@@ -5625,11 +7431,11 @@
         "latestRelease": {
           "version": "v2.12.0",
           "tagName": "v2.12.0",
-          "publishedAt": "2026-10-17T09:48:43Z",
+          "publishedAt": "2026-10-17T09:48:43.000Z",
           "url": "https://github.com/shaobeichen/dsh-pocket/releases/tag/v2.12.0"
         },
         "releases90d": 100,
-        "lastCommitAt": "2026-10-17T09:48:37Z",
+        "lastCommitAt": "2026-10-17T09:48:37.000Z",
         "lastCommitUrl": "https://github.com/shaobeichen/dsh-pocket/commit/aee3ae7e97516206049394c7a37dc38778ffb6da",
         "commitsUrl": "https://github.com/shaobeichen/dsh-pocket/commits/main",
         "issuesUrl": "https://github.com/shaobeichen/dsh-pocket/issues",
@@ -5767,13 +7573,142 @@
             "downloads": 1600
           }
         ],
+        "quality": {
+          "rawDaily": [
+            {
+              "downloads": 450,
+              "day": "2026-09-19"
+            },
+            {
+              "downloads": 483,
+              "day": "2026-09-20"
+            },
+            {
+              "downloads": 327,
+              "day": "2026-09-21"
+            },
+            {
+              "downloads": 395,
+              "day": "2026-09-22"
+            },
+            {
+              "downloads": 500,
+              "day": "2026-09-23"
+            },
+            {
+              "downloads": 436,
+              "day": "2026-09-24"
+            },
+            {
+              "downloads": 429,
+              "day": "2026-09-25"
+            },
+            {
+              "downloads": 378,
+              "day": "2026-09-26"
+            },
+            {
+              "downloads": 530,
+              "day": "2026-09-27"
+            },
+            {
+              "downloads": 343,
+              "day": "2026-09-28"
+            },
+            {
+              "downloads": 478,
+              "day": "2026-09-29"
+            },
+            {
+              "downloads": 866,
+              "day": "2026-09-30"
+            },
+            {
+              "downloads": 523,
+              "day": "2026-10-01"
+            },
+            {
+              "downloads": 476,
+              "day": "2026-10-02"
+            },
+            {
+              "downloads": 538,
+              "day": "2026-10-03"
+            },
+            {
+              "downloads": 529,
+              "day": "2026-10-04"
+            },
+            {
+              "downloads": 637,
+              "day": "2026-10-05"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-06"
+            },
+            {
+              "downloads": 437,
+              "day": "2026-10-07"
+            },
+            {
+              "downloads": 529,
+              "day": "2026-10-08"
+            },
+            {
+              "downloads": 487,
+              "day": "2026-10-09"
+            },
+            {
+              "downloads": 498,
+              "day": "2026-10-10"
+            },
+            {
+              "downloads": 540,
+              "day": "2026-10-11"
+            },
+            {
+              "downloads": 866,
+              "day": "2026-10-12"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-13"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-14"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-15"
+            },
+            {
+              "downloads": 688,
+              "day": "2026-10-16"
+            },
+            {
+              "downloads": 1517,
+              "day": "2026-10-17"
+            },
+            {
+              "downloads": 1600,
+              "day": "2026-10-18"
+            }
+          ],
+          "conflictDates": [],
+          "invalidCount": 0,
+          "notes": [],
+          "windowStart": "2026-09-19",
+          "windowEnd": "2026-10-18"
+        },
         "repositoryUrl": "git+https://github.com/shaobeichen/dsh-pocket.git",
         "registryUrl": "https://www.npmjs.com/package/dsh-pocket",
         "mappingEvidence": "npm registry repository=git+https://github.com/shaobeichen/dsh-pocket.git ↔ GitHub shaobeichen/dsh-pocket",
         "enginesNode": ">=22",
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-20T10:57:19.453Z",
-        "reason": "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "fetchedAt": "2026-10-20T16:23:11.658Z",
+        "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
         "status": "checked",
@@ -5781,7 +7716,7 @@
         "packageName": "dsh-pocket",
         "version": "2.12.0",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-20T10:57:19.453Z",
+        "checkedAt": "2026-10-20T16:23:11.658Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=dsh-pocket"
       },
@@ -5803,12 +7738,12 @@
       },
       "dataStatus": "partial",
       "warnings": [
-        "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-20T10:57:19.453Z",
+      "lastUpdatedAt": "2026-10-20T16:23:11.658Z",
       "scores": {
         "popularity": {
-          "score": 43.6,
+          "score": 43.5,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -5816,12 +7751,12 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "1,946 stars",
-              "rawValue": 1946,
-              "normalized": 76.6,
+              "rawLabel": "1,961 stars",
+              "rawValue": 1961,
+              "normalized": 76.4,
               "weight": 0.45,
               "effectiveWeight": 0.45,
-              "contribution": 34.5,
+              "contribution": 34.4,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
@@ -5847,7 +7782,7 @@
           "methodVersion": "1.1.0"
         },
         "maintenance": {
-          "score": 92.7,
+          "score": 92.5,
           "status": "scored",
           "confidence": "high",
           "coverage": 0.94,
@@ -5856,7 +7791,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "3 天前",
-              "rawValue": 3.047713576388889,
+              "rawValue": 3.27401224537037,
               "normalized": 100,
               "weight": 0.3,
               "effectiveWeight": 0.319,
@@ -5911,14 +7846,14 @@
             {
               "key": "pullRequests",
               "label": "近期 PR 合并率",
-              "rawLabel": "27/48 已合并 · 56.3%",
-              "rawValue": 56.3,
-              "normalized": 56.3,
+              "rawLabel": "27/49 已合并 · 55.1%",
+              "rawValue": 55.1,
+              "normalized": 55.1,
               "weight": 0.15,
               "effectiveWeight": 0.16,
-              "contribution": 9,
+              "contribution": 8.8,
               "included": true,
-              "sampleSize": 48,
+              "sampleSize": 49,
               "explanation": "近 90 天创建 PR 中已合并的比例。只统计 PR，不把 Issue 混入；少于 3 条时降低权重。仓库禁用 PR 时该维度被排除，而不是记 0。",
               "evidenceUrl": "https://github.com/shaobeichen/dsh-pocket/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-22"
             },
@@ -5926,7 +7861,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "3 天前",
-              "rawValue": 3.0476441319444443,
+              "rawValue": 3.273942800925926,
               "normalized": 100,
               "weight": 0.1,
               "effectiveWeight": 0.106,
@@ -5982,13 +7917,13 @@
         ],
         "language": "TypeScript",
         "license": "Apache-2.0",
-        "createdAt": "2026-08-15T16:29:45Z",
-        "pushedAt": "2026-10-08T08:36:16Z",
+        "createdAt": "2026-08-15T16:29:45.000Z",
+        "pushedAt": "2026-10-08T08:36:16.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 571,
+        "stars": 574,
         "forks": 46,
         "openIssues": 16,
         "openPullRequests": 0,
@@ -6017,11 +7952,11 @@
         "latestRelease": {
           "version": "v0.3.7",
           "tagName": "v0.3.7",
-          "publishedAt": "2026-10-08T08:41:38Z",
+          "publishedAt": "2026-10-08T08:41:38.000Z",
           "url": "https://github.com/dream-num/dsh-univer-office/releases/tag/v0.3.7"
         },
         "releases90d": 16,
-        "lastCommitAt": "2026-10-08T08:32:54Z",
+        "lastCommitAt": "2026-10-08T08:32:54.000Z",
         "lastCommitUrl": "https://github.com/dream-num/dsh-univer-office/commit/8f85ce4074fdbe51416b6c337468bb916a302c2a",
         "commitsUrl": "https://github.com/dream-num/dsh-univer-office/commits/main",
         "issuesUrl": "https://github.com/dream-num/dsh-univer-office/issues",
@@ -6159,13 +8094,142 @@
             "downloads": 2103
           }
         ],
+        "quality": {
+          "rawDaily": [
+            {
+              "downloads": 1429,
+              "day": "2026-09-19"
+            },
+            {
+              "downloads": 1557,
+              "day": "2026-09-20"
+            },
+            {
+              "downloads": 1441,
+              "day": "2026-09-21"
+            },
+            {
+              "downloads": 1302,
+              "day": "2026-09-22"
+            },
+            {
+              "downloads": 1588,
+              "day": "2026-09-23"
+            },
+            {
+              "downloads": 2378,
+              "day": "2026-09-24"
+            },
+            {
+              "downloads": 1665,
+              "day": "2026-09-25"
+            },
+            {
+              "downloads": 1626,
+              "day": "2026-09-26"
+            },
+            {
+              "downloads": 1709,
+              "day": "2026-09-27"
+            },
+            {
+              "downloads": 2044,
+              "day": "2026-09-28"
+            },
+            {
+              "downloads": 1538,
+              "day": "2026-09-29"
+            },
+            {
+              "downloads": 2492,
+              "day": "2026-09-30"
+            },
+            {
+              "downloads": 2277,
+              "day": "2026-10-01"
+            },
+            {
+              "downloads": 1420,
+              "day": "2026-10-02"
+            },
+            {
+              "downloads": 1329,
+              "day": "2026-10-03"
+            },
+            {
+              "downloads": 1127,
+              "day": "2026-10-04"
+            },
+            {
+              "downloads": 1203,
+              "day": "2026-10-05"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-06"
+            },
+            {
+              "downloads": 1400,
+              "day": "2026-10-07"
+            },
+            {
+              "downloads": 3062,
+              "day": "2026-10-08"
+            },
+            {
+              "downloads": 2263,
+              "day": "2026-10-09"
+            },
+            {
+              "downloads": 2152,
+              "day": "2026-10-10"
+            },
+            {
+              "downloads": 1983,
+              "day": "2026-10-11"
+            },
+            {
+              "downloads": 2992,
+              "day": "2026-10-12"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-13"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-14"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-15"
+            },
+            {
+              "downloads": 2034,
+              "day": "2026-10-16"
+            },
+            {
+              "downloads": 1999,
+              "day": "2026-10-17"
+            },
+            {
+              "downloads": 2103,
+              "day": "2026-10-18"
+            }
+          ],
+          "conflictDates": [],
+          "invalidCount": 0,
+          "notes": [],
+          "windowStart": "2026-09-19",
+          "windowEnd": "2026-10-18"
+        },
         "repositoryUrl": "git+https://github.com/dream-num/dsh-univer-office.git",
         "registryUrl": "https://www.npmjs.com/package/dsh-univer-office",
         "mappingEvidence": "npm registry repository=git+https://github.com/dream-num/dsh-univer-office.git ↔ GitHub dream-num/dsh-univer-office",
         "enginesNode": ">=22.19.0",
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-20T10:57:19.453Z",
-        "reason": "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "fetchedAt": "2026-10-20T16:23:11.658Z",
+        "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
         "status": "checked",
@@ -6173,7 +8237,7 @@
         "packageName": "dsh-univer-office",
         "version": "0.3.7",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-20T10:57:19.453Z",
+        "checkedAt": "2026-10-20T16:23:11.658Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=dsh-univer-office"
       },
@@ -6195,12 +8259,12 @@
       },
       "dataStatus": "partial",
       "warnings": [
-        "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-20T10:57:19.453Z",
+      "lastUpdatedAt": "2026-10-20T16:23:11.658Z",
       "scores": {
         "popularity": {
-          "score": 48.2,
+          "score": 48,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -6208,12 +8272,12 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "571 stars",
-              "rawValue": 571,
-              "normalized": 55.7,
+              "rawLabel": "574 stars",
+              "rawValue": 574,
+              "normalized": 55.3,
               "weight": 0.45,
               "effectiveWeight": 0.45,
-              "contribution": 25.1,
+              "contribution": 24.9,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
@@ -6248,7 +8312,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "12 天前",
-              "rawValue": 12.100294594907407,
+              "rawValue": 12.326593263888888,
               "normalized": 92,
               "weight": 0.3,
               "effectiveWeight": 0.3,
@@ -6318,7 +8382,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "12 天前",
-              "rawValue": 12.094229780092592,
+              "rawValue": 12.320528449074073,
               "normalized": 100,
               "weight": 0.1,
               "effectiveWeight": 0.1,
@@ -6354,14 +8418,14 @@
     },
     {
       "id": "ychris12138-dsh-usage-stats",
-      "repo": "Ychris12138/dsh-usage-stats",
+      "repo": "ychris12138/dsh-usage-stats",
       "name": "dsh-usage-stats",
       "category": "monitoring",
       "installCommand": "dsh plugin --profile web add \"@ychris12138/dsh-usage-stats@0.3.5\"",
       "curatorNote": "供应商余额、订阅配额与 Token 用量分析。",
       "repository": {
-        "fullName": "Ychris12138/dsh-usage-stats",
-        "url": "https://github.com/Ychris12138/dsh-usage-stats",
+        "fullName": "ychris12138/dsh-usage-stats",
+        "url": "https://github.com/ychris12138/dsh-usage-stats",
         "description": "Provider balances, subscription quotas, and token-usage analytics for the DeepSeek Harness Web GUI (dsh web).",
         "homepageUrl": null,
         "topics": [
@@ -6376,17 +8440,17 @@
         ],
         "language": "JavaScript",
         "license": "MIT",
-        "createdAt": "2026-08-14T01:40:02Z",
-        "pushedAt": "2026-10-20T08:18:39Z",
+        "createdAt": "2026-08-14T01:40:02.000Z",
+        "pushedAt": "2026-10-20T15:03:15.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 178,
+        "stars": 179,
         "forks": 24,
         "openIssues": 2,
-        "openPullRequests": 5,
-        "commits30d": 24,
+        "openPullRequests": 2,
+        "commits30d": 29,
         "commits30dTruncated": false,
         "issues": {
           "opened90d": 57,
@@ -6402,8 +8466,8 @@
         "pullRequests": {
           "available": true,
           "opened90d": 86,
-          "merged90d": 70,
-          "mergeRate": 0.813953488372093,
+          "merged90d": 73,
+          "mergeRate": 0.8488372093023255,
           "lowSample": false,
           "truncated": false,
           "queryUrl": "https://github.com/Ychris12138/dsh-usage-stats/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-22"
@@ -6411,12 +8475,12 @@
         "latestRelease": {
           "version": "v0.3.6 - Account compatibility and Command Code",
           "tagName": "v0.3.6",
-          "publishedAt": "2026-10-20T02:32:52Z",
+          "publishedAt": "2026-10-20T02:32:52.000Z",
           "url": "https://github.com/Ychris12138/dsh-usage-stats/releases/tag/v0.3.6"
         },
         "releases90d": 20,
-        "lastCommitAt": "2026-10-20T03:22:32Z",
-        "lastCommitUrl": "https://github.com/Ychris12138/dsh-usage-stats/commit/6ffc9f7553a6fd3e5d31c2ec9b814f245cc928a2",
+        "lastCommitAt": "2026-10-20T15:01:43.000Z",
+        "lastCommitUrl": "https://github.com/Ychris12138/dsh-usage-stats/commit/bf67b199473076b5fb87d062ea9b0107463f79ab",
         "commitsUrl": "https://github.com/Ychris12138/dsh-usage-stats/commits/main",
         "issuesUrl": "https://github.com/Ychris12138/dsh-usage-stats/issues",
         "pullsUrl": "https://github.com/Ychris12138/dsh-usage-stats/pulls",
@@ -6553,13 +8617,142 @@
             "downloads": 329
           }
         ],
+        "quality": {
+          "rawDaily": [
+            {
+              "downloads": 203,
+              "day": "2026-09-19"
+            },
+            {
+              "downloads": 222,
+              "day": "2026-09-20"
+            },
+            {
+              "downloads": 192,
+              "day": "2026-09-21"
+            },
+            {
+              "downloads": 214,
+              "day": "2026-09-22"
+            },
+            {
+              "downloads": 187,
+              "day": "2026-09-23"
+            },
+            {
+              "downloads": 160,
+              "day": "2026-09-24"
+            },
+            {
+              "downloads": 146,
+              "day": "2026-09-25"
+            },
+            {
+              "downloads": 481,
+              "day": "2026-09-26"
+            },
+            {
+              "downloads": 283,
+              "day": "2026-09-27"
+            },
+            {
+              "downloads": 341,
+              "day": "2026-09-28"
+            },
+            {
+              "downloads": 392,
+              "day": "2026-09-29"
+            },
+            {
+              "downloads": 407,
+              "day": "2026-09-30"
+            },
+            {
+              "downloads": 493,
+              "day": "2026-10-01"
+            },
+            {
+              "downloads": 363,
+              "day": "2026-10-02"
+            },
+            {
+              "downloads": 310,
+              "day": "2026-10-03"
+            },
+            {
+              "downloads": 225,
+              "day": "2026-10-04"
+            },
+            {
+              "downloads": 252,
+              "day": "2026-10-05"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-06"
+            },
+            {
+              "downloads": 283,
+              "day": "2026-10-07"
+            },
+            {
+              "downloads": 336,
+              "day": "2026-10-08"
+            },
+            {
+              "downloads": 304,
+              "day": "2026-10-09"
+            },
+            {
+              "downloads": 286,
+              "day": "2026-10-10"
+            },
+            {
+              "downloads": 248,
+              "day": "2026-10-11"
+            },
+            {
+              "downloads": 323,
+              "day": "2026-10-12"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-13"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-14"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-15"
+            },
+            {
+              "downloads": 177,
+              "day": "2026-10-16"
+            },
+            {
+              "downloads": 241,
+              "day": "2026-10-17"
+            },
+            {
+              "downloads": 329,
+              "day": "2026-10-18"
+            }
+          ],
+          "conflictDates": [],
+          "invalidCount": 0,
+          "notes": [],
+          "windowStart": "2026-09-19",
+          "windowEnd": "2026-10-18"
+        },
         "repositoryUrl": "git+https://github.com/Ychris12138/dsh-usage-stats.git",
         "registryUrl": "https://www.npmjs.com/package/@ychris12138/dsh-usage-stats",
         "mappingEvidence": "npm registry repository=git+https://github.com/Ychris12138/dsh-usage-stats.git ↔ GitHub Ychris12138/dsh-usage-stats",
         "enginesNode": null,
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-20T10:57:19.453Z",
-        "reason": "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "fetchedAt": "2026-10-20T16:23:11.658Z",
+        "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
         "status": "checked",
@@ -6567,7 +8760,7 @@
         "packageName": "@ychris12138/dsh-usage-stats",
         "version": "0.3.6",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-20T10:57:19.453Z",
+        "checkedAt": "2026-10-20T16:23:11.658Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=%40ychris12138%2Fdsh-usage-stats"
       },
@@ -6589,12 +8782,12 @@
       },
       "dataStatus": "partial",
       "warnings": [
-        "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-20T10:57:19.453Z",
+      "lastUpdatedAt": "2026-10-20T16:23:11.658Z",
       "scores": {
         "popularity": {
-          "score": 16.1,
+          "score": 15.9,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -6602,16 +8795,16 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "178 stars",
-              "rawValue": 178,
-              "normalized": 35.8,
+              "rawLabel": "179 stars",
+              "rawValue": 179,
+              "normalized": 35.4,
               "weight": 0.45,
               "effectiveWeight": 0.45,
-              "contribution": 16.1,
+              "contribution": 15.9,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
-              "evidenceUrl": "https://github.com/Ychris12138/dsh-usage-stats"
+              "evidenceUrl": "https://github.com/ychris12138/dsh-usage-stats"
             },
             {
               "key": "downloads",
@@ -6633,7 +8826,7 @@
           "methodVersion": "1.1.0"
         },
         "maintenance": {
-          "score": 96.1,
+          "score": 96.6,
           "status": "scored",
           "confidence": "high",
           "coverage": 0.94,
@@ -6642,7 +8835,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "0 天前",
-              "rawValue": 0.3158270023148148,
+              "rawValue": 0.05658168981481482,
               "normalized": 100,
               "weight": 0.3,
               "effectiveWeight": 0.319,
@@ -6650,13 +8843,13 @@
               "included": true,
               "sampleSize": null,
               "explanation": "距最近一次非合并提交的天数。使用提交记录的实际 committed date，而不是仓库 pushed_at。",
-              "evidenceUrl": "https://github.com/Ychris12138/dsh-usage-stats/commit/6ffc9f7553a6fd3e5d31c2ec9b814f245cc928a2"
+              "evidenceUrl": "https://github.com/Ychris12138/dsh-usage-stats/commit/bf67b199473076b5fb87d062ea9b0107463f79ab"
             },
             {
               "key": "commitCadence",
               "label": "近 30 天提交频率",
-              "rawLabel": "24 次",
-              "rawValue": 24,
+              "rawLabel": "29 次",
+              "rawValue": 29,
               "normalized": 100,
               "weight": 0.15,
               "effectiveWeight": 0.16,
@@ -6697,12 +8890,12 @@
             {
               "key": "pullRequests",
               "label": "近期 PR 合并率",
-              "rawLabel": "70/86 已合并 · 81.4%",
-              "rawValue": 81.4,
-              "normalized": 81.4,
+              "rawLabel": "73/86 已合并 · 84.9%",
+              "rawValue": 84.9,
+              "normalized": 84.9,
               "weight": 0.15,
               "effectiveWeight": 0.16,
-              "contribution": 13,
+              "contribution": 13.5,
               "included": true,
               "sampleSize": 86,
               "explanation": "近 90 天创建 PR 中已合并的比例。只统计 PR，不把 Issue 混入；少于 3 条时降低权重。仓库禁用 PR 时该维度被排除，而不是记 0。",
@@ -6712,7 +8905,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "0 天前",
-              "rawValue": 0.3503177430555556,
+              "rawValue": 0.5766164120370371,
               "normalized": 100,
               "weight": 0.1,
               "effectiveWeight": 0.106,
@@ -6773,8 +8966,8 @@
         ],
         "language": "JavaScript",
         "license": "MIT",
-        "createdAt": "2026-08-15T19:30:06Z",
-        "pushedAt": "2026-10-20T07:27:15Z",
+        "createdAt": "2026-08-15T19:30:06.000Z",
+        "pushedAt": "2026-10-20T07:27:15.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
@@ -6807,7 +9000,7 @@
         },
         "latestRelease": null,
         "releases90d": 0,
-        "lastCommitAt": "2026-10-20T07:27:02Z",
+        "lastCommitAt": "2026-10-20T07:27:02.000Z",
         "lastCommitUrl": "https://github.com/hkkz9522/dsh-session-manager/commit/93c1ced09ea87ae28543a5fd9950385f97c27e20",
         "commitsUrl": "https://github.com/hkkz9522/dsh-session-manager/commits/main",
         "issuesUrl": "https://github.com/hkkz9522/dsh-session-manager/issues",
@@ -6945,13 +9138,142 @@
             "downloads": 1236
           }
         ],
+        "quality": {
+          "rawDaily": [
+            {
+              "downloads": 284,
+              "day": "2026-09-19"
+            },
+            {
+              "downloads": 332,
+              "day": "2026-09-20"
+            },
+            {
+              "downloads": 279,
+              "day": "2026-09-21"
+            },
+            {
+              "downloads": 272,
+              "day": "2026-09-22"
+            },
+            {
+              "downloads": 204,
+              "day": "2026-09-23"
+            },
+            {
+              "downloads": 439,
+              "day": "2026-09-24"
+            },
+            {
+              "downloads": 305,
+              "day": "2026-09-25"
+            },
+            {
+              "downloads": 483,
+              "day": "2026-09-26"
+            },
+            {
+              "downloads": 321,
+              "day": "2026-09-27"
+            },
+            {
+              "downloads": 363,
+              "day": "2026-09-28"
+            },
+            {
+              "downloads": 499,
+              "day": "2026-09-29"
+            },
+            {
+              "downloads": 851,
+              "day": "2026-09-30"
+            },
+            {
+              "downloads": 767,
+              "day": "2026-10-01"
+            },
+            {
+              "downloads": 554,
+              "day": "2026-10-02"
+            },
+            {
+              "downloads": 395,
+              "day": "2026-10-03"
+            },
+            {
+              "downloads": 389,
+              "day": "2026-10-04"
+            },
+            {
+              "downloads": 382,
+              "day": "2026-10-05"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-06"
+            },
+            {
+              "downloads": 398,
+              "day": "2026-10-07"
+            },
+            {
+              "downloads": 526,
+              "day": "2026-10-08"
+            },
+            {
+              "downloads": 808,
+              "day": "2026-10-09"
+            },
+            {
+              "downloads": 661,
+              "day": "2026-10-10"
+            },
+            {
+              "downloads": 512,
+              "day": "2026-10-11"
+            },
+            {
+              "downloads": 628,
+              "day": "2026-10-12"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-13"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-14"
+            },
+            {
+              "downloads": 0,
+              "day": "2026-10-15"
+            },
+            {
+              "downloads": 764,
+              "day": "2026-10-16"
+            },
+            {
+              "downloads": 1144,
+              "day": "2026-10-17"
+            },
+            {
+              "downloads": 1236,
+              "day": "2026-10-18"
+            }
+          ],
+          "conflictDates": [],
+          "invalidCount": 0,
+          "notes": [],
+          "windowStart": "2026-09-19",
+          "windowEnd": "2026-10-18"
+        },
         "repositoryUrl": "git+https://github.com/hkkz9522/dsh-session-manager.git",
         "registryUrl": "https://www.npmjs.com/package/dsh-session-manager",
         "mappingEvidence": "npm registry repository=git+https://github.com/hkkz9522/dsh-session-manager.git ↔ GitHub hkkz9522/dsh-session-manager",
         "enginesNode": "^22.15.0 || >=24.0.0",
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-20T10:57:19.453Z",
-        "reason": "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "fetchedAt": "2026-10-20T16:23:11.658Z",
+        "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
         "status": "checked",
@@ -6959,7 +9281,7 @@
         "packageName": "dsh-session-manager",
         "version": "0.7.4",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-20T10:57:19.453Z",
+        "checkedAt": "2026-10-20T16:23:11.658Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=dsh-session-manager"
       },
@@ -6981,12 +9303,12 @@
       },
       "dataStatus": "partial",
       "warnings": [
-        "周下载窗口包含平台性缺数日，周变化暂不可用。"
+        "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-20T10:57:19.453Z",
+      "lastUpdatedAt": "2026-10-20T16:23:11.658Z",
       "scores": {
         "popularity": {
-          "score": 15.5,
+          "score": 15.3,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -6996,10 +9318,10 @@
               "label": "GitHub Stars",
               "rawLabel": "60 stars",
               "rawValue": 60,
-              "normalized": 17.4,
+              "normalized": 16.8,
               "weight": 0.45,
               "effectiveWeight": 0.45,
-              "contribution": 7.8,
+              "contribution": 7.6,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
@@ -7034,7 +9356,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "0 天前",
-              "rawValue": 0.14603533564814813,
+              "rawValue": 0.3723340046296296,
               "normalized": 100,
               "weight": 0.3,
               "effectiveWeight": 0.349,
@@ -7172,13 +9494,13 @@
         ],
         "language": "TypeScript",
         "license": "MIT",
-        "createdAt": "2026-08-15T03:40:19Z",
-        "pushedAt": "2026-10-12T19:57:27Z",
+        "createdAt": "2026-08-15T03:40:19.000Z",
+        "pushedAt": "2026-10-12T19:57:27.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 290,
+        "stars": 289,
         "forks": 5,
         "openIssues": 8,
         "openPullRequests": 6,
@@ -7207,11 +9529,11 @@
         "latestRelease": {
           "version": "v1.3.0 — On-demand team delegation",
           "tagName": "v1.3.0",
-          "publishedAt": "2026-09-19T05:04:58Z",
+          "publishedAt": "2026-09-19T05:04:58.000Z",
           "url": "https://github.com/toolclub/dsh-agent-team-gui/releases/tag/v1.3.0"
         },
         "releases90d": 8,
-        "lastCommitAt": "2026-10-08T09:46:02Z",
+        "lastCommitAt": "2026-10-08T09:46:02.000Z",
         "lastCommitUrl": "https://github.com/toolclub/dsh-agent-team-gui/commit/9e952e0681d528975444568b70f3c554ac2984be",
         "commitsUrl": "https://github.com/toolclub/dsh-agent-team-gui/commits/main",
         "issuesUrl": "https://github.com/toolclub/dsh-agent-team-gui/issues",
@@ -7234,7 +9556,15 @@
         "enginesNode": null,
         "dshPeerRange": null,
         "fetchedAt": null,
-        "reason": "该插件未配置可核验的 npm 包，暂无可靠下载数据。"
+        "reason": "该插件未配置可核验的 npm 包，暂无可靠下载数据。",
+        "quality": {
+          "rawDaily": [],
+          "conflictDates": [],
+          "invalidCount": 0,
+          "notes": [],
+          "windowStart": null,
+          "windowEnd": "2026-10-20"
+        }
       },
       "security": {
         "status": "unavailable",
@@ -7264,10 +9594,10 @@
       },
       "dataStatus": "partial",
       "warnings": [],
-      "lastUpdatedAt": "2026-10-20T10:57:19.453Z",
+      "lastUpdatedAt": "2026-10-20T16:23:11.658Z",
       "scores": {
         "popularity": {
-          "score": 44.1,
+          "score": 43.6,
           "status": "scored",
           "confidence": "medium",
           "coverage": 0.45,
@@ -7275,12 +9605,12 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "290 stars",
-              "rawValue": 290,
-              "normalized": 44.1,
+              "rawLabel": "289 stars",
+              "rawValue": 289,
+              "normalized": 43.6,
               "weight": 0.45,
               "effectiveWeight": 1,
-              "contribution": 44.1,
+              "contribution": 43.6,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
@@ -7317,7 +9647,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "12 天前",
-              "rawValue": 12.04950755787037,
+              "rawValue": 12.275806226851852,
               "normalized": 92,
               "weight": 0.3,
               "effectiveWeight": 0.3,
@@ -7387,7 +9717,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "31 天前",
-              "rawValue": 31.244692743055555,
+              "rawValue": 31.470991412037037,
               "normalized": 92,
               "weight": 0.1,
               "effectiveWeight": 0.1,
@@ -7468,13 +9798,13 @@
         ],
         "language": "JavaScript",
         "license": "MIT",
-        "createdAt": "2026-08-14T21:20:55Z",
-        "pushedAt": "2026-09-18T23:10:58Z",
+        "createdAt": "2026-08-14T21:20:55.000Z",
+        "pushedAt": "2026-09-18T23:10:58.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 6991,
+        "stars": 6990,
         "forks": 209,
         "openIssues": 157,
         "openPullRequests": 20,
@@ -7503,11 +9833,11 @@
         "latestRelease": {
           "version": "dsh-graded-mode v0.0.1-rc1",
           "tagName": "0.0.1-rc1",
-          "publishedAt": "2026-09-02T17:33:33Z",
+          "publishedAt": "2026-09-02T17:33:33.000Z",
           "url": "https://github.com/yjh051108/dsh-routing-suite/releases/tag/0.0.1-rc1"
         },
         "releases90d": 3,
-        "lastCommitAt": "2026-09-18T23:10:57Z",
+        "lastCommitAt": "2026-09-18T23:10:57.000Z",
         "lastCommitUrl": "https://github.com/yjh051108/dsh-routing-suite/commit/195273352f23bff7f9023ebe2ec0cdbdf9c98f10",
         "commitsUrl": "https://github.com/yjh051108/dsh-routing-suite/commits/main",
         "issuesUrl": "https://github.com/yjh051108/dsh-routing-suite/issues",
@@ -7530,7 +9860,15 @@
         "enginesNode": null,
         "dshPeerRange": null,
         "fetchedAt": null,
-        "reason": "该插件未配置可核验的 npm 包，暂无可靠下载数据。"
+        "reason": "该插件未配置可核验的 npm 包，暂无可靠下载数据。",
+        "quality": {
+          "rawDaily": [],
+          "conflictDates": [],
+          "invalidCount": 0,
+          "notes": [],
+          "windowStart": null,
+          "windowEnd": "2026-10-20"
+        }
       },
       "security": {
         "status": "unavailable",
@@ -7560,10 +9898,10 @@
       },
       "dataStatus": "partial",
       "warnings": [],
-      "lastUpdatedAt": "2026-10-20T10:57:19.453Z",
+      "lastUpdatedAt": "2026-10-20T16:23:11.658Z",
       "scores": {
         "popularity": {
-          "score": 98.5,
+          "score": 98.3,
           "status": "scored",
           "confidence": "medium",
           "coverage": 0.45,
@@ -7571,12 +9909,12 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "6,991 stars",
-              "rawValue": 6991,
-              "normalized": 98.5,
+              "rawLabel": "6,990 stars",
+              "rawValue": 6990,
+              "normalized": 98.3,
               "weight": 0.45,
               "effectiveWeight": 1,
-              "contribution": 98.5,
+              "contribution": 98.3,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
@@ -7613,7 +9951,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "31 天前",
-              "rawValue": 31.49053765046296,
+              "rawValue": 31.716836319444443,
               "normalized": 68,
               "weight": 0.3,
               "effectiveWeight": 0.3,
@@ -7683,7 +10021,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "47 天前",
-              "rawValue": 47.72484320601852,
+              "rawValue": 47.951141875,
               "normalized": 92,
               "weight": 0.1,
               "effectiveWeight": 0.1,
