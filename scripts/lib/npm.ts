@@ -71,8 +71,26 @@ function emptyNpm(reason: string, status: NpmMetrics['status'] = 'unavailable'):
   };
 }
 
-function sumLastRange(daily: DailyDownload[], start: number, end: number): number {
-  return daily.slice(start, end).reduce((sum, item) => sum + item.downloads, 0);
+function shiftDay(date: string, days: number): string {
+  const value = new Date(`${date.slice(0, 10)}T00:00:00.000Z`);
+  value.setUTCDate(value.getUTCDate() + days);
+  return value.toISOString().slice(0, 10);
+}
+
+/**
+ * Sum a calendar window. Returns null when any day is absent so a seven-day
+ * window is never silently computed from fewer than seven observations.
+ */
+function windowSum(daily: DailyDownload[], endDate: string, days: number): number | null {
+  const values = new Map(daily.map((item) => [item.date.slice(0, 10), item.downloads]));
+  const startDate = shiftDay(endDate, -(days - 1));
+  let sum = 0;
+  for (let index = 0; index < days; index += 1) {
+    const value = values.get(shiftDay(startDate, index));
+    if (value === undefined) return null;
+    sum += value;
+  }
+  return sum;
 }
 
 /**
@@ -158,16 +176,20 @@ export async function collectNpm(
           typeof item.downloads === 'number' &&
           Number.isFinite(item.downloads),
       )
-      .map((item) => ({ date: item.day, downloads: item.downloads }));
-    if (daily.length >= 14) {
-      downloads7d = sumLastRange(daily, daily.length - 7, daily.length);
-      previous7d = sumLastRange(daily, daily.length - 14, daily.length - 7);
+      .map((item) => ({ date: item.day, downloads: item.downloads }))
+      .sort((left, right) => left.date.localeCompare(right.date));
+    const lastDay = daily.at(-1)?.date;
+    if (lastDay) {
+      downloads7d = windowSum(daily, lastDay, 7);
+      previous7d = windowSum(daily, shiftDay(lastDay, -7), 7);
       weeklyChangePct =
-        previous7d > 0
-          ? ((downloads7d - previous7d) / previous7d) * 100
-          : downloads7d === 0
-            ? 0
-            : null;
+        downloads7d !== null && previous7d !== null
+          ? previous7d > 0
+            ? ((downloads7d - previous7d) / previous7d) * 100
+            : downloads7d === 0
+              ? 0
+              : null
+          : null;
     }
     if (downloads30d === null) {
       downloadReason = 'npm 下载 API 未返回 downloads 字段。';

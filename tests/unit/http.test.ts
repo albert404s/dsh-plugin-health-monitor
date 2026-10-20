@@ -92,6 +92,35 @@ describe('npm mapping', () => {
     expect(metrics.downloads30d).toBeNull();
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
+
+  it('uses date-aligned 7-day windows and refuses a window with a missing day', async () => {
+    const days = Array.from({ length: 14 }, (_, index) => {
+      const date = new Date(Date.UTC(2026, 9, 1 + index)).toISOString().slice(0, 10);
+      return { day: date, downloads: 10 };
+    });
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes('registry.npmjs.org')) {
+        return jsonResponse({
+          name: 'pkg',
+          'dist-tags': { latest: '1.0.0' },
+          time: { '1.0.0': NOW.toISOString() },
+          repository: { url: 'git+https://github.com/owner/repo.git' },
+          versions: { '1.0.0': { version: '1.0.0', repository: { url: 'git+https://github.com/owner/repo.git' } } },
+        });
+      }
+      if (url.includes('/downloads/point/')) return jsonResponse({ downloads: 140 });
+      if (url.includes('/downloads/range/')) return jsonResponse({ downloads: days.filter((_, index) => index !== 10) });
+      throw new Error(`Unhandled test URL: ${url}`);
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    const client = new JsonClient();
+    const metrics = await collectNpm('pkg', 'owner/repo', client, NOW);
+    expect(metrics.status).toBe('verified');
+    expect(metrics.downloads30d).toBe(140);
+    expect(metrics.downloads7d).toBeNull();
+    expect(metrics.weeklyChangePct).toBeNull();
+  });
 });
 
 describe('GitHub collection', () => {
@@ -111,6 +140,15 @@ describe('GitHub collection', () => {
         author: null,
       },
       parents: [{ sha: 'parent' }],
+    };
+    const mergeCommit = {
+      ...commit,
+      html_url: 'https://github.com/owner/repo/commit/merge',
+      commit: {
+        committer: { date: new Date(NOW.getTime() - 86_400_000).toISOString() },
+        author: null,
+      },
+      parents: [{ sha: 'parent-a' }, { sha: 'parent-b' }],
     };
 
     const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
@@ -133,8 +171,8 @@ describe('GitHub collection', () => {
           open_issues_count: 2,
         });
       }
-      if (url.includes('/commits?since=')) return jsonResponse([]);
-      if (url.includes('/commits?per_page=10')) return jsonResponse([commit]);
+      if (url.includes('/commits?since=')) return jsonResponse([mergeCommit, commit]);
+      if (url.includes('/commits?per_page=100')) return jsonResponse([mergeCommit, commit]);
       if (url.includes('/issues?state=all')) return jsonResponse([issue, pullInIssues, recentIssue]);
       if (url.includes('/pulls?state=open&per_page=1')) return jsonResponse([]);
       if (url.includes('/releases?')) return jsonResponse([]);
@@ -149,11 +187,12 @@ describe('GitHub collection', () => {
     const client = new JsonClient();
     const result = await collectGithub('owner/repo', client, NOW);
     expect(result.github.issues.opened90d).toBe(2);
+    expect(result.github.commits30d).toBe(1);
     expect(result.github.openPullRequests).toBe(0);
     expect(result.github.pullRequests.available).toBe(false);
     expect(result.availability.pullRequests).toBe(false);
     expect(result.warnings.join(' ')).toContain('Pull Requests');
-    expect(result.github.lastCommitAt).not.toBeNull();
+    expect(result.github.lastCommitAt).toBe(commit.commit.committer.date);
     expect(result.repository.archived).toBe(false);
   });
 });

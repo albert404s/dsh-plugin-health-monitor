@@ -119,8 +119,13 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-function fallbackNpm(previous: PluginRecord | undefined, reason: string): NpmMetrics | null {
+function fallbackNpm(
+  previous: PluginRecord | undefined,
+  expectedPackage: string | null,
+  reason: string,
+): NpmMetrics | null {
   if (!previous || previous.npm.status !== 'verified') return null;
+  if (expectedPackage === null || previous.npm.packageName !== expectedPackage) return null;
   return {
     ...previous.npm,
     reason: `${reason} 已保留上次成功快照（${previous.npm.fetchedAt ?? '未知时间'}）。`,
@@ -138,6 +143,48 @@ function fallbackSecurity(
     ...old,
     reason: `本次 OSV 请求失败，保留 ${old.checkedAt ?? '上次'} 的已匹配结果。`,
   };
+}
+
+/**
+ * npm range data can contain platform-wide zero days (for example an npm
+ * statistics outage). A package's 7-day window is not comparable when it
+ * contains such a day, so suppress the derived weekly change instead of
+ * presenting a false trend. The raw daily series is kept for display.
+ */
+function applyNpmGapGuard(records: Array<Omit<PluginRecord, 'scores'>>): number {
+  const dateStats = new Map<string, { total: number; zero: number }>();
+  for (const record of records) {
+    if (record.npm.status !== 'verified') continue;
+    for (const day of record.npm.daily) {
+      const entry = dateStats.get(day.date) ?? { total: 0, zero: 0 };
+      entry.total += 1;
+      if (day.downloads === 0) entry.zero += 1;
+      dateStats.set(day.date, entry);
+    }
+  }
+
+  const gapDates = new Set(
+    [...dateStats.entries()]
+      .filter(([, stats]) => stats.total >= 5 && stats.zero / stats.total >= 0.8)
+      .map(([date]) => date),
+  );
+  if (gapDates.size === 0) return 0;
+
+  let affected = 0;
+  for (const record of records) {
+    if (record.npm.status !== 'verified') continue;
+    const recent = record.npm.daily.slice(-14);
+    if (!recent.some((day) => gapDates.has(day.date))) continue;
+    record.npm.downloads7d = null;
+    record.npm.previous7d = null;
+    record.npm.weeklyChangePct = null;
+    const reason = '周下载窗口包含平台性缺数日，周变化暂不可用。';
+    record.npm.reason = record.npm.reason ? `${record.npm.reason} ${reason}` : reason;
+    if (!record.warnings.includes(reason)) record.warnings.push(reason);
+    if (record.dataStatus === 'complete') record.dataStatus = 'partial';
+    affected += 1;
+  }
+  return affected;
 }
 
 async function main(): Promise<void> {
@@ -162,6 +209,8 @@ async function main(): Promise<void> {
   let npmVerified = 0;
   let npmErrors = 0;
   let npmUnverified = 0;
+  let npmUnavailable = 0;
+  let npmWithoutDownloads = 0;
   let osvChecked = 0;
   let osvErrors = 0;
   let usedFallback = 0;
@@ -258,10 +307,18 @@ async function main(): Promise<void> {
     if (config.npm) npmChecked += 1;
     if (npm.status === 'verified') npmVerified += 1;
     if (npm.status === 'unverified') npmUnverified += 1;
+    if (config.npm && npm.status === 'unavailable') npmUnavailable += 1;
+    if (config.npm && npm.status === 'verified' && npm.downloads30d === null) {
+      npmWithoutDownloads += 1;
+    }
 
     if (npm.status === 'error') {
       npmErrors += 1;
-      const fallback = fallbackNpm(previousPlugin, `npm 采集失败：${npm.reason ?? '未知错误'}。`);
+      const fallback = fallbackNpm(
+        previousPlugin,
+        config.npm,
+        `npm 采集失败：${npm.reason ?? '未知错误'}。`,
+      );
       if (fallback) {
         npm = fallback;
         warnings.push('npm 数据沿用上次成功快照。');
@@ -354,6 +411,13 @@ async function main(): Promise<void> {
     );
   }
 
+  const gapAffected = applyNpmGapGuard(records);
+  if (gapAffected > 0) {
+    console.warn(
+      `[collect] suppressed weekly npm change for ${gapAffected} package(s) whose 7-day window contains platform-wide zero days`,
+    );
+  }
+
   const scored = scorePlugins(records, startedAt);
   const stats = computeStats(scored);
   const githubSource: SourceSnapshot = {
@@ -366,15 +430,16 @@ async function main(): Promise<void> {
     status:
       npmChecked === 0
         ? 'skipped'
-        : npmErrors > 0 && npmVerified > 0
-          ? 'partial'
-          : npmErrors > 0 && npmVerified === 0
-            ? 'failed'
-            : npmUnverified > 0
-              ? 'partial'
-              : 'ok',
+        : npmVerified === 0
+          ? 'failed'
+          : npmErrors > 0 ||
+              npmUnverified > 0 ||
+              npmUnavailable > 0 ||
+              npmWithoutDownloads > 0
+            ? 'partial'
+            : 'ok',
     fetchedAt: startedAt.toISOString(),
-    message: `${npmVerified}/${npmChecked} 个包映射通过，${npmUnverified} 个无法映射，${npmErrors} 个请求失败`,
+    message: `${npmVerified}/${npmChecked} 个包映射通过，${npmUnverified} 个无法映射，${npmUnavailable} 个不可用，${npmWithoutDownloads} 个缺少下载数据，${npmErrors} 个请求失败`,
   };
   const osvSource: SourceSnapshot = {
     status:
@@ -404,8 +469,12 @@ async function main(): Promise<void> {
       lastSuccessAt: previous.latest?.lastSuccessAt ?? null,
       outcome: 'failed',
       sources,
-      errorCount: errors.length,
-      messages: errors.slice(0, 20),
+      errorCount: errors.length + npmErrors + osvErrors,
+      messages: [
+        ...errors.slice(0, 20),
+        ...(npmErrors > 0 ? [`npm 请求失败 ${npmErrors} 个`] : []),
+        ...(osvErrors > 0 ? [`OSV 请求失败 ${osvErrors} 个`] : []),
+      ],
       nextRunHint: 'GitHub Actions 计划每 6 小时运行；失败时保留上一次成功快照。',
     };
     await writeStatus(options.dataDir, status);
@@ -415,7 +484,13 @@ async function main(): Promise<void> {
   }
 
   const outcome: StatusFile['outcome'] =
-    githubFailed > 0 || npmErrors > 0 || osvErrors > 0 || usedFallback > 0
+    githubFailed > 0 ||
+    npmErrors > 0 ||
+    npmUnverified > 0 ||
+    npmUnavailable > 0 ||
+    npmWithoutDownloads > 0 ||
+    osvErrors > 0 ||
+    usedFallback > 0
       ? 'partial'
       : 'success';
 
@@ -442,9 +517,11 @@ async function main(): Promise<void> {
     lastSuccessAt: latest.lastSuccessAt,
     outcome,
     sources,
-    errorCount: errors.length,
+    errorCount: errors.length + npmErrors + osvErrors,
     messages: [
       ...errors.slice(0, 15),
+      ...(npmErrors > 0 ? [`npm 请求失败 ${npmErrors} 个`] : []),
+      ...(osvErrors > 0 ? [`OSV 请求失败 ${osvErrors} 个`] : []),
       `评分方法版本 ${SCORE_METHOD_VERSION}`,
     ],
     nextRunHint: 'GitHub Actions 计划每 6 小时运行；npm 与 OSV 随同刷新。',
