@@ -62,18 +62,18 @@ test('legacy search and quadrant links redirect preserving parameters', async({p
   await expect(page).toHaveURL(/\/plugins\?q=context&sort=maintenance/);
   await page.goto('/quadrant?risk=high&focus=hot-healthy');
   await expect(page).toHaveURL(/\/ecosystem\?risk=high&focus=hot-healthy/);
-  await expect(page.getByLabel('按风险筛选')).toHaveValue('high');
+  await expect(page.getByLabel('按关注状态筛选')).toHaveValue('high');
 });
 
 test('ecosystem URL filters survive reload and list selects a readable summary', async({page})=>{
   await page.goto('/ecosystem');
   await page.getByRole('button',{name:/热门 · 活跃/}).click();
   await expect(page).toHaveURL(/focus=hot-healthy/);
-  await page.getByLabel('按风险筛选').selectOption('high');
-  await page.reload(); await expect(page.getByLabel('按风险筛选')).toHaveValue('high');
+  await page.getByLabel('按关注状态筛选').selectOption('high');
+  await page.reload(); await expect(page.getByLabel('按关注状态筛选')).toHaveValue('high');
   await page.getByRole('heading',{name:'生态分布',exact:true}).hover();
   await expect(page.getByRole('tooltip')).toContainText('固定 0–100 轴，筛选不会重新缩放');
-  const list=page.getByRole('complementary',{name:'象限内插件列表'});
+  const list=page.getByRole('complementary',{name:'当前视图插件列表'});
   await list.locator('ul button').first().click();
   await expect(list.getByRole('status')).toBeVisible();
   await list.getByRole('link',{name:'查看详情',exact:false}).click();
@@ -98,7 +98,7 @@ test('missing npm is unavailable rather than zero and is not described as safe',
   await expect(page.getByRole('heading',{level:1})).toContainText('dsh-agent-team-gui');
   await expect(page.getByText('暂无可靠 npm 下载数据').first()).toBeVisible();
   await expect(page.getByText('未完成漏洞检查').first()).toBeVisible();
-  await expect(page.getByText('信息不完整',{exact:true}).first()).toBeVisible();
+  await expect(page.getByText('信息待补充',{exact:true}).first()).toBeVisible();
 });
 
 test('compare matrix remains sticky and selections can swap',async({page})=>{
@@ -290,4 +290,69 @@ test('detail supporting metric and score notes use the same quiet hints',async({
   const label=page.locator('#raw-metrics .orbit-quiet-hint').filter({hasText:/^Stars$/});
   await label.hover();
   await expect(page.getByRole('tooltip')).toHaveText('GitHub 当前值');
+});
+
+test('collection controls distinguish published refresh from maintainer actions and restore focus',async({page})=>{
+  let paused=true;
+  const providerRequests:string[]=[];
+  page.on('request',request=>{if(/api.github.com|registry.npmjs.org|api.npmjs.org|api.osv.dev/.test(request.url()))providerRequests.push(request.url());});
+  await page.route('**/data/collection-control.json',route=>route.fulfill({json:{
+    version:1,automaticPaused:paused,updatedAt:'2026-10-22T10:00:00.000Z',updatedBy:'maintainer',
+  }}));
+  await page.goto('/');
+  const trigger=page.getByRole('button',{name:'数据更新',exact:true});
+  await trigger.click();
+  const dialog=page.getByRole('dialog',{name:'数据更新',exact:true});
+  await expect(dialog.getByRole('status')).toHaveText('自动采集已暂停');
+  await dialog.getByRole('radio',{name:/暂停自动采集/}).check();
+  await expect(dialog.locator('code')).toHaveText('pause');
+  await expect(dialog.getByRole('link',{name:'到 GitHub暂停自动采集'})).toHaveAttribute('href','https://github.com/albert404s/dsh-plugin-health-monitor/actions/workflows/update-data.yml');
+  await dialog.getByRole('radio',{name:/恢复自动采集/}).check();
+  await expect(dialog.locator('code')).toHaveText('resume');
+  await expect(dialog.getByRole('status')).toHaveText('自动采集已暂停');
+  paused=false;
+  await dialog.getByRole('button',{name:'刷新已发布数据'}).click();
+  await expect(dialog.getByRole('status')).toHaveText('自动采集 · 每 6 小时');
+  expect(providerRequests).toEqual([]);
+  await page.keyboard.press('Escape');
+  await expect(dialog).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+});
+
+test('invalid control status stays unknown without taking down published data',async({page})=>{
+  await page.route('**/data/collection-control.json',route=>route.fulfill({json:{automaticPaused:'false'}}));
+  await page.goto('/');
+  await page.getByRole('button',{name:'数据更新',exact:true}).click();
+  const dialog=page.getByRole('dialog',{name:'数据更新',exact:true});
+  await expect(dialog.getByRole('status')).toHaveText('自动采集状态待确认');
+  await expect(dialog.getByRole('button',{name:'刷新已发布数据'})).toBeEnabled();
+  await dialog.getByRole('button',{name:'关闭数据更新'}).click();
+  await expect(page.locator('#home-title')).toBeVisible();
+});
+
+test('the method update entry opens usable collection controls at 390px',async({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.route('**/data/collection-control.json',route=>route.fulfill({json:{version:1,automaticPaused:false,updatedAt:null,updatedBy:null}}));
+  await page.goto('/#collection-controls');
+  const dialog=page.getByRole('dialog',{name:'数据更新',exact:true});
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole('status')).toHaveText('自动采集 · 每 6 小时');
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(1);
+  expect(await dialog.evaluate(el=>el.scrollWidth-el.clientWidth)).toBeLessThanOrEqual(1);
+  await dialog.getByRole('radio',{name:/重新采集一次/}).check();
+  await expect(dialog.locator('code')).toHaveText('refresh');
+  await page.keyboard.press('Escape');
+  await expect(dialog).toHaveCount(0);
+  await page.getByRole('button',{name:'数据更新',exact:true}).click();
+  await expect(dialog).toBeVisible();
+});
+
+test('method defaults to simple choices with technical formulas collapsed',async({page})=>{
+  await page.goto('/method');
+  await expect(page.getByText('快速指南',{exact:true})).toBeVisible();
+  const technical=page.locator('#maintenance details');
+  await expect(technical).toHaveCount(1);
+  await expect(technical).not.toHaveAttribute('open','');
+  await expect(page.locator('#maintenance')).toContainText('维护');
+  await expect(page.getByRole('heading',{name:'数据与方法',exact:true})).toBeVisible();
 });

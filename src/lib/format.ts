@@ -114,10 +114,10 @@ export function scoreTone(score: number | null): string {
 }
 
 export function riskLabel(level: RiskLevel): string {
-  if (level === 'high') return '优先核查';
-  if (level === 'medium') return '需要关注';
-  if (level === 'low') return '未见公开风险';
-  return '信息不完整';
+  if (level === 'high') return '建议先了解';
+  if (level === 'medium') return '有选用提醒';
+  if (level === 'low') return '暂无额外提醒';
+  return '信息待补充';
 }
 
 export function riskTone(level: RiskLevel): {

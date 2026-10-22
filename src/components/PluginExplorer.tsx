@@ -59,10 +59,10 @@ const MAINTENANCE_OPTIONS: Array<{ value: MaintenanceFilter; label: string }> = 
 
 const RISK_OPTIONS: Array<{ value: RiskFilter; label: string }> = [
   { value: 'all', label: '全部关注状态' },
-  { value: 'high', label: '优先核查' },
-  { value: 'medium', label: '需要关注' },
-  { value: 'unknown', label: '信息不完整' },
-  { value: 'low', label: '未见公开风险' },
+  { value: 'high', label: '建议先了解' },
+  { value: 'medium', label: '有选用提醒' },
+  { value: 'unknown', label: '信息待补充' },
+  { value: 'low', label: '暂无额外提醒' },
 ];
 
 const DATA_OPTIONS: Array<{ value: DataFilter; label: string }> = [
@@ -191,7 +191,7 @@ export function PluginExplorer({
   if (state.risk !== 'all') {
     chips.push({
       key: 'risk',
-      label: `风险：${RISK_OPTIONS.find((item) => item.value === state.risk)?.label ?? state.risk}`,
+      label: `关注状态：${RISK_OPTIONS.find((item) => item.value === state.risk)?.label ?? state.risk}`,
       remove: () => update({ risk: 'all' }),
     });
   }
@@ -222,7 +222,7 @@ export function PluginExplorer({
   }
 
   const emptyDescription = state.query.trim()
-    ? `没有匹配“${state.query.trim().slice(0, 24)}${state.query.trim().length > 24 ? '…' : ''}”的结果。尝试缩短关键词，或清除分类、风险与覆盖筛选。`
+    ? `没有匹配“${state.query.trim().slice(0, 24)}${state.query.trim().length > 24 ? '…' : ''}”的结果。尝试缩短关键词，或清除分类、关注状态与覆盖筛选。`
     : '当前筛选下没有结果。尝试清除筛选，或更换排序与搜索词。';
 
   return (
@@ -379,7 +379,7 @@ export function PluginExplorer({
               className="select-field max-md:w-full"
               value={state.risk}
               onChange={(event) => update({ risk: event.target.value as RiskFilter })}
-              aria-label="按风险等级筛选"
+              aria-label="按关注状态筛选"
             >
               {RISK_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -597,7 +597,7 @@ export function PluginExplorer({
                       </td>
                       <td className="px-2 py-3">
                         {plugin.scores.risk.level === 'low' ? (
-                          <span className="text-2xs text-content-muted">未见公开风险</span>
+                          <span className="text-2xs text-content-muted">暂无额外提醒</span>
                         ) : (
                           <RiskBadge level={plugin.scores.risk.level} compact />
                         )}
@@ -658,7 +658,7 @@ export function PluginExplorer({
                             </p>
                           </div>
                           {plugin.scores.risk.level === 'low' ? (
-                            <span className="shrink-0 text-2xs text-content-muted">未见公开风险</span>
+                            <span className="shrink-0 text-2xs text-content-muted">暂无额外提醒</span>
                           ) : (
                             <RiskBadge level={plugin.scores.risk.level} compact className="shrink-0" />
                           )}

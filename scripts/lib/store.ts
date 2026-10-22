@@ -3,6 +3,7 @@ import path from 'node:path';
 import type { HistoryFile, HistoryPoint, LatestData, StatusFile } from '../../src/lib/types';
 import { latestSchema, historySchema, statusSchema, parseLatest, parseHistory, parseStatus } from '../../src/lib/contracts';
 import { computeStats } from '../../src/lib/scoring';
+import { readCollectionControl } from './collection-control';
 import {
   HISTORY_SCHEMA_VERSION,
   LATEST_SCHEMA_VERSION,
@@ -215,10 +216,12 @@ export async function copyDataFiles(sourceDir: string, destinationDir: string): 
   assertLatestData(latest);
   assertHistory(history);
   assertStatus(status);
+  const collectionControl = await readCollectionControl(sourceDir);
   await mkdir(destinationDir, { recursive: true });
   await Promise.all([
     atomicWriteJson(path.join(destinationDir, 'latest.json'), latest),
     atomicWriteJson(path.join(destinationDir, 'history.json'), history),
     atomicWriteJson(path.join(destinationDir, 'status.json'), status),
+    atomicWriteJson(path.join(destinationDir, 'collection-control.json'), collectionControl),
   ]);
 }

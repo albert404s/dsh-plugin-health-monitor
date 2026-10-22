@@ -13,24 +13,24 @@ export function AttentionPanel({ plugins }: { plugins: PluginRecord[] }): JSX.El
       <div className="flex items-center gap-2">
         <Radar size={16} className="text-content-secondary" aria-hidden="true" />
         <h3 className="text-xl font-semibold tracking-title text-content-primary">关注事项</h3>
-        <InfoHint text="这里汇总风险信号与数据缺口，不等同于质量差或安全结论。" />
+        <InfoHint text="选用前可先了解维护提醒、公开漏洞记录和数据缺口。" />
         <Link
           to="/plugins?risk=high"
           className="ml-auto shrink-0 text-xs text-content-secondary underline-offset-4 transition-colors hover:text-brand-text hover:underline"
         >
-          查看优先核查
+          查看选用提醒
         </Link>
       </div>
       {items.length === 0 ? (
         <div className="mt-3 border-t border-line-hairline py-6">
           <p className="text-sm leading-6 text-content-secondary">
-            当前没有触发关注规则。这不代表所有插件都健康或安全。
+            暂无额外提醒，可继续按用途和维护活动筛选。
           </p>
           <Link
             to="/method#risk"
             className="mt-2 inline-flex min-h-9 items-center text-xs text-content-secondary underline underline-offset-4 hover:text-brand-text"
           >
-            查看风险口径
+            了解提醒依据
           </Link>
         </div>
       ) : (
@@ -51,7 +51,7 @@ export function AttentionPanel({ plugins }: { plugins: PluginRecord[] }): JSX.El
                     </p>
                   </div>
                   {plugin.scores.risk.level === 'low' ? (
-                    <span className="shrink-0 text-2xs text-content-muted">未见风险</span>
+                    <span className="shrink-0 text-2xs text-content-muted">暂无额外提醒</span>
                   ) : (
                     <RiskBadge level={plugin.scores.risk.level} compact className="shrink-0" />
                   )}

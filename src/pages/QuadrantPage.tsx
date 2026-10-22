@@ -134,7 +134,7 @@ export function QuadrantPage(): JSX.Element {
 
       <div className="data-band mt-6 lg:sticky lg:top-[var(--header-h)] lg:z-20 lg:bg-canvas/95 lg:backdrop-blur-sm">
         <div className="flex flex-col gap-3 px-4 py-3 md:px-5 xl:flex-row xl:items-center xl:justify-between">
-          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap" role="group" aria-label="按象限筛选">
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap" role="group" aria-label="按生态分区筛选">
             <button
               type="button"
               onClick={() => setFocus('all')}
@@ -209,13 +209,13 @@ export function QuadrantPage(): JSX.Element {
                 className="select-field max-sm:w-full"
                 value={risk}
                 onChange={(event) => setRisk(event.target.value)}
-                aria-label="按风险筛选"
+                aria-label="按关注状态筛选"
               >
-                <option value="all">全部风险</option>
-                <option value="high">高风险信号</option>
-                <option value="medium">需要关注</option>
-                <option value="low">未见公开风险</option>
-                <option value="unknown">信息不完整</option>
+                <option value="all">全部关注状态</option>
+                <option value="high">建议先了解</option>
+                <option value="medium">有选用提醒</option>
+                <option value="low">暂无额外提醒</option>
+                <option value="unknown">信息待补充</option>
               </select>
               <select
                 className="select-field max-sm:w-full"
@@ -223,7 +223,7 @@ export function QuadrantPage(): JSX.Element {
                 onChange={(event) => setSort(event.target.value as Sort)}
                 aria-label="列表排序"
               >
-                <option value="popularity">按人气</option>
+                <option value="popularity">按关注度</option>
                 <option value="maintenance">按维护</option>
                 <option value="completeness">按数据覆盖</option>
                 <option value="name">按名称</option>
@@ -274,7 +274,7 @@ export function QuadrantPage(): JSX.Element {
 
           <aside
             className="flex min-h-0 flex-col border-t border-line xl:border-l xl:border-t-0"
-            aria-label="象限内插件列表"
+            aria-label="当前视图插件列表"
           >
             <div className="border-b border-line px-4 py-3.5">
               <p className="stamp">CURRENT VIEW</p>
@@ -372,7 +372,7 @@ export function QuadrantPage(): JSX.Element {
         <SectionHeading
           eyebrow="HOW TO READ"
           title={<span id="quadrant-reading-title">如何读这张图</span>}
-          description="象限只帮助组织观察，不替你做出“应该安装”的决定。"
+          description="先看插件用途，再结合关注度和维护活动筛选。"
         />
         <div className="data-band mt-4">
           <div className="grid grid-cols-2 divide-x divide-y divide-line-hairline md:grid-cols-4 md:divide-y-0">

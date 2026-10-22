@@ -1,0 +1,57 @@
+import { appendFile } from 'node:fs/promises';
+import path from 'node:path';
+const {
+  decideCollectionAction,
+  readCollectionControl,
+  stageCollectionArtifact,
+  writeCollectionControl,
+} = await import(decodeURI(new URL('./lib/collection-control.ts', import.meta.url).href)) as typeof import('./lib/collection-control');
+
+function argument(name: string): string | undefined {
+  const index = process.argv.indexOf('--' + name);
+  return index >= 0 ? process.argv[index + 1] : undefined;
+}
+
+async function main(): Promise<void> {
+  const command = process.argv[2];
+  const dataDir = path.resolve(argument('data-dir') || 'data-store');
+  if (command === 'stage') {
+    const artifactDir = path.resolve(argument('artifact-dir') || 'artifact-data');
+    if (artifactDir === dataDir || artifactDir.startsWith(dataDir + path.sep)) {
+      throw new Error('数据 artifact 目录必须独立于源数据目录');
+    }
+    await stageCollectionArtifact(dataDir, artifactDir);
+    console.log('[collection-control] staged snapshot and control file');
+    return;
+  }
+  if (command !== 'gate') throw new Error('用法：collection-control.ts gate|stage --data-dir DIR');
+  const current = await readCollectionControl(dataDir);
+  const decision = decideCollectionAction(
+    process.env.COLLECTION_EVENT || '',
+    process.env.COLLECTION_ACTION,
+    current,
+    process.env.GITHUB_ACTOR,
+  );
+  if (decision.controlChanged) await writeCollectionControl(dataDir, decision.control);
+  console.log('[collection-control] ' + decision.message);
+  if (process.env.GITHUB_OUTPUT) {
+    // Only closed-set enum and Boolean values are emitted; no user string interpolation.
+    await appendFile(process.env.GITHUB_OUTPUT, [
+      'action=' + decision.action,
+      'should_collect=' + decision.shouldCollect,
+      'control_changed=' + decision.controlChanged,
+      '',
+    ].join('\n'));
+  }
+  if (process.env.GITHUB_STEP_SUMMARY) {
+    await appendFile(process.env.GITHUB_STEP_SUMMARY,
+      '### ORBIT 采集控制\n\n' + decision.message + '\n\n自动更新：**'
+      + (decision.control.automaticPaused ? '已暂停' : '已开启') + '**\n',
+    );
+  }
+}
+
+main().catch((error) => {
+  console.error('[collection-control] failed:', error);
+  process.exitCode = 1;
+});

@@ -15,7 +15,6 @@ import {
   ServerOff,
   ShieldAlert,
   ShieldCheck,
-  ShieldQuestion,
 } from 'lucide-react';
 import type { CompletenessResult, Confidence, PluginRecord, RiskLevel } from '../lib/types';
 import { cn } from '../lib/cn';
@@ -158,10 +157,10 @@ export function ConfidenceBadge({
 }
 
 const RISK_SHORT: Record<RiskLevel, string> = {
-  high: '优先核查',
-  medium: '需关注',
-  low: '未见风险',
-  unknown: '信息不完整',
+  high: '建议先了解',
+  medium: '有选用提醒',
+  low: '暂无额外提醒',
+  unknown: '信息待补充',
 };
 
 export function RiskBadge({
@@ -176,12 +175,10 @@ export function RiskBadge({
   const tone = riskTone(level);
   const Icon =
     level === 'high'
-      ? ShieldAlert
-      : level === 'medium'
-        ? AlertTriangle
-        : level === 'low'
-          ? ShieldCheck
-          : ShieldQuestion;
+      ? AlertTriangle
+      : level === 'low'
+        ? Check
+        : CircleHelp;
   if (level === 'low') {
     return (
       <span

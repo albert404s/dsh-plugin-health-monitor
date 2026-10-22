@@ -175,3 +175,37 @@ it('invalid history entries are isolated while valid stored latest remains reada
   await writeFile(path.join(directory,'history.json'),JSON.stringify({schemaVersion:1,updatedAt:NOW.toISOString(),retentionDays:90,plugins:{bad:'broken'}}));
   const loaded=await loadExisting(directory);expect(loaded.latest?.plugins).toHaveLength(1);expect(loaded.history?.plugins).toEqual({});
 });
+
+async function controlTestDirectory(): Promise<string> {
+  const directory=await temporaryDirectory();
+  const latest=makeLatest();
+  await writeLatest(directory,latest);
+  await updateHistory(directory,latest,null,NOW);
+  await writeStatus(directory,makeStatus(latest.lastSuccessAt));
+  return directory;
+}
+
+it('publishes the automatic update default for legacy data without a control file',async()=>{
+  const source=await controlTestDirectory(),destination=await temporaryDirectory();
+  await copyDataFiles(source,destination);
+  expect(JSON.parse(await readFile(path.join(destination,'collection-control.json'),'utf8'))).toEqual({
+    version:1,automaticPaused:false,updatedAt:null,updatedBy:null,
+  });
+});
+
+it('keeps a paused control state during ordinary and in-place data builds',async()=>{
+  const source=await controlTestDirectory(),destination=await temporaryDirectory();
+  const control={version:1,automaticPaused:true,updatedAt:NOW.toISOString(),updatedBy:'project-maintainer'};
+  await writeFile(path.join(source,'collection-control.json'),JSON.stringify(control));
+  await copyDataFiles(source,source);
+  await copyDataFiles(source,destination);
+  expect(JSON.parse(await readFile(path.join(destination,'collection-control.json'),'utf8'))).toEqual(control);
+});
+
+it('invalid control data blocks publication and preserves the last valid destination',async()=>{
+  const source=await controlTestDirectory(),destination=await controlTestDirectory();
+  await writeFile(path.join(source,'collection-control.json'),JSON.stringify({version:1,automaticPaused:'false'}));
+  const before=await readFile(path.join(destination,'latest.json'),'utf8');
+  await expect(copyDataFiles(source,destination)).rejects.toThrow('采集控制文件不可用');
+  expect(await readFile(path.join(destination,'latest.json'),'utf8')).toBe(before);
+});

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import type { EChartsOption } from 'echarts';
 import type { PluginRecord, RiskLevel } from '../../lib/types';
 import { quadrantOf, hasQuadrantData } from '../../lib/scoring';
-import { formatCompact, formatDateTime } from '../../lib/format';
+import { formatCompact, formatDateTime, riskLabel } from '../../lib/format';
 import { escapeHtml } from '../../lib/html';
 import { useEChart } from '../../hooks/useEChart';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
@@ -43,13 +43,6 @@ const CONFIDENCE_LABELS: Record<string, string> = {
   low: '依据较少',
 };
 
-const RISK_LABELS: Record<RiskLevel, string> = {
-  high: '优先核查',
-  medium: '需要关注',
-  low: '未见公开风险',
-  unknown: '信息不完整',
-};
-
 interface QuadrantChartProps {
   plugins: PluginRecord[];
   unpositionedPlugins?: PluginRecord[];
@@ -87,7 +80,7 @@ function tooltipHtml(plugin: PluginRecord): string {
       ? formatCompact(plugin.npm.downloads30d)
       : '暂无可靠下载数据';
   const risk = plugin.scores.risk.level;
-  const riskLabel = RISK_LABELS[risk];
+  const attentionLabel = riskLabel(risk);
   const riskStyle = chartTheme.riskSoft[risk];
   const row = (label: string, value: string, mono = true): string =>
     `<span style="color:${chartTheme.tooltip.muted}">${escapeHtml(label)}</span><b style="color:${chartTheme.strong};text-align:right;font-weight:600;${
@@ -98,7 +91,7 @@ function tooltipHtml(plugin: PluginRecord): string {
       <div style="padding:12px 14px 10px">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
           <strong style="color:${chartTheme.tooltip.title};font-size:13px;line-height:18px;font-weight:600">${escapeHtml(plugin.name)}</strong>
-          <span style="flex:none;border-radius:2px;padding:2px 6px;font-size:12px;line-height:16px;background:${riskStyle.bg};color:${riskStyle.text}">${escapeHtml(riskLabel)}</span>
+          <span style="flex:none;border-radius:2px;padding:2px 6px;font-size:12px;line-height:16px;background:${riskStyle.bg};color:${riskStyle.text}">${escapeHtml(attentionLabel)}</span>
         </div>
         <div style="color:${chartTheme.tooltip.muted};font-size:12px;line-height:18px;margin-top:4px">${escapeHtml(plugin.repo)}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:12px;line-height:18px;color:${chartTheme.tooltip.body};margin-top:10px">
@@ -232,8 +225,8 @@ export function QuadrantChart({
       },
       series: [
         {
-          // A static outer ring is the non-colour cue for high-risk bubbles.
-          name: '高风险外环',
+          // A static outer ring also identifies bubbles with priority selection notes.
+          name: '建议先了解 · 外环',
           type: 'scatter',
           z: 1,
           silent: true,
@@ -410,14 +403,14 @@ export function QuadrantChart({
               className="h-2 w-2 rounded-full border-[1.5px] bg-transparent"
               style={{ borderColor: riskColor('low') }}
             />
-            未见公开风险
+            {riskLabel('low')}
           </span>
           <span className="inline-flex items-center gap-1.5">
             <span
               className="h-2 w-2 rounded-full border-[1.5px] bg-transparent"
               style={{ borderColor: riskColor('medium') }}
             />
-            需要关注
+            {riskLabel('medium')}
           </span>
           <span className="inline-flex items-center gap-1.5">
             <span className="relative inline-flex h-3.5 w-3.5 items-center justify-center" aria-hidden="true">
@@ -430,14 +423,14 @@ export function QuadrantChart({
                 style={{ borderColor: riskColor('high') }}
               />
             </span>
-            优先核查 · 外环
+            {riskLabel('high')} · 外环
           </span>
           <span className="inline-flex items-center gap-1.5">
             <span
               className="h-2 w-2 rounded-full border-[1.5px] border-dashed bg-transparent"
               style={{ borderColor: riskColor('unknown') }}
             />
-            信息不完整
+            {riskLabel('unknown')}
           </span>
           <span className="ml-auto text-content-muted">气泡面积 ≈ Star 量级</span>
         </div>
@@ -451,7 +444,7 @@ export function QuadrantChart({
           className="mt-3 rounded-control border border-line bg-surface-subtle px-3 py-2 text-xs"
         >
           <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-xs">
-            <span>{unpositioned.length} 个插件未进入象限</span>
+            <span>{unpositioned.length} 个插件暂未定位</span>
 
           </summary>
           <ul className="mt-2 space-y-1.5 text-content-secondary">
@@ -478,7 +471,7 @@ export function QuadrantChart({
               <th>插件</th>
               <th>关注度</th>
               <th>维护活跃度</th>
-              <th>风险等级</th>
+              <th>关注状态</th>
               <th>数据覆盖</th>
             </tr>
           </thead>
@@ -488,7 +481,7 @@ export function QuadrantChart({
                 <td>{plugin.repo}</td>
                 <td>{plugin.scores.popularity.score}</td>
                 <td>{plugin.scores.maintenance.score}</td>
-                <td>{plugin.scores.risk.label}</td>
+                <td>{riskLabel(plugin.scores.risk.level)}</td>
                 <td>{plugin.scores.completeness.score}%</td>
               </tr>
             ))}

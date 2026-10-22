@@ -10,6 +10,7 @@ async function main(): Promise<void> {
   await access(path.join(DIST, 'index.html'));
   await access(path.join(DIST, 'data', 'latest.json'));
   await access(path.join(DIST, 'data', 'history.json'));
+  await access(path.join(DIST, 'data', 'collection-control.json'));
   await copyFile(path.join(DIST, 'index.html'), path.join(DIST, '404.html'));
   await writeFile(path.join(DIST, '.nojekyll'), '', 'utf8');
   // Snapshot copies are only needed on the data branch; the site never

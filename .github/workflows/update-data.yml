@@ -2,22 +2,81 @@ name: Update plugin data
 
 on:
   schedule:
-    # Every 6 hours. Data is committed before the build/deploy stages so a
-    # build failure cannot destroy the newly collected snapshot.
+    # The gate checks the data branch before any provider API is called.
     - cron: '0 */6 * * *'
   workflow_dispatch:
+    inputs:
+      action:
+        description: 'refresh: collect once; pause/resume: change future automatic updates'
+        required: true
+        default: refresh
+        type: choice
+        options:
+          - refresh
+          - pause
+          - resume
 
 permissions:
   contents: read
 
+# Shared with deploy.yml: data and Pages changes are serialized.
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
+  gate:
+    name: Check collection controls
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      action: ${{ steps.control.outputs.action }}
+      should_collect: ${{ steps.control.outputs.should_collect }}
+      control_changed: ${{ steps.control.outputs.control_changed }}
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Checkout data branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: data
+          path: data-store
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+
+      - name: Decide collection action
+        id: control
+        env:
+          COLLECTION_EVENT: ${{ github.event_name }}
+          COLLECTION_ACTION: ${{ inputs.action }}
+        run: node scripts/collection-control.ts gate --data-dir data-store
+
+      - name: Stage existing data for control-only deployment
+        if: steps.control.outputs.control_changed == 'true'
+        run: node scripts/collection-control.ts stage --data-dir data-store --artifact-dir artifact-data
+
+      - name: Upload control-only data artifact
+        if: steps.control.outputs.control_changed == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: plugin-data
+          path: artifact-data/
+          retention-days: 3
+
   collect:
     name: Collect GitHub, npm and OSV data
     runs-on: ubuntu-latest
+    needs: gate
+    if: needs.gate.outputs.should_collect == 'true'
     timeout-minutes: 30
     permissions:
       contents: read
@@ -49,12 +108,7 @@ jobs:
         run: npm run collect -- --data-dir data-store
 
       - name: Stage data artifact
-        run: |
-          mkdir -p artifact-data
-          cp data-store/latest.json artifact-data/
-          cp data-store/history.json artifact-data/
-          cp data-store/status.json artifact-data/
-          cp -R data-store/snapshots artifact-data/
+        run: node scripts/collection-control.ts stage --data-dir data-store --artifact-dir artifact-data
 
       - name: Upload data artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -66,53 +120,20 @@ jobs:
       - name: Run summary
         if: always()
         run: |
-          echo "### DSH Plugin Health Monitor data update" >> "$GITHUB_STEP_SUMMARY"
+          echo "### ORBIT data update" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           if [ -f artifact-data/status.json ]; then
             node -e "const s=require('./artifact-data/status.json'); const safe=(v)=>String(v).replace(/[<>]/g,''); console.log('- outcome: **'+safe(s.outcome)+'**'); console.log('- last success: '+safe(s.lastSuccessAt)); console.log('- errors: '+Number(s.errorCount)); for (const [k,v] of Object.entries(s.sources)) console.log('- '+safe(k)+': '+safe(v.status));" >> "$GITHUB_STEP_SUMMARY"
           fi
 
-  persist:
-    name: Persist snapshot to data branch
-    runs-on: ubuntu-latest
-    needs: [collect, build]
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout data branch
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          ref: data
-          path: data-store
-
-      - name: Download data artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: plugin-data
-          path: downloaded-data
-
-      - name: Commit and push snapshot
-        working-directory: data-store
-        run: |
-          cp ../downloaded-data/latest.json .
-          cp ../downloaded-data/history.json .
-          cp ../downloaded-data/status.json .
-          rm -rf snapshots
-          cp -R ../downloaded-data/snapshots .
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add latest.json history.json status.json snapshots
-          if git diff --cached --quiet; then
-            echo "No data changes to commit."
-          else
-            git commit -m "data: refresh snapshot $(date -u +%Y-%m-%dT%H:%MZ)"
-            git push origin HEAD:data
-          fi
-
   build:
     name: Build static site
     runs-on: ubuntu-latest
-    needs: collect
+    needs: [gate, collect]
+    # collect is deliberately skipped for pause/resume; a paused schedule has no artifact.
+    if: >-
+      ${{ !cancelled() && needs.gate.result == 'success' &&
+      (needs.collect.result == 'success' || needs.gate.outputs.control_changed == 'true') }}
     timeout-minutes: 15
     permissions:
       contents: read
@@ -159,10 +180,55 @@ jobs:
           path: dist/
           retention-days: 3
 
+  persist:
+    name: Persist data or control change
+    runs-on: ubuntu-latest
+    needs: [gate, collect, build]
+    if: ${{ !cancelled() && needs.gate.result == 'success' && needs.build.result == 'success' }}
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout data branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: data
+          path: data-store
+
+      - name: Download data artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: plugin-data
+          path: downloaded-data
+
+      - name: Commit and push data change
+        working-directory: data-store
+        env:
+          CONTROL_ONLY: ${{ needs.gate.outputs.control_changed }}
+        run: |
+          cp ../downloaded-data/collection-control.json .
+          git add collection-control.json
+          if [ "$CONTROL_ONLY" != "true" ]; then
+            cp ../downloaded-data/latest.json .
+            cp ../downloaded-data/history.json .
+            cp ../downloaded-data/status.json .
+            rm -rf snapshots
+            cp -R ../downloaded-data/snapshots .
+            git add latest.json history.json status.json snapshots
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "data: update snapshot or collection control $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push origin HEAD:data
+          fi
+
   deploy:
     name: Deploy Pages
     runs-on: ubuntu-latest
     needs: [persist, build]
+    if: ${{ !cancelled() && needs.persist.result == 'success' && needs.build.result == 'success' }}
     permissions:
       contents: read
       pages: write

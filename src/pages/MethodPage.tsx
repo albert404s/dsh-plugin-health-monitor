@@ -1,97 +1,72 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  ArrowUp,
-  ArrowUpRight,
-  BookOpen,
-  Calculator,
-  Database,
-  GitBranch,
-  RefreshCw,
-  ShieldAlert,
-} from 'lucide-react';
+import { ArrowUp, ArrowUpRight, ChevronDown } from 'lucide-react';
 import { useData } from '../hooks/useData';
 import { SCORE_METHOD_VERSION } from '../lib/types';
 import { formatDateTime } from '../lib/format';
 import { QuietHint } from '../components/quiet-hint';
-import { ExternalTextLink, InlineNotice } from '../components/ui';
+import { ExternalTextLink } from '../components/ui';
 
 const TOC = [
-  { href: '#principles', label: '读数原则' },
-  { href: '#sources', label: '数据来源' },
-  { href: '#popularity', label: '关注度' },
-  { href: '#maintenance', label: '维护活跃度' },
-  { href: '#risk', label: '关注事项' },
+  { href: '#principles', label: '怎么选排序' },
+  { href: '#sources', label: '数据从哪来' },
+  { href: '#popularity', label: '关注度怎么算' },
+  { href: '#maintenance', label: '维护活跃度怎么看' },
+  { href: '#risk', label: '关注事项怎么看' },
   { href: '#completeness', label: '数据完整度' },
-  { href: '#pipeline', label: '更新与存储' },
-  { href: '#limits', label: '局限与边界' },
+  { href: '#pipeline', label: '更新与暂停' },
+  { href: '#limits', label: '使用边界' },
 ];
 
-const METHOD_SOURCES = [
-  {
-    name: 'GitHub REST API',
-    fields:
-      'Stars、Forks、归档状态、最近非合并提交、近 30 天非合并提交、近 90 天 Issue/PR、长期开放 Issue、Release。',
-    limits:
-      '使用分页与重试；分页上限触发时标记为下限。Issue 列表会过滤 PR；不使用 updated_at 代替最近代码提交。',
-  },
-  {
-    name: 'npm Download API',
-    fields: '近 30 天下载、近 7 天 / 前 7 天对比、日下载序列、latest 版本、engines、DSH peer range。',
-    limits:
-      '只有 npm registry 的 repository 字段与 GitHub 仓库一致时才采信。Star、Fork、Release Asset 下载量不会冒充 npm 下载量。',
-  },
-  {
-    name: 'OSV API',
-    fields: '以 npm 包名 + latest 精确版本查询 querybatch，并读取公开漏洞详情。',
-    limits:
-      '只覆盖 OSV 已收录的公开记录。无法精确匹配或请求失败时显示“未完成漏洞检查”，不会显示“安全”或“零风险”。',
-  },
-];
+const SORT_OPTIONS = [
+  ['Stars', '想看被更多人收藏的项目。按 GitHub Stars 从多到少排列。'],
+  ['npm 下载', '想看近期下载较多的插件。按近 30 天下载量排列；下载次数不等于用户人数。'],
+  ['维护活跃度', '想先看近期维护活动较多的项目。综合提交、Issue、PR 和版本发布。'],
+  ['关注度', '想综合看收藏和下载。表示在已收录插件中的相对位置。'],
+  ['最近更新', '想看最近改过代码的项目。按最近一次非合并代码提交的时间排列。'],
+  ['数据完整度', '想先看资料更齐全的插件。资料多不代表插件更好。'],
+  ['近 30 天提交', '想看最近代码改动频繁的项目。提交次数多不代表质量高。'],
+  ['名称', '按插件名称排列，方便找到已知项目。'],
+] as const;
 
 const MAINTENANCE_ROWS = [
-  ['最近代码提交', '30%', '距最近非合并提交：≤7d 100；≤14d 92；≤30d 82；≤60d 68；≤90d 55；≤180d 38；≤365d 20；更久 6。', '无提交日期时整项剔除。'],
-  ['近 30 天非合并提交频率', '15%', '0 次=12，1=38，2–3=55，4–7=72，8–11=88，≥12=100。', '分页达到上限时按已取得的提交数作下限计分。'],
-  ['近期 Issue 关闭率', '20%', '近 90 天创建的非 PR Issue 中当前已关闭比例 × 100。', '少于 5 条按 n/5 折减权重；0 条新 Issue 不参与，不扣分。'],
-  ['开放 Issue 积压', '10%', '若当前有开放 Issue：100 − (开放 Issue 数 / 近 90 天新开 Issue 数) × 100。', '按近 90 天新开样本缩放权重；无开放 Issue 时不参与。'],
-  ['近期 PR 合并率', '15%', '近 90 天创建 PR 中已合并比例 × 100。', '少于 3 条按 n/3 折减；PR 功能不可用时剔除，不记 0。'],
-  ['最近版本发布', '10%', '≤30d 100；≤60d 92；≤90d 80；≤180d 62；≤365d 40；更久 18。', '没有稳定 Release 时不参与评分，不直接惩罚。'],
+  ['最近代码提交', '30%', '距最近非合并提交 ≤7 / 14 / 30 / 60 / 90 / 180 / 365 天，分别为 100 / 92 / 82 / 68 / 55 / 38 / 20 分；更久为 6 分。无日期时不参与。'],
+  ['近 30 天提交', '15%', '0 / 1 / 2–3 / 4–7 / 8–11 / ≥12 次，分别为 12 / 38 / 55 / 72 / 88 / 100 分。分页截断时，仅已取得 ≥12 次才可参与。'],
+  ['Issue 关闭率', '20%', '近 90 天创建的非 PR Issue 中，当前已关闭的比例 × 100。少于 5 条时，权重乘以样本数 / 5；没有新 Issue 时不参与。'],
+  ['开放 Issue 积压', '10%', '100 − 当前开放数 / 近 90 天新开数 × 100，限制在 0–100 分；分母为 0 且存在开放 Issue 时为 0 分。权重乘以 min(1, 当前开放数 / 5)。'],
+  ['PR 合并率', '15%', '近 90 天创建 PR 中已合并的比例 × 100。少于 3 条时，权重乘以样本数 / 3；没有新 PR 或功能不可用时不参与。'],
+  ['最近版本发布', '10%', '距最近 Release ≤30 / 60 / 90 / 180 / 365 天，分别为 100 / 92 / 80 / 62 / 40 分；更久为 18 分。无 Release 时不参与。'],
 ] as const;
 
 function MethodSection({
   id,
   index,
   title,
-  description,
   children,
 }: {
   id: string;
   index: string;
   title: string;
-  description?: string;
   children: React.ReactNode;
 }): JSX.Element {
-  const [sectionNumber, ...sectionLabel] = index.split(' / ');
   return (
     <section id={id} className="scroll-mt-24 border-t border-line pt-6">
-      <p className="flex flex-wrap items-center gap-2">
-        <span className="index">{sectionNumber}</span>
-        <span className="text-2xs font-medium text-content-muted">{sectionLabel.join(' / ')}</span>
-      </p>
-      <h2 className="mt-2 text-2xl font-semibold leading-8 tracking-title text-content-primary">{description ? <QuietHint text={description}>{title}</QuietHint> : title}</h2>
-      <div className="mt-5 max-w-prose">{children}</div>
+      <span className="index">{index}</span>
+      <h2 className="mt-2 text-xl font-semibold leading-8 tracking-title text-content-primary">{title}</h2>
+      <div className="mt-4 text-sm leading-7 text-content-secondary">{children}</div>
     </section>
   );
 }
 
-function ScrollableTable({ label, children }: { label: string; children: React.ReactNode }): JSX.Element {
+function MoreDetails({ title, children }: { title: string; children: React.ReactNode }): JSX.Element {
   return (
-    <div>
-      <div className="overflow-x-auto rounded-panel border border-line" role="region" aria-label={label} tabIndex={0}>
-        {children}
-      </div>
-      <p className="mt-2 text-2xs text-content-muted lg:hidden">表格较宽，可在表格内左右滑动查看。</p>
-    </div>
+    <details className="group mt-4 rounded-panel border border-line bg-surface">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-medium text-content-primary">
+        {title}
+        <ChevronDown size={15} className="shrink-0 text-content-muted transition-transform group-open:rotate-180" aria-hidden="true" />
+      </summary>
+      <div className="space-y-3 border-t border-line-hairline px-4 py-4 text-sm leading-7 text-content-secondary">{children}</div>
+    </details>
   );
 }
 
@@ -120,467 +95,201 @@ export function MethodPage(): JSX.Element {
   return (
     <div id="top" className="orbit-page orbit-method page-enter">
       <div className="lg:mx-auto lg:max-w-[1080px]">
-      <div className="max-w-[48rem]">
         <p className="stamp">METHOD / v{SCORE_METHOD_VERSION}</p>
         <h1 className="mt-2 text-[2rem] font-semibold leading-[1.15] tracking-tightest text-content-primary md:text-4xl lg:text-[2.5rem]">
-          <QuietHint text="数据来源、计算方式与局限。">数据与方法</QuietHint>
+          <QuietHint text="帮你读懂排序，找到适合自己的插件。">数据与方法</QuietHint>
         </h1>
-        <div className="mt-5 flex flex-wrap items-center gap-2 text-2xs text-content-muted">
-          <span className="rounded-chip border border-line bg-surface px-2 py-1 font-mono">方法 v{SCORE_METHOD_VERSION}</span>
-          <span className="rounded-chip border border-line bg-surface px-2 py-1 font-mono">数据 schema v1</span>
-          {data ? (
-            <span className="rounded-chip border border-line bg-surface px-2 py-1">
-              当前快照 {formatDateTime(data.latest.lastSuccessAt)}
-            </span>
-          ) : null}
-          <span className="rounded-chip border border-line bg-surface px-2 py-1">数据来源：GitHub / npm / OSV</span>
+        <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-content-muted">
+          <QuietHint text="用于比较公开活动，不代表插件质量。">
+            <span className="rounded-chip border border-line bg-surface px-2 py-1 font-mono">方法 v{SCORE_METHOD_VERSION}</span>
+          </QuietHint>
+          {data ? <span>数据更新于 {formatDateTime(data.latest.lastSuccessAt)}</span> : null}
         </div>
-      </div>
 
-      <details className="mt-6 rounded-panel border border-line bg-surface lg:hidden">
-        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-medium text-content-primary">
-          本页目录
-          <span className="text-2xs text-content-muted">8 节</span>
-        </summary>
-        <nav className="grid grid-cols-2 gap-x-4 border-t border-line-hairline px-4 py-2" aria-label="方法页移动端目录">
-          {TOC.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className="flex min-h-11 items-center text-xs text-content-secondary hover:text-brand-text"
-            >
-              {item.label}
-            </a>
-          ))}
-        </nav>
-      </details>
+        <section className="panel mt-6 p-5" aria-labelledby="quick-guide-title">
+          <h2 id="quick-guide-title" className="text-base font-semibold text-content-primary">快速指南</h2>
+          <ol className="mt-4 grid gap-5 md:grid-cols-3">
+            {[
+              ['01 · 先搜功能', '在插件库搜索用途、名称或关键词。'],
+              ['02 · 再看维护和用量', '看最近提交、下载和关注事项，选几个候选。'],
+              ['03 · 对比后去仓库确认', '对比原始数据，再查看文档、安装要求和兼容版本。'],
+            ].map(([title, text]) => (
+              <li key={title}>
+                <h3 className="text-sm font-medium text-brand-text">{title}</h3>
+                <p className="mt-1 text-sm leading-6 text-content-secondary">{text}</p>
+              </li>
+            ))}
+          </ol>
+          <Link to="/plugins" className="mt-5 inline-flex min-h-11 items-center gap-1 text-sm font-medium text-brand-text hover:text-content-primary">
+            去插件库 <ArrowUpRight size={14} aria-hidden="true" />
+          </Link>
+        </section>
 
-      <details className="panel mt-6 p-5"><summary className="cursor-pointer text-sm font-semibold text-content-primary">快速指南</summary><div className="mt-4 grid gap-5 md:grid-cols-3"><div><h2 className="text-sm font-medium text-brand-text">01 · 看用途</h2><p className="mt-2 text-sm leading-7 text-content-secondary">在插件库按功能筛选，分数不能替代功能适配。</p></div><div><h2 className="text-sm font-medium text-brand-text">02 · 看证据</h2><p className="mt-2 text-sm leading-7 text-content-secondary">维护活跃度描述公开活动；数据缺失不等于零。</p></div><div><h2 className="text-sm font-medium text-brand-text">03 · 再比较</h2><p className="mt-2 text-sm leading-7 text-content-secondary">仅当方法、参与分项和有效权重一致时计算分差。</p></div></div></details>
-      <div className="mt-8 grid gap-10 lg:grid-cols-[180px_minmax(0,1fr)] lg:gap-8 xl:grid-cols-[200px_minmax(0,1fr)] xl:gap-12">
-        <aside className="hidden lg:block">
-          <nav className="sticky top-[calc(var(--header-h)+16px)]" aria-label="方法页目录">
-            <p className="stamp mb-3">ON THIS PAGE</p>
-            <div className="space-y-0.5 border-l border-line pl-2">
-              {TOC.map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  aria-current={activeSection === item.href ? 'location' : undefined}
-                  className={
-                    activeSection === item.href
-                      ? '-ml-px block border-l-2 border-brand bg-brand-soft/50 px-2 py-1.5 text-xs font-semibold text-content-primary'
-                      : '-ml-px block border-l-2 border-transparent px-2 py-1.5 text-xs text-content-secondary transition-colors hover:border-line-strong hover:bg-surface-subtle hover:text-content-primary'
-                  }
-                >
-                  {item.label}
-                </a>
-              ))}
-            </div>
+        <details className="mt-6 rounded-panel border border-line bg-surface lg:hidden">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-medium text-content-primary">
+            本页目录 <ChevronDown size={15} aria-hidden="true" />
+          </summary>
+          <nav className="grid grid-cols-2 gap-x-4 border-t border-line-hairline px-4 py-2" aria-label="方法页移动端目录">
+            {TOC.map((item) => <a key={item.href} href={item.href} className="flex min-h-11 items-center text-xs text-content-secondary hover:text-brand-text">{item.label}</a>)}
           </nav>
-        </aside>
+        </details>
 
-        <div className="min-w-0 space-y-12">
-          <MethodSection
-            id="principles"
-            index="01 / 读数原则"
-            title="四条读数原则"
-            description="这些原则优先于任何具体权重。"
-          >
-            <div className="grid gap-px border border-line bg-line sm:grid-cols-2">
-              {[
-                {
-                  title: '相对评价，不是绝对标准',
-                  text: '指数在本次收录的插件样本内计算。样本变化会改变排名，因此所有分数都显示数据快照时间与评分依据。',
-                },
-                {
-                  title: '缺失不是 0',
-                  text: '没有可靠下载、Issue 样本或 OSV 匹配时，该项从权重中剔除或显示“信息不足”，不补 0，也不补造历史点。',
-                },
-                {
-                  title: '活跃不等于质量',
-                  text: '提交频率、Issue 关闭率与 PR 合并率只描述公开维护活动，不评价代码架构、文档、用户体验或隐藏缺陷。',
-                },
-                {
-                  title: '风险提示不是审计',
-                  text: '归档、长期 Issue 与 OSV 公开记录都是需要阅读的信号；没有记录不等于安全，未检查会明确显示“未完成”。',
-                },
-              ].map((principle) => (
-                <div key={principle.title} className="bg-surface p-4">
-                  <h3 className="text-base font-semibold text-content-primary">{principle.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-content-secondary">{principle.text}</p>
-                </div>
-              ))}
-            </div>
-          </MethodSection>
-
-          <MethodSection
-            id="sources"
-            index="02 / 数据来源"
-            title="数据从哪里来"
-            description="只使用公开、可追溯的数据。项目不安装、不执行、不加载被检测插件的代码。"
-          >
-            <div className="space-y-3 md:hidden">
-              {METHOD_SOURCES.map((source) => (
-                <div key={source.name} className="border border-line bg-surface">
-                  <h3 className="border-b border-line bg-surface-subtle px-4 py-2.5 text-sm font-semibold text-content-primary">
-                    {source.name}
-                  </h3>
-                  <dl className="divide-y divide-line-hairline">
-                    <div className="px-4 py-3">
-                      <dt className="text-2xs font-medium text-content-muted">字段与窗口</dt>
-                      <dd className="mt-1 text-xs leading-5 text-content-secondary">{source.fields}</dd>
-                    </div>
-                    <div className="px-4 py-3">
-                      <dt className="text-2xs font-medium text-content-muted">准确性边界</dt>
-                      <dd className="mt-1 text-xs leading-5 text-content-secondary">{source.limits}</dd>
-                    </div>
-                  </dl>
-                </div>
-              ))}
-            </div>
-            <div className="hidden md:block">
-              <ScrollableTable label="数据来源与准确性边界">
-                <table className="w-full min-w-[680px] text-left">
-                  <thead>
-                    <tr className="border-b border-line-strong bg-surface-subtle">
-                      {['来源', '字段与窗口', '准确性边界'].map((heading) => (
-                        <th
-                          key={heading}
-                          className={
-                            heading === '来源'
-                              ? 'sticky left-0 bg-surface-subtle px-4 py-2.5 text-2xs font-medium text-content-secondary'
-                              : 'px-4 py-2.5 text-2xs font-medium text-content-secondary'
-                          }
-                        >
-                          {heading}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-line-hairline text-xs leading-5">
-                    {METHOD_SOURCES.map((source) => (
-                      <tr key={source.name}>
-                        <td className="sticky left-0 bg-surface px-4 py-3 align-top text-sm font-medium text-content-primary">
-                          {source.name}
-                        </td>
-                        <td className="px-4 py-3 align-top text-content-secondary">{source.fields}</td>
-                        <td className="px-4 py-3 align-top text-content-secondary">{source.limits}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </ScrollableTable>
-            </div>
-            <div className="mt-3 flex flex-wrap gap-4 text-xs text-content-muted">
-              <ExternalTextLink href="https://docs.github.com/rest">GitHub REST 文档</ExternalTextLink>
-              <ExternalTextLink href="https://github.com/npm/registry/blob/main/docs/download-counts.md">
-                npm 下载统计口径
-              </ExternalTextLink>
-              <ExternalTextLink href="https://google.github.io/osv-scanner/">OSV 文档</ExternalTextLink>
-            </div>
-          </MethodSection>
-
-          <MethodSection
-            id="popularity"
-            index="03 / 关注度"
-            title="关注度"
-            description="回答“有多少人在关注或使用”，不回答“好不好”。"
-          >
-            <div className="grid gap-6 md:grid-cols-2">
-              <div>
-                <h3 className="flex items-center gap-2 text-base font-semibold text-content-primary">
-                  <Calculator size={16} className="text-content-secondary" aria-hidden="true" /> 计算
-                </h3>
-                <div className="mt-3 space-y-3 text-base leading-7 text-content">
-                  <p>
-                    对每个有效值先做{' '}
-                    <code className="rounded-chip border-l-2 border-content-primary bg-surface-subtle px-1.5 py-0.5 font-mono text-sm text-content-primary">
-                      log10(1 + x)
-                    </code>
-                    ，再在本次样本内做 min-max 归一化到 0–100。这样可以压缩几个数量级间的差异，避免下载量直接淹没 Star。
-                  </p>
-                  <p>
-                    同时有两种数据时：Stars 权重 <b className="text-content-primary">45%</b>，经核验的近 30 天下载量权重{' '}
-                    <b className="text-content-primary">55%</b>。
-                  </p>
-                  <p>
-                    缺少可靠下载量时，仅使用 Stars 的归一化位置，权重归一为 100%，评分依据覆盖降为 45%，依据等级为一般。
-                    该插件仍可在详情页查看，但不会进入生态分布定位。
-                  </p>
-                </div>
+        <div className="mt-8 grid gap-10 lg:grid-cols-[180px_minmax(0,1fr)] lg:gap-8 xl:grid-cols-[200px_minmax(0,1fr)] xl:gap-12">
+          <aside className="hidden lg:block">
+            <nav className="sticky top-[calc(var(--header-h)+16px)]" aria-label="方法页目录">
+              <p className="stamp mb-3">ON THIS PAGE</p>
+              <div className="space-y-0.5 border-l border-line pl-2">
+                {TOC.map((item) => (
+                  <a key={item.href} href={item.href} aria-current={activeSection === item.href ? 'location' : undefined}
+                    className={activeSection === item.href
+                      ? '-ml-px block border-l-2 border-brand bg-brand-soft/50 px-2 py-2 text-xs font-semibold text-content-primary'
+                      : '-ml-px block border-l-2 border-transparent px-2 py-2 text-xs text-content-secondary transition-colors hover:border-line-strong hover:bg-surface-subtle hover:text-content-primary'}>
+                    {item.label}
+                  </a>
+                ))}
               </div>
-              <div className="border-l-2 border-content-primary bg-surface-subtle px-4 py-4">
-                <p className="text-2xs font-medium text-content-muted">为什么不用绝对分</p>
-                <p className="mt-2 text-sm leading-6 text-content-secondary">
-                  当前 DSH 插件生态仍在快速变化。Star 与下载量受传播、发布节奏、镜像和统计口径影响，
-                  用固定行业阈值会制造虚假精确感。因此本指数表达“在这批插件中的相对位置”，并随收录样本变化。
-                </p>
-                <p className="mt-3 border-t border-line-hairline pt-3 text-xs leading-5 text-warning">
-                  缺少下载量时不会简单计 0；星级高但下载缺失的插件也不会被强行放入“高人气”象限。
-                </p>
-              </div>
-            </div>
-          </MethodSection>
+            </nav>
+          </aside>
 
-          <MethodSection
-            id="maintenance"
-            index="04 / 维护活跃度"
-            title="维护活跃度"
-            description="最近有多少可观察的公开维护证据，而不是代码质量分。"
-          >
-            <div className="space-y-3 md:hidden">
-              {MAINTENANCE_ROWS.map((row) => (
-                <div key={row[0]} className="border border-line bg-surface">
-                  <div className="flex items-center justify-between gap-3 border-b border-line bg-surface-subtle px-4 py-2.5">
-                    <h3 className="text-sm font-semibold text-content-primary">{row[0]}</h3>
-                    <span className="tnum font-mono text-xs text-content-secondary">{row[1]}</span>
+          <div className="min-w-0 space-y-9">
+            <MethodSection id="principles" index="01" title="怎么选排序">
+              <dl className="divide-y divide-line-hairline">
+                {SORT_OPTIONS.map(([label, text]) => (
+                  <div key={label} className="grid gap-1 py-3 sm:grid-cols-[108px_minmax(0,1fr)] sm:gap-4">
+                    <dt className="font-medium text-content-primary">{label}</dt>
+                    <dd>{text}</dd>
                   </div>
-                  <dl className="divide-y divide-line-hairline">
-                    <div className="px-4 py-3">
-                      <dt className="text-2xs font-medium text-content-muted">算法</dt>
-                      <dd className="mt-1 text-xs leading-5 text-content-secondary">{row[2]}</dd>
-                    </div>
-                    <div className="px-4 py-3">
-                      <dt className="text-2xs font-medium text-content-muted">缺失 / 小样本处理</dt>
-                      <dd className="mt-1 text-xs leading-5 text-content-secondary">{row[3]}</dd>
-                    </div>
-                  </dl>
-                </div>
-              ))}
-            </div>
-            <div className="hidden md:block">
-              <ScrollableTable label="维护活跃度分项、权重与算法">
-                <table className="w-full min-w-[720px] text-left">
-                  <thead>
-                    <tr className="border-b border-line-strong bg-surface-subtle">
-                      {['分项', '设计权重', '算法', '缺失 / 小样本处理'].map((heading) => (
-                        <th
-                          key={heading}
-                          className={
-                            heading === '分项'
-                              ? 'sticky left-0 bg-surface-subtle px-4 py-2.5 text-2xs font-medium text-content-secondary'
-                              : 'px-4 py-2.5 text-2xs font-medium text-content-secondary'
-                          }
-                        >
-                          {heading}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-line-hairline text-xs leading-5">
-                    {MAINTENANCE_ROWS.map((row) => (
-                      <tr key={row[0]}>
-                        <td className="sticky left-0 bg-surface px-4 py-3 align-top text-sm font-medium text-content-primary">
-                          {row[0]}
-                        </td>
-                        <td className="px-4 py-3 align-top font-mono text-content-secondary">{row[1]}</td>
-                        <td className="px-4 py-3 align-top text-content-secondary">{row[2]}</td>
-                        <td className="px-4 py-3 align-top text-content-secondary">{row[3]}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </ScrollableTable>
-            </div>
-            <ul className="mt-4 divide-y divide-line-hairline border-y border-line text-sm leading-6 text-content-secondary">
-              <li className="py-3">
-                <b className="text-content-primary">证据覆盖 &lt; 45%</b> → 不输出维护分，显示“信息不足”。
-              </li>
-              <li className="py-3">
-                <b className="text-content-primary">覆盖 ≥ 80% / 55%</b> → 依据较充分 / 一般，剩余为依据较少。
-              </li>
-              <li className="py-3">
-                <b className="text-content-primary">提交多 ≠ 质量高</b>。维护分只描述公开活动，不进入“代码质量”判断。
-              </li>
-            </ul>
-          </MethodSection>
+                ))}
+              </dl>
+              <p className="mt-3 text-xs leading-6 text-content-muted">排序只作用于已收录的数据，不会每点一次就请求 GitHub。没有数据的指标不当作 0 分。</p>
+            </MethodSection>
 
-          <MethodSection
-            id="risk"
-            index="05 / 风险提示"
-            title="关注事项"
-            description="按信号分级展示，不做风险总分，也不把“无记录”写成“安全”。"
-          >
-            <div className="grid gap-8 md:grid-cols-2">
-              <div>
-                <h3 className="flex items-center gap-2 text-base font-semibold text-content-primary">
-                  <ShieldAlert size={16} className="text-risk-high" aria-hidden="true" /> 触发规则
-                </h3>
-                <ul className="mt-3 divide-y divide-line-hairline border-t border-line text-sm leading-6 text-content-secondary">
-                  {[
-                    '仓库 archived → 高风险信号。',
-                    '长期开放 Issue ≥ 20 高风险；≥ 5 需关注。',
-                    '开放 Issue ≥ 100 或开放 / 近 90 天新开 ≥ 75% → 高风险；≥ 50 或 ≥ 50% → 需关注。',
-                    'OSV 返回 high/critical → 高风险信号；其他公开记录 → 需关注。',
-                    '未完成漏洞检查、无可靠 npm 数据、数据超过 2 天未更新 → 信息缺口。',
-                    '若 OSV 未完成且无其他高风险信号 → 等级为“风险信息不完整”，不是“低风险”。',
-                  ].map((rule) => (
-                    <li key={rule} className="py-2.5">
-                      {rule}
-                    </li>
+            <MethodSection id="sources" index="02" title="数据从哪来">
+              <dl className="grid gap-4 sm:grid-cols-3">
+                {[
+                  ['GitHub', '仓库收藏、代码提交、Issue、PR 和版本发布。'],
+                  ['npm', '通过仓库地址核验的包，其近 30 天下载量和版本信息。'],
+                  ['OSV', '与 npm 包及具体版本匹配的公开漏洞记录。'],
+                ].map(([name, text]) => (
+                  <div key={name} className="rounded-panel border border-line bg-surface p-4">
+                    <dt className="font-semibold text-content-primary">{name}</dt>
+                    <dd className="mt-2 text-sm leading-6">{text}</dd>
+                  </div>
+                ))}
+              </dl>
+              <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs">
+                <ExternalTextLink href="https://docs.github.com/rest">GitHub 文档</ExternalTextLink>
+                <ExternalTextLink href="https://github.com/npm/registry/blob/main/docs/download-counts.md">npm 下载统计</ExternalTextLink>
+                <ExternalTextLink href="https://google.github.io/osv.dev/api/">OSV 文档</ExternalTextLink>
+              </div>
+            </MethodSection>
+
+            <MethodSection id="popularity" index="03" title="关注度：综合看收藏和下载">
+              <p>Stars 和近 30 天 npm 下载共同计算。它是这批插件中的相对位置，不是质量评分；新增插件后，分数也可能变化。</p>
+              <MoreDetails title="查看计算方式">
+                <p>有效数据先做 <code className="font-mono text-xs text-content-primary">log10(1 + x)</code>，再在本次收录的有效样本内归一化到 0–100，减小数量级差异。</p>
+                <p>Stars 占 45%，经核验的 npm 下载占 55%。缺少可靠下载时，只按 Stars 计算，评分依据覆盖为 45%；不把缺失下载记为 0。</p>
+                <p>生态分布只定位满足数据条件的插件。不同方法版本、参与分项或有效权重的分数不直接计算分差。</p>
+              </MoreDetails>
+            </MethodSection>
+
+            <MethodSection id="maintenance" index="04" title="维护活跃度：近期有没有人在维护">
+              <p>综合最近提交、提交次数、Issue 处理、PR 合并和版本发布。稳定的小插件可能很久不用修改，分数低时可以先去仓库了解原因。</p>
+              <MoreDetails title="查看分项与权重">
+                <div className="space-y-4">
+                  {MAINTENANCE_ROWS.map(([label, weight, rule]) => (
+                    <div key={label} className="border-b border-line-hairline pb-4 last:border-0 last:pb-0">
+                      <div className="flex items-baseline justify-between gap-3">
+                        <h3 className="font-medium text-content-primary">{label}</h3>
+                        <span className="font-mono text-xs text-content-muted">{weight}</span>
+                      </div>
+                      <p className="mt-1 text-xs leading-6">{rule}</p>
+                    </div>
                   ))}
-                </ul>
-              </div>
-              <div>
-                <h3 className="flex items-center gap-2 text-base font-semibold text-content-primary">
-                  <GitBranch size={16} className="text-content-secondary" aria-hidden="true" /> 兼容性证据
-                </h3>
-                <p className="mt-3 text-sm leading-6 text-content-secondary">
-                  详情页展示 npm 包声明的 Node engines、DSH peer range 与版本链接。
-                  本项目不安装插件、不执行安装脚本、不做运行时兼容性测试。没有声明不等于不兼容，已声明也不等于已验证。
-                </p>
-                <p className="mt-3 border-t border-line-hairline pt-3 text-xs leading-5 text-content-muted">
-                  Issue 与 PR 的统计窗口固定为 90 天，分母分别是窗口内创建的非 PR Issue 数和 PR 数。
-                </p>
-              </div>
-            </div>
-          </MethodSection>
-
-          <MethodSection
-            id="completeness"
-            index="06 / 数据完整度"
-            title="数据完整度"
-            description="七个数据域，分别记录“是否真的取得”，避免把零值和缺失混在一起。"
-          >
-            <div className="grid gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
-              {[
-                '仓库基础信息',
-                '提交活动',
-                'Issue 处理',
-                'PR 处理',
-                '版本发布',
-                'npm 下载',
-                'OSV 漏洞检查',
-              ].map((domain, index) => (
-                <div key={domain} className="bg-surface px-3 py-3">
-                  <span className="font-mono text-2xs text-content-muted">0{index + 1}</span>
-                  <p className="mt-1 text-sm text-content-primary">{domain}</p>
                 </div>
-              ))}
-            </div>
-            <p className="mt-3 text-base leading-7 text-content">
-              完整度 = 可用数据域 / 7。它衡量的是“这份画像有多少证据”，不是插件质量。
-              没有 Release、没有 Issue 或没有 npm 包是项目的真实状态，但仍会降低画像覆盖，因为对应维度无法形成证据。
-            </p>
-          </MethodSection>
+                <p className="border-t border-line pt-3 text-xs leading-6">有效权重按可用数据和样本数调整后重新归一化。必要数据缺失、Issue / PR 分页不完整时，相应分项不参与。评分依据覆盖低于 45% 时不输出维护分；≥80% 为依据较充分，≥55% 为一般，其余为较少。</p>
+                <p className="text-xs leading-6">提交、关闭 Issue 或合并 PR 都只表示活动，不能证明代码质量；Issue 关闭也不一定表示问题已解决。</p>
+              </MoreDetails>
+            </MethodSection>
 
-          <MethodSection
-            id="pipeline"
-            index="07 / 更新与存储"
-            title="更新、历史与部署"
-            description="静态 JSON、独立 data 分支、GitHub Actions 与 Pages。"
-          >
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {[
-                { icon: <Database size={15} />, title: '采集', text: 'Node/TypeScript 采集 GitHub、npm、OSV，带超时、重试、分页与请求级缓存。' },
-                { icon: <Calculator size={15} />, title: '计算', text: '统一评分模块生成快照、历史点与状态文件。历史点只在成功写入时追加。' },
-                { icon: <GitBranch size={15} />, title: '存储', text: '源码在 main，数据在 data 分支。失败采集只更新 status，不覆盖最后成功快照。' },
-                { icon: <RefreshCw size={15} />, title: '部署', text: 'GitHub Actions 构建并部署 Pages；前端只读取静态 JSON，不含任何 Token。' },
-              ].map((step, index) => (
-                <div key={step.title} className="border-t-2 border-metal-200 pt-3">
-                  <div className="flex items-center justify-between text-content-secondary">
-                    <span className="text-content-secondary">{step.icon}</span>
-                    <span className="font-mono text-2xs text-content-muted">0{index + 1}</span>
+            <MethodSection id="risk" index="05" title="关注事项：分开看，方便做决定">
+              <dl className="divide-y divide-line-hairline">
+                {[
+                  ['维护提示', '仓库归档、Issue 长期未处理等。结合项目规模和具体问题判断。'],
+                  ['公开漏洞', '查看受影响版本和修复版本。它与维护是否活跃是两件事。'],
+                  ['数据缺口', '说明哪些信息没取得或需要更新，不代表插件有问题。'],
+                ].map(([label, text]) => (
+                  <div key={label} className="grid gap-1 py-3 sm:grid-cols-[108px_minmax(0,1fr)] sm:gap-4">
+                    <dt className="font-medium text-content-primary">{label}</dt><dd>{text}</dd>
                   </div>
-                  <h3 className="mt-2 text-base font-semibold text-content-primary">{step.title}</h3>
-                  <p className="mt-1 text-sm leading-6 text-content-secondary">{step.text}</p>
-                </div>
-              ))}
-            </div>
-            <div className="mt-6 grid gap-8 md:grid-cols-2">
-              <div>
-                <p className="text-2xs font-medium text-content-muted">保留策略</p>
-                <ul className="mt-2 divide-y divide-line-hairline border-t border-line text-sm leading-6 text-content-secondary">
-                  <li className="py-2">每 6 小时尝试更新 GitHub 数据；npm 与 OSV 随同刷新。</li>
-                  <li className="py-2">历史保留 90 天，单插件最多保留 400 个点；完整快照最多保留 120 份。</li>
-                  <li className="py-2">连续执行两次更新不会清空历史；失败采集不生成新的 latest 快照。</li>
-                  <li className="py-2">data 分支提交不会触发 main 的部署，避免工作流循环。</li>
+                ))}
+              </dl>
+              <MoreDetails title="查看提示规则">
+                <ul className="list-disc space-y-2 pl-5 text-xs leading-6">
+                  <li>仓库已归档、长期开放 Issue ≥20 条，会优先提示；长期开放 Issue ≥5 条时提示关注。</li>
+                  <li>没有较高级别的长期 Issue 提示时，开放 Issue ≥100 条，或其数量达到近 90 天新开数的 75%，会优先提示；≥50 条或达到 50% 时提示关注。这些阈值可能受小样本影响，请查看原始问题。</li>
+                  <li>OSV 高危 / 严重漏洞优先提示，其他公开漏洞也单独列出；按具体 npm 包版本匹配。</li>
+                  <li>无可靠 npm 数据、漏洞检查未完成、插件数据超过 2 天未更新，标记为数据缺口。</li>
                 </ul>
-              </div>
-              <div>
-                <p className="text-2xs font-medium text-content-muted">安全边界</p>
-                <ul className="mt-2 divide-y divide-line-hairline border-t border-line text-sm leading-6 text-content-secondary">
-                  <li className="py-2">GitHub Token 只存在于采集进程环境，不进入 Vite 前端构建。</li>
-                  <li className="py-2">构建后扫描产物中的 token 形态，CI 失败即阻止交付。</li>
-                  <li className="py-2">不安装、不执行第三方插件，不把 README/Issue 文本当指令。</li>
-                  <li className="py-2">页面只展示静态 JSON，没有服务端运行时和用户凭据。</li>
-                </ul>
-              </div>
-            </div>
-          </MethodSection>
+                <p className="text-xs leading-6">“未发现公开记录”只描述查询结果，不等于经过安全审计。没有安装或执行插件，也没有验证运行时兼容性。</p>
+              </MoreDetails>
+            </MethodSection>
 
-          <MethodSection
-            id="limits"
-            index="08 / 局限与边界"
-            title="明确知道它不知道什么"
-            description="这些限制不是免责声明，而是读分时必须带入的条件。"
-          >
-            <ol className="divide-y divide-line-hairline border-y border-line">
-              {[
-                {
-                  title: '不是软件质量评估',
-                  text: '没有代码审查、架构分析、测试覆盖率、用户体验或长期缺陷数据。维护活动不能替代质量判断。',
-                },
-                {
-                  title: '相对指数会随样本变化',
-                  text: '新增或移除一个插件可能改变其他人气分。分数适合做同快照内比较，不适合跨时间、跨榜单直接对比。',
-                },
-                {
-                  title: 'npm 不等于 DSH 实际使用量',
-                  text: '下载可能来自 CI、镜像、重复安装或依赖解析；非 npm 分发的插件没有下载指标，数据完整度会下降。',
-                },
-                {
-                  title: 'GitHub 的窗口与样本偏差',
-                  text: 'Issue 关闭不等于解决，PR 合并不等于高质量，提交次数受合并策略影响；样本小、分页上限和仓库权限都会影响结果。',
-                },
-                {
-                  title: 'OSV 不是完整安全审计',
-                  text: 'OSV 只覆盖已公开记录，精确版本匹配依赖 npm 与版本。没有记录不代表没有漏洞。',
-                },
-                {
-                  title: '兼容性未验证',
-                  text: '只展示项目声明。真实兼容性需要安装、运行、版本矩阵与宿主环境测试；本项目明确不做这些执行。',
-                },
-              ].map((limit, index) => (
-                <li key={limit.title} className="grid gap-1 py-4 sm:grid-cols-[48px_minmax(0,1fr)] sm:gap-4">
-                  <span className="font-mono text-2xs text-content-muted">0{index + 1}</span>
-                  <div>
-                    <h3 className="text-base font-semibold text-content-primary">{limit.title}</h3>
-                    <p className="mt-1 text-sm leading-6 text-content-secondary">{limit.text}</p>
+            <MethodSection id="completeness" index="06" title="数据完整度：资料齐不齐">
+              <p>仓库、提交、Issue、PR、版本、npm 和漏洞检查，共 7 类数据。可用的类别越多，完整度越高；它不参与判断插件好坏。</p>
+              <MoreDetails title="完整度和评分依据覆盖有什么不同">
+                <p><b className="font-medium text-content-primary">数据完整度</b> = 可用数据类别 / 7。真实的 0 和“未取得”分别记录；完整度取决于数据是否可用，不仅取决于有没有活动。</p>
+                <p><b className="font-medium text-content-primary">评分依据覆盖</b>表示本次计算用了多少原定权重。缺失分项或 Issue / PR 样本太少时会降低，方便知道分数依据是否充足。</p>
+              </MoreDetails>
+            </MethodSection>
+
+            <MethodSection id="pipeline" index="07" title="更新与暂停">
+              <p>默认每 6 小时采集一次。维护者可从网站的“数据更新”入口前往 GitHub Actions，登录有权限的 GitHub 账号后选择操作。</p>
+              <dl className="mt-4 divide-y divide-line-hairline rounded-panel border border-line bg-surface px-4">
+                {[
+                  ['手动采集 · refresh', '重新获取 API 数据，成功后发布新快照。暂停期间也能使用。'],
+                  ['暂停自动采集 · pause', '跳过后续每 6 小时的定时采集；不会取消已经开始的任务。'],
+                  ['恢复自动采集 · resume', '恢复后续每 6 小时的定时采集。'],
+                ].map(([title, text]) => (
+                  <div key={title} className="py-3">
+                    <dt className="font-medium text-content-primary">{title}</dt>
+                    <dd className="mt-1 text-xs leading-6">{text}</dd>
                   </div>
-                </li>
-              ))}
-            </ol>
-            <InlineNotice tone="neutral" className="mt-4">
-              发现口径问题、数据错误或有新的 DSH 插件要加入？请通过项目 GitHub 仓库提交 Issue 或 PR。
-              配置文件位于 <code className="break-all rounded-chip bg-surface px-1 py-0.5 font-mono text-xs">config/plugins.json</code>。
-            </InlineNotice>
-          </MethodSection>
-
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-5">
-            <p className="text-xs text-content-muted">
-              <BookOpen size={13} className="mr-1 inline" aria-hidden="true" />
-              文档随代码版本迭代；当前方法版本 {SCORE_METHOD_VERSION}。
-            </p>
-            <div className="flex flex-wrap items-center gap-4 text-xs text-content-secondary">
-              <a href="#top" className="inline-flex items-center gap-1 hover:text-brand-text">
-                <ArrowUp size={13} /> 回到顶部
-              </a>
-              <Link to="/" className="hover:text-brand-text">
-                返回总览
+                ))}
+              </dl>
+              <Link to="/#collection-controls" className="mt-4 inline-flex min-h-11 items-center gap-1 font-medium text-brand-text hover:text-content-primary">
+                打开数据更新入口 <ArrowUpRight size={14} aria-hidden="true" />
               </Link>
-              <a
-                href="https://github.com/albert404s/dsh-plugin-health-monitor"
-                target="_blank"
-                rel="noreferrer noopener"
-                className="inline-flex items-center gap-1 hover:text-brand-text"
-              >
-                源码 <ArrowUpRight size={12} />
-              </a>
-            </div>
+              <MoreDetails title="刷新、调用限制和保存方式">
+                <p>右上角的“刷新页面数据”只重读已发布快照，不触发采集。重新请求 GitHub、npm 和 OSV，需要使用“手动采集”。</p>
+                <p>API 有调用限制。增加收录数量或频繁采集会增加请求，单个仓库还可能需要多次分页；“20 个插件”不等于“20 次请求”。暂停定时采集可以减少后续请求，但不能绕过平台限额。</p>
+                <p>遇到限额或临时失败，采集会重试或按数据可用情况回退；完整采集失败时保留上次成功快照。请先查看工作流结果和快照时间，再决定是否重试。</p>
+                <p>源码保存在 main，数据保存在 data 分支。网页只读取静态 JSON，GitHub Token 不进入前端；历史保留 90 天，单插件最多 400 个点，完整快照最多 120 份。</p>
+              </MoreDetails>
+            </MethodSection>
+
+            <MethodSection id="limits" index="08" title="使用边界">
+              <p>先选功能，再参考数据。安装前请回到项目仓库确认文档、许可证和适用版本。</p>
+              <MoreDetails title="还需要知道的几件事">
+                <ul className="list-disc space-y-2 pl-5">
+                  <li>当前是已收录的插件榜单，不能代表 GitHub 全部插件。更多项目需先核实用途与仓库，再加入采集名单。</li>
+                  <li>npm 下载包含重复安装和自动构建等，不等于真实用户数；没有 npm 包也不代表插件没人使用。</li>
+                  <li>不同时间或不同样本的综合分不宜直接比较。想看实际变化，请优先看 Stars、下载和提交等原始记录。</li>
+                  <li>项目只展示兼容性声明，不进行代码审查、安装测试或安全审计。</li>
+                </ul>
+                <p>发现数据有误或想推荐插件，可到 <ExternalTextLink href="https://github.com/albert404s/dsh-plugin-health-monitor/issues">项目 GitHub</ExternalTextLink> 提交反馈。</p>
+              </MoreDetails>
+            </MethodSection>
+
+            <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-5 text-xs text-content-muted">
+              <span>计算方法 v{SCORE_METHOD_VERSION}</span>
+              <div className="flex flex-wrap items-center gap-5">
+                <a href="#top" className="inline-flex min-h-11 items-center gap-1 hover:text-brand-text"><ArrowUp size={13} aria-hidden="true" />回到顶部</a>
+                <Link to="/" className="inline-flex min-h-11 items-center hover:text-brand-text">返回概览</Link>
+              </div>
+            </footer>
           </div>
         </div>
-      </div>
       </div>
     </div>
   );

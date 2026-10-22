@@ -252,7 +252,7 @@ export function ComparePage(): JSX.Element {
         hint: '归档、长期 Issue、OSV 与数据缺口',
         a: <RiskBadge level={left.scores.risk.level} compact />,
         b: <RiskBadge level={right.scores.risk.level} compact />,
-        diff: `A ${left.scores.risk.flags.length} · B ${right.scores.risk.flags.length} 条信号`,
+        diff: `A ${left.scores.risk.flags.length} · B ${right.scores.risk.flags.length} 条提醒`,
       },
       {
         label: 'OSV 漏洞检查',

@@ -1,5 +1,5 @@
 import type { HistoryFile, HistoryPoint, PluginRecord } from './types';
-import { formatCompact, formatSigned } from './format';
+import { formatCompact, formatSigned, riskLabel } from './format';
 
 export interface AttentionItem {
   plugin: PluginRecord;
@@ -69,13 +69,6 @@ function historyPair(history: HistoryFile, id: string): [HistoryPoint, HistoryPo
   return [points[points.length - 2], points[points.length - 1]];
 }
 
-const RISK_LEVEL_LABELS: Record<HistoryPoint['riskLevel'], string> = {
-  high: '高风险',
-  medium: '需要关注',
-  low: '未见公开风险',
-  unknown: '信息不完整',
-};
-
 export function recentChanges(
   plugins: PluginRecord[],
   history: HistoryFile,
@@ -96,8 +89,8 @@ export function recentChanges(
             (latest.riskLevel === 'medium' && previous.riskLevel === 'low'));
         items.push({
           plugin,
-          title: unknown ? '风险信息发生变化' : '风险信号发生变化',
-          detail: `${RISK_LEVEL_LABELS[previous.riskLevel]} → ${RISK_LEVEL_LABELS[latest.riskLevel]}`,
+          title: '关注事项变化',
+          detail: `${riskLabel(previous.riskLevel)} → ${riskLabel(latest.riskLevel)}`,
           tone: unknown ? 'neutral' : worsened ? 'down' : 'up',
           magnitude: unknown ? 8 : worsened ? 40 : 12,
           since: latest.t,
@@ -111,7 +104,7 @@ export function recentChanges(
         const delta = latest.maintenance - previous.maintenance;
         items.push({
           plugin,
-          title: '维护指数变化',
+          title: '维护活跃度变化',
           detail: `${formatSigned(delta, 1)} 分（${previous.maintenance.toFixed(1)} → ${latest.maintenance.toFixed(1)}）`,
           tone: delta >= 0 ? 'up' : 'down',
           magnitude: Math.abs(delta),
@@ -126,7 +119,7 @@ export function recentChanges(
         const delta = latest.popularity - previous.popularity;
         items.push({
           plugin,
-          title: '人气指数变化',
+          title: '关注度变化',
           detail: `${formatSigned(delta, 1)} 分（${previous.popularity.toFixed(1)} → ${latest.popularity.toFixed(1)}）`,
           tone: delta >= 0 ? 'up' : 'down',
           magnitude: Math.abs(delta),

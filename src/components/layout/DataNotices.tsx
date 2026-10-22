@@ -88,12 +88,12 @@ export function DataNotices(): JSX.Element | null {
     );
   }
 
-  if (stale) {
+  if (stale && !partial && warnings.length === 0) {
     return (
       <div ref={bannerRef} className="border-b border-warning-line bg-warning-soft" role="status">
         <div className="mx-auto flex max-w-shell flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-2.5 text-xs text-warning md:px-6">
           <AlertTriangle size={14} className="shrink-0" aria-hidden="true" />
-          <span className="font-medium">数据可能已过期。</span>
+          <span className="font-medium">快照较早，选用前可核对原仓库。</span>
           <span className="text-content-secondary">
             当前展示 {formatDateTime(data.latest.lastSuccessAt)} 的快照（{formatRelative(data.latest.lastSuccessAt)}）。
           </span>
@@ -120,10 +120,11 @@ export function DataNotices(): JSX.Element | null {
       <div ref={bannerRef} className="border-b border-warning-line bg-warning-soft" role="status">
         <div className="mx-auto flex max-w-shell flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-2.5 text-xs text-warning md:px-6">
           <AlertTriangle size={14} className="shrink-0" aria-hidden="true" />
-          <span className="font-medium">部分数据源已降级，缺失项不会被当作 0。</span>
+          <span className="font-medium">部分数据暂不可用，已有结果仍可查看。</span>
           <span className="text-content-secondary">
             {warnings[0]?.split('：')[0] || sourceFailures.slice(0, 2).join(' · ')}
           </span>
+          {stale ? <span className="text-content-secondary">采集于 {formatDateTime(data.latest.lastSuccessAt)}</span> : null}
           {warnings.length > 0 ? <details className="w-full text-content-secondary"><summary className="min-h-9 cursor-pointer py-2 text-xs">{warnings.length} 条数据说明</summary><ul className="space-y-2 pb-2">{warnings.map((warning, index) => <li key={index} className="break-words text-xs leading-6">{warning}</li>)}</ul></details> : null}
           <Link
             to="/method"

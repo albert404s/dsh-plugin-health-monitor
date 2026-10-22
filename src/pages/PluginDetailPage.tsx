@@ -504,7 +504,7 @@ export function PluginDetailPage(): JSX.Element {
           </div>
         </div>
 
-        <p className="mt-4 max-w-3xl text-base leading-6 text-content">{plugin.curatorNote}</p><p className="mt-3 max-w-3xl text-sm leading-7 text-content-secondary">公开维护活动：<b className="font-medium text-content-primary">{plugin.scores.maintenance.score === null ? '证据不足' : plugin.scores.maintenance.score >= 75 ? '近期较活跃' : '建议结合提交记录核实'}</b> · {plugin.security.status === 'checked' ? `精确版本查询返回 ${plugin.security.vulnerabilities.length} 条公开漏洞记录` : '漏洞检查尚未完成'}。<a href="#risk-evidence" className="text-brand-text underline-offset-4 hover:underline">阅读关注事项 →</a></p>
+        <p className="mt-4 max-w-3xl text-base leading-6 text-content">{plugin.curatorNote}</p><p className="mt-3 max-w-3xl text-sm leading-7 text-content-secondary">公开维护活动：<b className="font-medium text-content-primary">{plugin.scores.maintenance.score === null ? '证据不足' : plugin.scores.maintenance.score >= 75 ? '近期较活跃' : '可查看最近的提交记录'}</b> · {plugin.security.status === 'checked' ? `精确版本查询返回 ${plugin.security.vulnerabilities.length} 条公开漏洞记录` : '漏洞检查尚未完成'}。<a href="#risk-evidence" className="text-brand-text underline-offset-4 hover:underline">阅读关注事项 →</a></p>
         {plugin.repository.description ? (
           <details className="mt-2 max-w-3xl">
             <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-1 text-xs text-content-muted hover:text-brand-text sm:min-h-0">
@@ -624,8 +624,8 @@ export function PluginDetailPage(): JSX.Element {
             </div>
             <p className="mt-2 text-xs leading-5 text-content-muted">
               {risk.flags.length > 0
-                ? `${risk.flags.length} 条信号需要阅读；不代表存在安全事件。`
-                : '未命中归档、积压或公开漏洞规则；仍不等于安全审计。'}
+                ? `${risk.flags.length} 条选用提醒，详见维护、漏洞与数据说明。`
+                : '暂无额外提醒，可继续查看插件用途与适用版本。'}
             </p>
             <a href="#risk-evidence" className="mt-2 inline-flex min-h-8 items-center gap-1 text-xs text-content-secondary underline-offset-4 hover:text-brand-text hover:underline">
               查看关注事项 <ArrowRight size={11} aria-hidden="true" />
@@ -767,7 +767,7 @@ export function PluginDetailPage(): JSX.Element {
                       跨多个定时采集周期后才展示趋势，不补造历史点。
                     </p>
                     <p className="mt-2 font-mono text-xs text-content-secondary">
-                      当前 维护 {formatScore(plugin.scores.maintenance.score)} / 人气{' '}
+                      当前 维护活跃度 {formatScore(plugin.scores.maintenance.score)} / 关注度{' '}
                       {formatScore(plugin.scores.popularity.score)}
                     </p>
                   </div>
@@ -835,7 +835,7 @@ export function PluginDetailPage(): JSX.Element {
       <section id="evidence" className="mt-10 scroll-mt-24 border-t border-line pt-6" aria-labelledby="evidence-title">
         <SectionHeading
           eyebrow="证据"
-          title={<span id="evidence-title">处理与安全证据</span>}
+          title={<span id="evidence-title">指标与原始记录</span>}
           description="Issue、PR、OSV 与兼容性声明来自公开数据；本项目不安装、不执行被检测插件。"
         />
         <div className="panel mt-4 overflow-hidden lg:grid lg:grid-cols-2 lg:divide-x lg:divide-line">
@@ -942,7 +942,7 @@ export function PluginDetailPage(): JSX.Element {
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <ShieldAlert size={16} className="text-content-secondary" aria-hidden="true" />
-                <h3 className="text-base font-semibold text-content-primary">安全与兼容性证据</h3>
+                <h3 className="text-base font-semibold text-content-primary">公开漏洞与兼容性</h3>
               </div>
               <span className="text-2xs text-content-muted">
                 {plugin.security.status === 'checked' ? 'OSV 已完成精确查询' : '未完成检查'}
