@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-22T16:40:06.907Z",
+  "updatedAt": "2026-10-22T21:13:11.963Z",
   "retentionDays": 90,
   "plugins": {
     "michengai-dsh-agency-agents": [
@@ -195,6 +195,22 @@
         "prsMerged90d": 1,
         "releaseAt": "2026-10-22T03:43:37.000Z",
         "archived": false
+      },
+      {
+        "t": "2026-10-22T21:13:11.963Z",
+        "methodVersion": "2.0.0",
+        "stars": 169,
+        "downloads": 147552,
+        "popularity": 50.9,
+        "maintenance": 98.2,
+        "riskLevel": "low",
+        "commits30d": 112,
+        "issuesOpened90d": 29,
+        "issuesClosed90d": 27,
+        "prsOpened90d": 1,
+        "prsMerged90d": 1,
+        "releaseAt": "2026-10-22T03:43:37.000Z",
+        "archived": false
       }
     ],
     "michengai-dsh-codex-ui": [
@@ -380,6 +396,22 @@
         "stars": 195,
         "downloads": 252579,
         "popularity": 58.5,
+        "maintenance": 93.5,
+        "riskLevel": "low",
+        "commits30d": 138,
+        "issuesOpened90d": 49,
+        "issuesClosed90d": 47,
+        "prsOpened90d": 6,
+        "prsMerged90d": 4,
+        "releaseAt": "2026-10-22T12:04:45.000Z",
+        "archived": false
+      },
+      {
+        "t": "2026-10-22T21:13:11.963Z",
+        "methodVersion": "2.0.0",
+        "stars": 197,
+        "downloads": 252579,
+        "popularity": 58.7,
         "maintenance": 93.5,
         "riskLevel": "low",
         "commits30d": 138,
@@ -583,6 +615,22 @@
         "prsMerged90d": 2,
         "releaseAt": null,
         "archived": false
+      },
+      {
+        "t": "2026-10-22T21:13:11.963Z",
+        "methodVersion": "2.0.0",
+        "stars": 294,
+        "downloads": 212152,
+        "popularity": 59.7,
+        "maintenance": 87.1,
+        "riskLevel": "low",
+        "commits30d": 122,
+        "issuesOpened90d": 49,
+        "issuesClosed90d": 48,
+        "prsOpened90d": 8,
+        "prsMerged90d": 2,
+        "releaseAt": "2026-10-21T15:55:20.000Z",
+        "archived": false
       }
     ],
     "michengai-dsh-archive-manager": [
@@ -776,6 +824,22 @@
         "prsOpened90d": 7,
         "prsMerged90d": 6,
         "releaseAt": null,
+        "archived": false
+      },
+      {
+        "t": "2026-10-22T21:13:11.963Z",
+        "methodVersion": "2.0.0",
+        "stars": 207,
+        "downloads": 179275,
+        "popularity": 54.8,
+        "maintenance": 97.3,
+        "riskLevel": "low",
+        "commits30d": 101,
+        "issuesOpened90d": 65,
+        "issuesClosed90d": 64,
+        "prsOpened90d": 7,
+        "prsMerged90d": 6,
+        "releaseAt": "2026-10-22T06:19:43.000Z",
         "archived": false
       }
     ],
@@ -971,6 +1035,22 @@
         "prsMerged90d": 6,
         "releaseAt": null,
         "archived": false
+      },
+      {
+        "t": "2026-10-22T21:13:11.963Z",
+        "methodVersion": "2.0.0",
+        "stars": 83,
+        "downloads": 138931,
+        "popularity": 44.4,
+        "maintenance": 91.2,
+        "riskLevel": "low",
+        "commits30d": 180,
+        "issuesOpened90d": 36,
+        "issuesClosed90d": 34,
+        "prsOpened90d": 11,
+        "prsMerged90d": 6,
+        "releaseAt": "2026-10-21T15:13:04.000Z",
+        "archived": false
       }
     ],
     "michengai-dsh-automation": [
@@ -1165,6 +1245,22 @@
         "prsMerged90d": 3,
         "releaseAt": null,
         "archived": false
+      },
+      {
+        "t": "2026-10-22T21:13:11.963Z",
+        "methodVersion": "2.0.0",
+        "stars": 36,
+        "downloads": 117794,
+        "popularity": 35.9,
+        "maintenance": 94.4,
+        "riskLevel": "low",
+        "commits30d": 158,
+        "issuesOpened90d": 16,
+        "issuesClosed90d": 15,
+        "prsOpened90d": 4,
+        "prsMerged90d": 3,
+        "releaseAt": "2026-10-22T12:28:31.000Z",
+        "archived": false
       }
     ],
     "michengai-dsh-btw": [
@@ -1348,6 +1444,22 @@
         "t": "2026-10-22T16:40:06.907Z",
         "methodVersion": "2.0.0",
         "stars": 30,
+        "downloads": 91781,
+        "popularity": 31.1,
+        "maintenance": 94.1,
+        "riskLevel": "low",
+        "commits30d": 40,
+        "issuesOpened90d": 14,
+        "issuesClosed90d": 14,
+        "prsOpened90d": 2,
+        "prsMerged90d": 1,
+        "releaseAt": "2026-10-22T11:56:24.000Z",
+        "archived": false
+      },
+      {
+        "t": "2026-10-22T21:13:11.963Z",
+        "methodVersion": "2.0.0",
+        "stars": 29,
         "downloads": 91781,
         "popularity": 31.1,
         "maintenance": 94.1,
@@ -1553,6 +1665,22 @@
         "prsMerged90d": 20,
         "releaseAt": "2026-10-21T06:37:42.000Z",
         "archived": false
+      },
+      {
+        "t": "2026-10-22T21:13:11.963Z",
+        "methodVersion": "2.0.0",
+        "stars": 3396,
+        "downloads": 164775,
+        "popularity": 76.2,
+        "maintenance": 89.5,
+        "riskLevel": "low",
+        "commits30d": 365,
+        "issuesOpened90d": 122,
+        "issuesClosed90d": 120,
+        "prsOpened90d": 51,
+        "prsMerged90d": 20,
+        "releaseAt": "2026-10-21T06:37:42.000Z",
+        "archived": false
       }
     ],
     "dsh-market-dsh-market": [
@@ -1747,6 +1875,22 @@
         "prsMerged90d": 389,
         "releaseAt": "2026-10-22T13:58:16.000Z",
         "archived": false
+      },
+      {
+        "t": "2026-10-22T21:13:11.963Z",
+        "methodVersion": "2.0.0",
+        "stars": 8235,
+        "downloads": 637573,
+        "popularity": 100,
+        "maintenance": 95.3,
+        "riskLevel": "low",
+        "commits30d": 364,
+        "issuesOpened90d": 504,
+        "issuesClosed90d": 463,
+        "prsOpened90d": 478,
+        "prsMerged90d": 396,
+        "releaseAt": "2026-10-22T20:55:57.000Z",
+        "archived": false
       }
     ],
     "ccch1mneyyy-dsh-tui": [
@@ -1937,6 +2081,22 @@
         "commits30d": 669,
         "issuesOpened90d": 42,
         "issuesClosed90d": 21,
+        "prsOpened90d": 945,
+        "prsMerged90d": 718,
+        "releaseAt": "2026-10-17T21:33:29.000Z",
+        "archived": false
+      },
+      {
+        "t": "2026-10-22T21:13:11.963Z",
+        "methodVersion": "2.0.0",
+        "stars": 5236,
+        "downloads": 48617,
+        "popularity": 64.6,
+        "maintenance": 93.9,
+        "riskLevel": "medium",
+        "commits30d": 669,
+        "issuesOpened90d": 685,
+        "issuesClosed90d": 619,
         "prsOpened90d": 945,
         "prsMerged90d": 718,
         "releaseAt": "2026-10-17T21:33:29.000Z",
@@ -2135,6 +2295,22 @@
         "prsMerged90d": 288,
         "releaseAt": "2026-10-17T06:23:55.000Z",
         "archived": false
+      },
+      {
+        "t": "2026-10-22T21:13:11.963Z",
+        "methodVersion": "2.0.0",
+        "stars": 4440,
+        "downloads": 224109,
+        "popularity": 82.2,
+        "maintenance": 84.2,
+        "riskLevel": "high",
+        "commits30d": 335,
+        "issuesOpened90d": 459,
+        "issuesClosed90d": 304,
+        "prsOpened90d": 575,
+        "prsMerged90d": 288,
+        "releaseAt": "2026-10-17T06:23:55.000Z",
+        "archived": false
       }
     ],
     "meteornox-deepseek-balance-whale-widget": [
@@ -2329,6 +2505,22 @@
         "prsMerged90d": 19,
         "releaseAt": "2026-10-11T12:25:56.000Z",
         "archived": false
+      },
+      {
+        "t": "2026-10-22T21:13:11.963Z",
+        "methodVersion": "2.0.0",
+        "stars": 5781,
+        "downloads": 207795,
+        "popularity": 83.3,
+        "maintenance": 73.5,
+        "riskLevel": "medium",
+        "commits30d": 25,
+        "issuesOpened90d": 174,
+        "issuesClosed90d": 93,
+        "prsOpened90d": 102,
+        "prsMerged90d": 19,
+        "releaseAt": "2026-10-11T12:25:56.000Z",
+        "archived": false
       }
     ],
     "t-auto-dsh-ops": [
@@ -2512,6 +2704,22 @@
         "t": "2026-10-22T16:40:06.907Z",
         "methodVersion": "2.0.0",
         "stars": 3840,
+        "downloads": 22879,
+        "popularity": 52.8,
+        "maintenance": 90.9,
+        "riskLevel": "low",
+        "commits30d": 467,
+        "issuesOpened90d": 178,
+        "issuesClosed90d": 139,
+        "prsOpened90d": 186,
+        "prsMerged90d": 138,
+        "releaseAt": "2026-10-20T09:15:19.000Z",
+        "archived": false
+      },
+      {
+        "t": "2026-10-22T21:13:11.963Z",
+        "methodVersion": "2.0.0",
+        "stars": 3853,
         "downloads": 22879,
         "popularity": 52.8,
         "maintenance": 90.9,
@@ -2717,6 +2925,22 @@
         "prsMerged90d": 27,
         "releaseAt": null,
         "archived": false
+      },
+      {
+        "t": "2026-10-22T21:13:11.963Z",
+        "methodVersion": "2.0.0",
+        "stars": 2244,
+        "downloads": 15480,
+        "popularity": 43.7,
+        "maintenance": 91.8,
+        "riskLevel": "low",
+        "commits30d": 14,
+        "issuesOpened90d": 132,
+        "issuesClosed90d": 129,
+        "prsOpened90d": 50,
+        "prsMerged90d": 27,
+        "releaseAt": "2026-10-17T09:48:43.000Z",
+        "archived": false
       }
     ],
     "dream-num-dsh-univer-office": [
@@ -2902,6 +3126,22 @@
         "stars": 583,
         "downloads": 48113,
         "popularity": 46.8,
+        "maintenance": 85.1,
+        "riskLevel": "low",
+        "commits30d": 21,
+        "issuesOpened90d": 48,
+        "issuesClosed90d": 32,
+        "prsOpened90d": 78,
+        "prsMerged90d": 71,
+        "releaseAt": "2026-10-08T08:41:38.000Z",
+        "archived": false
+      },
+      {
+        "t": "2026-10-22T21:13:11.963Z",
+        "methodVersion": "2.0.0",
+        "stars": 584,
+        "downloads": 48113,
+        "popularity": 46.9,
         "maintenance": 85.1,
         "riskLevel": "low",
         "commits30d": 21,
@@ -3105,6 +3345,22 @@
         "prsMerged90d": 74,
         "releaseAt": "2026-10-20T02:32:52.000Z",
         "archived": false
+      },
+      {
+        "t": "2026-10-22T21:13:11.963Z",
+        "methodVersion": "2.0.0",
+        "stars": 183,
+        "downloads": 7398,
+        "popularity": 14.5,
+        "maintenance": 96.2,
+        "riskLevel": "low",
+        "commits30d": 30,
+        "issuesOpened90d": 58,
+        "issuesClosed90d": 55,
+        "prsOpened90d": 88,
+        "prsMerged90d": 74,
+        "releaseAt": "2026-10-20T02:32:52.000Z",
+        "archived": false
       }
     ],
     "hkkz9522-dsh-session-manager": [
@@ -3290,6 +3546,22 @@
         "stars": 67,
         "downloads": 13796,
         "popularity": 14,
+        "maintenance": 82.3,
+        "riskLevel": "low",
+        "commits30d": 55,
+        "issuesOpened90d": 39,
+        "issuesClosed90d": 37,
+        "prsOpened90d": 8,
+        "prsMerged90d": 1,
+        "releaseAt": null,
+        "archived": false
+      },
+      {
+        "t": "2026-10-22T21:13:11.963Z",
+        "methodVersion": "2.0.0",
+        "stars": 68,
+        "downloads": 13796,
+        "popularity": 14.4,
         "maintenance": 82.3,
         "riskLevel": "low",
         "commits30d": 55,
@@ -3493,6 +3765,22 @@
         "prsMerged90d": 12,
         "releaseAt": null,
         "archived": false
+      },
+      {
+        "t": "2026-10-22T21:13:11.963Z",
+        "methodVersion": "2.0.0",
+        "stars": 281,
+        "downloads": null,
+        "popularity": 39.9,
+        "maintenance": 66.2,
+        "riskLevel": "unknown",
+        "commits30d": 3,
+        "issuesOpened90d": 17,
+        "issuesClosed90d": 9,
+        "prsOpened90d": 26,
+        "prsMerged90d": 12,
+        "releaseAt": "2026-09-19T05:04:58.000Z",
+        "archived": false
       }
     ],
     "yjh051108-dsh-routing-suite": [
@@ -3687,6 +3975,22 @@
         "prsMerged90d": 9,
         "releaseAt": "2026-09-02T17:33:33.000Z",
         "archived": false
+      },
+      {
+        "t": "2026-10-22T21:13:11.963Z",
+        "methodVersion": "2.0.0",
+        "stars": 6991,
+        "downloads": null,
+        "popularity": 97.1,
+        "maintenance": 41.3,
+        "riskLevel": "high",
+        "commits30d": 0,
+        "issuesOpened90d": 189,
+        "issuesClosed90d": 32,
+        "prsOpened90d": 57,
+        "prsMerged90d": 9,
+        "releaseAt": "2026-09-02T17:33:33.000Z",
+        "archived": false
       }
     ],
     "liustack-modlens": [
@@ -3861,6 +4165,22 @@
         "commits30d": 26,
         "issuesOpened90d": 0,
         "issuesClosed90d": 0,
+        "prsOpened90d": 0,
+        "prsMerged90d": 0,
+        "releaseAt": "2026-10-15T19:20:25.000Z",
+        "archived": false
+      },
+      {
+        "t": "2026-10-22T21:13:11.963Z",
+        "methodVersion": "2.0.0",
+        "stars": 4407,
+        "downloads": 102724,
+        "popularity": 72.5,
+        "maintenance": 95.8,
+        "riskLevel": "low",
+        "commits30d": 22,
+        "issuesOpened90d": 114,
+        "issuesClosed90d": 110,
         "prsOpened90d": 0,
         "prsMerged90d": 0,
         "releaseAt": "2026-10-15T19:20:25.000Z",
