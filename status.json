@@ -1,29 +1,28 @@
 {
   "schemaVersion": 1,
-  "runId": "2026-10-21T03:23:53.279Z-3ca3561a",
-  "lastAttemptAt": "2026-10-21T03:23:53.279Z",
-  "lastSuccessAt": "2026-10-21T03:23:53.279Z",
+  "runId": "2026-10-22T03:22:37.113Z-c40e834e",
+  "lastAttemptAt": "2026-10-22T03:22:37.113Z",
+  "lastSuccessAt": "2026-10-22T03:22:37.113Z",
   "outcome": "partial",
   "sources": {
     "github": {
       "status": "ok",
-      "fetchedAt": "2026-10-21T03:23:53.279Z",
+      "fetchedAt": "2026-10-22T03:22:37.113Z",
       "message": "20 成功 / 0 失败"
     },
     "npm": {
       "status": "ok",
-      "fetchedAt": "2026-10-21T03:23:53.279Z",
+      "fetchedAt": "2026-10-22T03:22:37.113Z",
       "message": "18/18 个包映射通过，0 个无法映射，0 个不可用，0 个缺少下载数据，0 个请求失败"
     },
     "osv": {
       "status": "ok",
-      "fetchedAt": "2026-10-21T03:23:53.279Z",
+      "fetchedAt": "2026-10-22T03:22:37.113Z",
       "message": "18 个精确版本检查完成，0 个失败"
     }
   },
-  "errorCount": 1,
+  "errorCount": 0,
   "messages": [
-    "ccch1mneyyy-dsh-tui: 仓库推送 时间异常，未参与相关判断。",
     "评分方法版本 1.1.0"
   ],
   "nextRunHint": "GitHub Actions 计划每 6 小时运行；npm 与 OSV 随同刷新。"
