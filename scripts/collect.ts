@@ -24,11 +24,17 @@ import { computeStats, scorePlugins } from '../src/lib/scoring';
 import { cleanSeedRecords, applyNpmGapGuard } from './lib/clean';
 import { normalizeGithubRepository } from '../src/lib/data-quality';
 import { JsonClient, createGithubClient, createNpmClient } from './lib/http';
+import { RequestBudget } from './lib/request-budget';
+import { DiskHttpCache } from './lib/http-cache';
+import { readCollectionSettings } from './lib/collection-control';
+import { boundedCollectionInteger } from '../src/lib/collection-control';
+import { selectCollectionScope } from './lib/collection-scope';
+import type { CollectionReport } from '../src/lib/collection-report';
 import { collectGithub } from './lib/github';
 import { collectNpm } from './lib/npm';
 import { collectOsv } from './lib/osv';
 import {
-  loadExisting,
+  loadExisting, atomicWriteJson,
   updateHistory,
   writeLatest,
   writeSnapshot,
@@ -42,14 +48,23 @@ interface Options {
   dataDir: string;
   configPath: string;
   allowGhCliToken: boolean;
+  cacheDir: string; maxPlugins?: number; maxRequests?: number; githubReserve?: number;
 }
 
 function parseArgs(argv: string[]): Options {
   let dataDir = process.env.DATA_DIR || path.join(ROOT, 'public', 'data');
   let configPath = path.join(ROOT, 'config', 'plugins.json');
   let allowGhCliToken = false;
+  let cacheDir = path.join(ROOT, '.data-cache', 'http');
+  const limits: { maxPlugins?: number; maxRequests?: number; githubReserve?: number } = {};
   for (let index = 0; index < argv.length; index += 1) {
-    if (argv[index] === '--data-dir' && argv[index + 1]) {
+    if (['--max-plugins', '--max-requests', '--github-reserve'].includes(argv[index])) {
+      const flag = argv[index], field = flag === '--max-plugins' ? 'maxPlugins' : flag === '--max-requests' ? 'maxRequests' : 'githubReserve';
+      limits[field] = boundedCollectionInteger(argv[index + 1], flag, field === 'githubReserve' ? 0 : 1, field === 'maxRequests' ? 10000 : 1000);
+      index += 1;
+    } else if (argv[index] === '--cache-dir' && argv[index + 1]) {
+      cacheDir = path.resolve(argv[++index]);
+    } else if (argv[index] === '--data-dir' && argv[index + 1]) {
       dataDir = path.resolve(argv[index + 1]);
       index += 1;
     } else if (argv[index] === '--config' && argv[index + 1]) {
@@ -59,7 +74,7 @@ function parseArgs(argv: string[]): Options {
       allowGhCliToken = true;
     }
   }
-  return { dataDir, configPath, allowGhCliToken };
+  return { dataDir, configPath, allowGhCliToken, cacheDir, ...limits };
 }
 
 function resolveGithubToken(allowGhCliToken: boolean): { token: string | null; note: string } {
@@ -92,8 +107,8 @@ async function loadConfig(configPath: string): Promise<PluginConfig[]> {
   if (!raw || typeof raw !== 'object') throw new Error('插件配置不是有效对象');
   const config = raw as PluginConfigFile;
   if (!Array.isArray(config.plugins)) throw new Error('插件配置缺少 plugins 数组');
-  if (config.plugins.length < 10 || config.plugins.length > 30) {
-    throw new Error(`插件数量应在 10–30 之间，当前为 ${config.plugins.length}`);
+  if (config.plugins.length < 1 || config.plugins.length > 1000) {
+    throw new Error(`已核验插件清单应在 1–1000 之间，当前为 ${config.plugins.length}`);
   }
   const ids = new Set<string>();
   const repos = new Set<string>();
@@ -152,19 +167,23 @@ function fallbackSecurity(
   };
 }
 
-async function main(): Promise<void> {
+export async function runCollection(argv = process.argv.slice(2)): Promise<void> {
   const startedAt = new Date();
-  const options = parseArgs(process.argv.slice(2));
+  const options = parseArgs(argv);
   const pluginsConfig = await loadConfig(options.configPath);
   const previous = await loadExisting(options.dataDir);
+  const settings = { ...await readCollectionSettings(options.dataDir), ...Object.fromEntries(Object.entries({maxPlugins:options.maxPlugins,maxRequests:options.maxRequests,githubReserve:options.githubReserve}).filter(([,value])=>value!==undefined)) };
+  const selectedConfigs = selectCollectionScope(pluginsConfig, previous.latest?.plugins ?? [], settings.maxPlugins);
+  const selectedIds = new Set(selectedConfigs.map(config => config.id));
   const previousById = new Map((previous.latest?.plugins ?? []).map((plugin) => [plugin.id, plugin]));
   const { token, note } = resolveGithubToken(options.allowGhCliToken);
   console.log(`[collect] ${pluginsConfig.length} plugins; GitHub ${note}`);
   const deadline = startedAt.getTime() + 20 * 60 * 1000;
 
-  const githubClient: JsonClient = createGithubClient(token ?? undefined);
-  const npmClient = createNpmClient();
-  const osvClient = createNpmClient();
+  const budget = new RequestBudget({ maxRequests: settings.maxRequests, githubReserve: settings.githubReserve, githubConcurrency: 1 });
+  const githubClient: JsonClient = createGithubClient(token ?? undefined, { budget, cache: new DiskHttpCache({directory:options.cacheDir}), ...(process.env.GITHUB_REPOSITORY ? {cacheScope:'public-workflow:'+process.env.GITHUB_REPOSITORY} : {}) });
+  const npmClient = createNpmClient({ budget });
+  const osvClient = createNpmClient({ budget });
 
   const records: Array<Omit<PluginRecord, 'scores'>> = [];
   const errors: string[] = [];
@@ -180,7 +199,7 @@ async function main(): Promise<void> {
   let osvErrors = 0;
   let usedFallback = 0;
 
-  for (const config of pluginsConfig) {
+  for (const config of selectedConfigs) {
     const candidate = previousById.get(config.id);
     const previousPlugin = candidate && normalizeGithubRepository(candidate.repo) === normalizeGithubRepository(config.repo) ? candidate : undefined;
     if (Date.now() > deadline) {
@@ -247,6 +266,8 @@ async function main(): Promise<void> {
       usedFallback += 1;
     }
 
+    if (budget.isStopped) break;
+
     let npm: NpmMetrics;
     try {
       npm = await collectNpm(config.npm, repository.fullName, npmClient, startedAt);
@@ -270,6 +291,7 @@ async function main(): Promise<void> {
         reason: errorMessage(error),
       };
     }
+    if (budget.isStopped) break;
     if (config.npm) npmChecked += 1;
     if (npm.status === 'verified') npmVerified += 1;
     if (npm.status === 'unverified') npmUnverified += 1;
@@ -331,6 +353,7 @@ async function main(): Promise<void> {
       };
     }
 
+    if (budget.isStopped) break;
     const availability: PluginRecord['availability'] = {
       ...availabilityBase,
       npm: npm.status === 'verified' && npm.downloads30d !== null,
@@ -377,6 +400,46 @@ async function main(): Promise<void> {
     );
   }
 
+  try { await githubClient.flushCache(); } catch { console.warn('[collect] optional HTTP cache could not be saved; data collection remains usable'); }
+  const usage = budget.getSummary();
+  const core = usage.githubByResource.core;
+  const report: CollectionReport = {
+    version:1, startedAt:startedAt.toISOString(), completedAt:new Date().toISOString(),
+    configuredPlugins:pluginsConfig.length, selectedPlugins:selectedConfigs.length,
+    completedPlugins:records.filter(record => record.dataStatus !== 'stale').length,
+    deferredPlugins:pluginsConfig.length-selectedConfigs.length,
+    maxPlugins:settings.maxPlugins,maxRequests:settings.maxRequests,githubReserve:settings.githubReserve,
+    requestsMade:usage.requestsMade,memoryCacheHits:usage.memoryCacheHits,revalidatedCacheHits:usage.revalidatedCacheHits,persistentCacheHits:usage.persistentCacheHits,
+    githubRemaining:core?.remaining ?? null,githubResetAt:core?.resetAt ?? null,
+    stopped:usage.stopped,stopReason:usage.stopReason,
+  };
+  await atomicWriteJson(path.join(options.dataDir,'collection-report.json'),report);
+  if (process.env.GITHUB_STEP_SUMMARY) {
+    const { appendFile } = await import('node:fs/promises');
+    await appendFile(process.env.GITHUB_STEP_SUMMARY,
+      '\n### 采集预算\n\n- 请求：'+report.requestsMade+' / '+report.maxRequests
+      +'\n- 304 复用：'+report.revalidatedCacheHits+'\n- 采集范围：'+report.selectedPlugins+' / '+report.configuredPlugins
+      +'\n- 状态：'+(report.stopped?'已停止，保留上次快照':'预算内完成')+'\n');
+  }
+  if (budget.isStopped) {
+    await writeStatus(options.dataDir, {
+      schemaVersion:STATUS_SCHEMA_VERSION,runId:startedAt.toISOString()+'-budget-stop',lastAttemptAt:startedAt.toISOString(),
+      lastSuccessAt:previous.latest?.lastSuccessAt ?? null,outcome:previous.latest?'partial':'failed',
+      sources: { github:{status:'partial',fetchedAt:null,message:'预算保护停止本轮，未发布半轮数据。'},npm:{status:'skipped',fetchedAt:null},osv:{status:'skipped',fetchedAt:null} },
+      errorCount:0,messages:['触及采集预算或平台预留边界，保留整份上次有效快照。',String(budget.stopReason)],
+      nextRunHint:'查看采集记录，待额度恢复或调整预算后再更新。',
+    });
+    if (!previous.latest) process.exitCode=1;
+    console.warn('[collect] budget protection: previous latest/history untouched');
+    return;
+  }
+  // Carry deferred records as dated fallback data; do not manufacture fresh history.
+  for (const config of pluginsConfig.filter(item=>!selectedIds.has(item.id))) {
+    const old = previousById.get(config.id);
+    if (!old || normalizeGithubRepository(old.repo)!==normalizeGithubRepository(config.repo)) continue;
+    const { scores: _scores, ...seed } = old;
+    records.push({...seed,dataStatus:'stale',warnings:[...seed.warnings,'本轮未纳入采集范围，保留上次数据。']});
+  }
   const cleaned = cleanSeedRecords(records, previous.latest?.plugins ?? [], startedAt);
   errors.push(...cleaned.messages);
   const gapAffected = applyNpmGapGuard(cleaned.records);
@@ -452,6 +515,7 @@ async function main(): Promise<void> {
   }
 
   const outcome: StatusFile['outcome'] =
+    selectedConfigs.length < pluginsConfig.length ||
     githubFailed > 0 ||
     npmErrors > 0 ||
     npmUnverified > 0 ||
@@ -504,7 +568,7 @@ async function main(): Promise<void> {
   console.log(`[collect] data dir: ${options.dataDir}`);
 }
 
-main().catch((error) => {
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) runCollection().catch((error) => {
   console.error('[collect] fatal:', error);
   process.exitCode = 1;
 });

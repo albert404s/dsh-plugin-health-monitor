@@ -13,11 +13,11 @@ import type { PluginRecord } from '../lib/types';
 import { categoryLabel } from '../lib/types';
 import {
   categories,
-  filterPlugins,
   hasActiveFilters,
   paginate,
   PAGE_SIZE,
-  sortPlugins,
+  parseRankingLimit,
+  rankPlugins,
   stateFromSearchParams,
   stateToSearchParams,
   type DataFilter,
@@ -28,6 +28,7 @@ import {
 } from '../lib/filters';
 import { formatCompact, formatDateTime, formatRelative, formatScore, scoreLabel } from '../lib/format';
 import { cn } from '../lib/cn';
+import { QuietHint } from './quiet-hint';
 import {
   CategoryTag,
   DataCoverage,
@@ -48,6 +49,8 @@ const SORT_OPTIONS: Array<{ value: SortKey; label: string }> = [
   { value: 'recent', label: '最近提交时间' },
   { value: 'name', label: '名称 A–Z' },
 ];
+
+const TOP_PRESETS = [10, 20, 50, 100];
 
 const MAINTENANCE_OPTIONS: Array<{ value: MaintenanceFilter; label: string }> = [
   { value: 'all', label: '全部维护' },
@@ -141,12 +144,14 @@ export function PluginExplorer({
   const [searchParams, setSearchParams] = useSearchParams();
   const [moreOpen, setMoreOpen] = useState(false);
   const [queryInput, setQueryInput] = useState('');
+  const [customTopOpen, setCustomTopOpen] = useState(false);
+  const [topInput, setTopInput] = useState('');
+  const [topError, setTopError] = useState('');
   const composing = useRef(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const state = useMemo(() => stateFromSearchParams(searchParams), [searchParams]);
-  const filtered = useMemo(() => filterPlugins(plugins, state), [plugins, state]);
-  const sorted = useMemo(() => sortPlugins(filtered, state.sort), [filtered, state.sort]);
-  const page = paginate(sorted, state.page);
+  const ranking = useMemo(() => rankPlugins(plugins, state), [plugins, state]);
+  const page = paginate(ranking.items, state.page);
   const active = hasActiveFilters(state);
   const activeCount = [
     state.query.trim(),
@@ -161,6 +166,12 @@ export function PluginExplorer({
     setQueryInput(state.query);
   }, [state.query]);
 
+  useEffect(() => {
+    setTopInput(state.top === 'all' ? '' : String(state.top));
+    setCustomTopOpen(state.top !== 'all' && !TOP_PRESETS.includes(state.top));
+    setTopError('');
+  }, [state.top]);
+
   function update(patch: Partial<typeof state>): void {
     const next = { ...state, ...patch };
     if (!('page' in patch)) next.page = 1;
@@ -171,6 +182,16 @@ export function PluginExplorer({
     setSearchParams(new URLSearchParams());
     setQueryInput('');
     window.requestAnimationFrame(() => searchRef.current?.focus());
+  }
+
+  function applyCustomTop(): void {
+    const top = parseRankingLimit(topInput);
+    if (top === 'all') {
+      setTopError('请输入 1–1000 的整数');
+      return;
+    }
+    setTopError('');
+    update({ top });
   }
 
   function handlePageChange(nextPage: number): void {
@@ -248,12 +269,17 @@ export function PluginExplorer({
         </div>
         <p className="tnum text-xs text-content-secondary" aria-live="polite">
           共 {plugins.length} 个插件
-          {active ? <span className="ml-2 text-content-muted">· 筛选后 {sorted.length} 个</span> : null}
+          {active ? <span className="ml-2 text-content-muted">· 匹配 {ranking.matched} 个</span> : null}
+          {state.top !== 'all' ? <span className="ml-2 text-brand-text">· 最多前 {state.top} 个，实际 {ranking.items.length} 个</span> : null}
         </p>
       </div>
 
       <div className="panel mt-4">
         <div className="border-b border-line px-4 py-3.5 md:px-5 lg:sticky lg:top-[var(--header-h)] lg:z-20 lg:bg-surface">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <h3 className="text-xs font-semibold text-content-primary"><QuietHint text="先筛选，再按所选维度排序，最后取前 N 个。设置保存在网址中，展示数量不会增加或减少 API 采集。">榜单设置</QuietHint></h3>
+            <span className="text-2xs text-content-muted">仅展示已收录快照</span>
+          </div>
           <div className="flex flex-wrap items-center gap-2">
             <label className="relative block min-w-0 flex-1 basis-full lg:basis-auto">
               <span className="sr-only">搜索插件</span>
@@ -298,7 +324,7 @@ export function PluginExplorer({
               ) : null}
             </label>
 
-            <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+            <div className="flex w-full min-w-0 flex-wrap items-center gap-2 sm:w-auto">
               <label className="sr-only" htmlFor="plugin-sort">
                 排序方式
               </label>
@@ -327,6 +353,28 @@ export function PluginExplorer({
                   aria-hidden="true"
                 />
               </div>
+              <label className="flex min-w-0 items-center gap-2 text-2xs text-content-secondary">
+                <span className="shrink-0">展示数量</span>
+                <select
+                  className="select-field min-w-0 max-sm:max-w-[140px]"
+                  aria-label="展示数量"
+                  value={customTopOpen ? 'custom' : String(state.top)}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    setTopError('');
+                    if (value === 'custom') {
+                      setCustomTopOpen(true);
+                      return;
+                    }
+                    setCustomTopOpen(false);
+                    update({ top: parseRankingLimit(value) });
+                  }}
+                >
+                  <option value="all">全部结果</option>
+                  {TOP_PRESETS.map((count) => <option key={count} value={count}>最多前 {count} 个</option>)}
+                  <option value="custom">自定义…</option>
+                </select>
+              </label>
               <button
                 type="button"
                 onClick={() => setMoreOpen((open) => !open)}
@@ -344,6 +392,17 @@ export function PluginExplorer({
               </button>
             </div>
           </div>
+
+          {customTopOpen ? <form className="mt-3 flex flex-wrap items-center gap-2" onSubmit={(event) => { event.preventDefault(); applyCustomTop(); }}>
+            <label className="text-2xs text-content-secondary" htmlFor="ranking-top">展示前</label>
+            <input id="ranking-top" aria-label="自定义展示数量" type="number" inputMode="numeric" min={1} max={1000} step={1} value={topInput}
+              onChange={(event) => { setTopInput(event.target.value); setTopError(''); }}
+              className="h-10 w-24 rounded-control border border-line-control bg-surface px-3 font-mono text-xs text-content-primary max-sm:h-11"
+              aria-invalid={Boolean(topError)} aria-describedby={topError ? 'ranking-top-error' : undefined} />
+            <span className="text-2xs text-content-muted">个</span>
+            <button type="submit" className="min-h-10 rounded-control border border-line-control px-3 text-xs text-content-secondary hover:border-content-primary hover:text-content-primary max-sm:min-h-11">应用数量</button>
+            {topError ? <p id="ranking-top-error" role="alert" className="text-2xs text-warning">{topError}</p> : null}
+          </form> : null}
 
           <div
             id="plugin-filters"
@@ -434,28 +493,29 @@ export function PluginExplorer({
             </div>
           </div>
 
-          {active ? (
+          {active || state.top !== 'all' ? (
             <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-line-hairline pt-3">
-              <span className="text-2xs text-content-muted">已筛选 {sorted.length} / {plugins.length}</span>
+              {active ? <span className="text-2xs text-content-muted">已筛选 {ranking.matched} / {plugins.length}</span> : null}
+              {state.top !== 'all' ? <FilterChip label={`展示：最多前 ${state.top} 个`} onRemove={() => update({ top: 'all' })} /> : null}
               {chips.map((chip) => (
                 <FilterChip key={chip.key} label={chip.label} onRemove={chip.remove} />
               ))}
-              <button
+              {active ? <button
                 type="button"
                 onClick={reset}
                 className="inline-flex h-10 items-center gap-1 rounded-control border border-line-control px-3 text-xs text-content-secondary transition-colors hover:border-content-primary hover:bg-surface-subtle hover:text-content-primary max-sm:h-11"
               >
                 <X size={12} aria-hidden="true" /> 清除 {activeCount} 项
-              </button>
+              </button> : null}
             </div>
           ) : null}
 
           <p className="sr-only" aria-live="polite">
-            当前筛选结果 {sorted.length} 个插件。
+            当前筛选匹配 {ranking.matched} 个插件，榜单展示 {ranking.items.length} 个。
           </p>
         </div>
 
-        {sorted.length === 0 ? (
+        {ranking.items.length === 0 ? (
           <EmptyState
             description={emptyDescription}
             action={
@@ -472,7 +532,7 @@ export function PluginExplorer({
           <>
             <div className="hidden lg:block">
               <table className="w-full table-fixed border-collapse text-left">
-                <caption className="sr-only">插件库，共 {sorted.length} 个结果</caption>
+                <caption className="sr-only">插件库，共 {page.total} 个结果</caption>
                 <colgroup>
                   <col className="w-[36%]" />
                   <col className="w-[11%]" />
@@ -722,7 +782,7 @@ export function PluginExplorer({
           </>
         )}
 
-        {sorted.length > 0 ? (
+        {ranking.items.length > 0 ? (
           <div className="border-t border-line px-4 py-3.5 md:px-5">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-2xs text-content-muted">
               <time className="timestamp" dateTime={lastSuccessAt ?? undefined}>
@@ -733,7 +793,7 @@ export function PluginExplorer({
             <Pagination
               page={page.page}
               totalPages={page.totalPages}
-              total={sorted.length}
+              total={page.total}
               onPageChange={handlePageChange}
             />
           </div>

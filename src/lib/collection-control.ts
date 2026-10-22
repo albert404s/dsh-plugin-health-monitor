@@ -60,3 +60,36 @@ export const collectionControlSchema = {
 export function defaultCollectionControl(): CollectionControl {
   return { version: COLLECTION_CONTROL_VERSION, automaticPaused: false, updatedAt: null, updatedBy: null };
 }
+
+export const COLLECTION_SETTINGS_FILENAME = 'collection-settings.json';
+export interface CollectionSettings {
+  version: 1;
+  maxPlugins: number;
+  maxRequests: number;
+  githubReserve: number;
+  updatedAt: string | null;
+  updatedBy: string | null;
+}
+export function defaultCollectionSettings(): CollectionSettings {
+  return { version: 1, maxPlugins: 100, maxRequests: 600, githubReserve: 100, updatedAt: null, updatedBy: null };
+}
+export function boundedCollectionInteger(value: unknown, label: string, min: number, max: number): number {
+  const number = typeof value === 'string' && /^\d+$/.test(value) ? Number(value) : value;
+  if (typeof number !== 'number' || !Number.isSafeInteger(number) || number < min || number > max) {
+    throw new Error(label + '必须是 ' + min + '–' + max + ' 的整数');
+  }
+  return number;
+}
+export function parseCollectionSettings(value: unknown): CollectionSettings {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('采集设置必须是对象');
+  const input = value as Record<string, unknown>;
+  const keys = ['version', 'maxPlugins', 'maxRequests', 'githubReserve', 'updatedAt', 'updatedBy'];
+  if (Object.keys(input).length !== keys.length || keys.some(key => !Object.hasOwn(input, key)) || input.version !== 1) throw new Error('采集设置字段或版本不兼容');
+  const audit = parseCollectionControl({ version: 1, automaticPaused: false, updatedAt: input.updatedAt, updatedBy: input.updatedBy });
+  return { version: 1,
+    maxPlugins: boundedCollectionInteger(input.maxPlugins, '采集数量', 1, 1000),
+    maxRequests: boundedCollectionInteger(input.maxRequests, '请求预算', 1, 10000),
+    githubReserve: boundedCollectionInteger(input.githubReserve, 'GitHub 预留额度', 0, 1000),
+    updatedAt: audit.updatedAt, updatedBy: audit.updatedBy,
+  };
+}

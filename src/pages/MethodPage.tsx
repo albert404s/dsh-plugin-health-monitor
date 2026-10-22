@@ -30,12 +30,11 @@ const SORT_OPTIONS = [
 ] as const;
 
 const MAINTENANCE_ROWS = [
-  ['最近代码提交', '30%', '距最近非合并提交 ≤7 / 14 / 30 / 60 / 90 / 180 / 365 天，分别为 100 / 92 / 82 / 68 / 55 / 38 / 20 分；更久为 6 分。无日期时不参与。'],
-  ['近 30 天提交', '15%', '0 / 1 / 2–3 / 4–7 / 8–11 / ≥12 次，分别为 12 / 38 / 55 / 72 / 88 / 100 分。分页截断时，仅已取得 ≥12 次才可参与。'],
-  ['Issue 关闭率', '20%', '近 90 天创建的非 PR Issue 中，当前已关闭的比例 × 100。少于 5 条时，权重乘以样本数 / 5；没有新 Issue 时不参与。'],
-  ['开放 Issue 积压', '10%', '100 − 当前开放数 / 近 90 天新开数 × 100，限制在 0–100 分；分母为 0 且存在开放 Issue 时为 0 分。权重乘以 min(1, 当前开放数 / 5)。'],
-  ['PR 合并率', '15%', '近 90 天创建 PR 中已合并的比例 × 100。少于 3 条时，权重乘以样本数 / 3；没有新 PR 或功能不可用时不参与。'],
-  ['最近版本发布', '10%', '距最近 Release ≤30 / 60 / 90 / 180 / 365 天，分别为 100 / 92 / 80 / 62 / 40 分；更久为 18 分。无 Release 时不参与。'],
+  ['最近代码提交', '约33.3%', '距最近非合并提交 ≤7 / 14 / 30 / 60 / 90 / 180 / 365 天，分别为 100 / 92 / 82 / 68 / 55 / 38 / 20 分；更久为 6 分。无日期时不参与。'],
+  ['近 30 天提交', '约16.7%', '0 / 1 / 2–3 / 4–7 / 8–11 / ≥12 次，分别为 12 / 38 / 55 / 72 / 88 / 100 分。分页截断时，仅已取得 ≥12 次才可参与。'],
+  ['Issue 关闭率', '约22.2%', '近 90 天创建的非 PR Issue 中，当前已关闭的比例 × 100。少于 5 条时，权重乘以样本数 / 5；没有新 Issue 时不参与。'],
+  ['PR 合并率', '约16.7%', '近 90 天创建 PR 中已合并的比例 × 100。少于 3 条时，权重乘以样本数 / 3；没有新 PR 或功能不可用时不参与。'],
+  ['最近版本发布', '约11.1%', '距最近 Release ≤30 / 60 / 90 / 180 / 365 天，分别为 100 / 92 / 80 / 62 / 40 分；更久为 18 分。无 Release 时不参与。'],
 ] as const;
 
 function MethodSection({
@@ -72,6 +71,7 @@ function MoreDetails({ title, children }: { title: string; children: React.React
 
 export function MethodPage(): JSX.Element {
   const { data } = useData();
+  const snapshotMethods = [...new Set(data?.latest.plugins.map(plugin=>plugin.scores.maintenance.methodVersion) ?? [])];
   const [activeSection, setActiveSection] = useState<string>(TOC[0].href);
 
   useEffect(() => {
@@ -101,8 +101,9 @@ export function MethodPage(): JSX.Element {
         </h1>
         <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-content-muted">
           <QuietHint text="用于比较公开活动，不代表插件质量。">
-            <span className="rounded-chip border border-line bg-surface px-2 py-1 font-mono">方法 v{SCORE_METHOD_VERSION}</span>
+            <span className="rounded-chip border border-line bg-surface px-2 py-1 font-mono">规则 v{SCORE_METHOD_VERSION}</span>
           </QuietHint>
+          {snapshotMethods.some(version=>version!==SCORE_METHOD_VERSION) ? <span>快照评分 {snapshotMethods.join(' / ')} · 新规则在下次采集后应用</span> : null}
           {data ? <span>数据更新于 {formatDateTime(data.latest.lastSuccessAt)}</span> : null}
         </div>
 
@@ -161,7 +162,7 @@ export function MethodPage(): JSX.Element {
                   </div>
                 ))}
               </dl>
-              <p className="mt-3 text-xs leading-6 text-content-muted">排序只作用于已收录的数据，不会每点一次就请求 GitHub。没有数据的指标不当作 0 分。</p>
+              <p className="mt-3 text-xs leading-6 text-content-muted">先筛选、再排序、最后取前 N 项；展示数量与实际采集上限分开。只读取已发布数据，不会每点一次就请求 GitHub。没有数据的指标不当作 0 分。</p>
             </MethodSection>
 
             <MethodSection id="sources" index="02" title="数据从哪来">
@@ -207,7 +208,7 @@ export function MethodPage(): JSX.Element {
                     </div>
                   ))}
                 </div>
-                <p className="border-t border-line pt-3 text-xs leading-6">有效权重按可用数据和样本数调整后重新归一化。必要数据缺失、Issue / PR 分页不完整时，相应分项不参与。评分依据覆盖低于 45% 时不输出维护分；≥80% 为依据较充分，≥55% 为一般，其余为较少。</p>
+                <p className="border-t border-line pt-3 text-xs leading-6">基础比重为 30:15:20:15:10，合计 90；表内百分比为归一化后的约值。开放 / 新开 Issue 比率只作提醒，不再重复参与评分。有效权重按可用数据和样本数调整后重新归一化。必要数据缺失、Issue / PR 分页不完整时，相应分项不参与。评分依据覆盖低于 45% 时不输出维护分；≥80% 为依据较充分，≥55% 为一般，其余为较少。</p>
                 <p className="text-xs leading-6">提交、关闭 Issue 或合并 PR 都只表示活动，不能证明代码质量；Issue 关闭也不一定表示问题已解决。</p>
               </MoreDetails>
             </MethodSection>
@@ -227,7 +228,7 @@ export function MethodPage(): JSX.Element {
               <MoreDetails title="查看提示规则">
                 <ul className="list-disc space-y-2 pl-5 text-xs leading-6">
                   <li>仓库已归档、长期开放 Issue ≥20 条，会优先提示；长期开放 Issue ≥5 条时提示关注。</li>
-                  <li>没有较高级别的长期 Issue 提示时，开放 Issue ≥100 条，或其数量达到近 90 天新开数的 75%，会优先提示；≥50 条或达到 50% 时提示关注。这些阈值可能受小样本影响，请查看原始问题。</li>
+                  <li>比例提醒需要完整 Issue 数据、近 90 天新开至少 5 条且当前开放至少 5 条，才检查 75% / 50% 等阈值；小样本不因比例升为明显提醒，原始数量照常显示。</li>
                   <li>OSV 高危 / 严重漏洞优先提示，其他公开漏洞也单独列出；按具体 npm 包版本匹配。</li>
                   <li>无可靠 npm 数据、漏洞检查未完成、插件数据超过 2 天未更新，标记为数据缺口。</li>
                 </ul>
@@ -250,6 +251,7 @@ export function MethodPage(): JSX.Element {
                   ['手动采集 · refresh', '重新获取 API 数据，成功后发布新快照。暂停期间也能使用。'],
                   ['暂停自动采集 · pause', '跳过后续每 6 小时的定时采集；不会取消已经开始的任务。'],
                   ['恢复自动采集 · resume', '恢复后续每 6 小时的定时采集。'],
+                  ['采集设置 · configure', '设置每轮采集上限、请求预算和 GitHub 预留额度；不会立即采集。'],
                 ].map(([title, text]) => (
                   <div key={title} className="py-3">
                     <dt className="font-medium text-content-primary">{title}</dt>
@@ -263,7 +265,7 @@ export function MethodPage(): JSX.Element {
               <MoreDetails title="刷新、调用限制和保存方式">
                 <p>右上角的“刷新页面数据”只重读已发布快照，不触发采集。重新请求 GitHub、npm 和 OSV，需要使用“手动采集”。</p>
                 <p>API 有调用限制。增加收录数量或频繁采集会增加请求，单个仓库还可能需要多次分页；“20 个插件”不等于“20 次请求”。暂停定时采集可以减少后续请求，但不能绕过平台限额。</p>
-                <p>遇到限额或临时失败，采集会重试或按数据可用情况回退；完整采集失败时保留上次成功快照。请先查看工作流结果和快照时间，再决定是否重试。</p>
+                <p>每次真实请求都计数，包括分页、重试和 304 验证；内存复用不计请求。触及总预算、GitHub 预留边界或平台限流时，保留整份上次快照。已有的跨轮 GitHub 公共数据缓存先向平台验证变化，不直接冒充新数据。</p>
                 <p>源码保存在 main，数据保存在 data 分支。网页只读取静态 JSON，GitHub Token 不进入前端；历史保留 90 天，单插件最多 400 个点，完整快照最多 120 份。</p>
               </MoreDetails>
             </MethodSection>
@@ -282,7 +284,7 @@ export function MethodPage(): JSX.Element {
             </MethodSection>
 
             <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-5 text-xs text-content-muted">
-              <span>计算方法 v{SCORE_METHOD_VERSION}</span>
+              <span>计算规则 v{SCORE_METHOD_VERSION}</span>
               <div className="flex flex-wrap items-center gap-5">
                 <a href="#top" className="inline-flex min-h-11 items-center gap-1 hover:text-brand-text"><ArrowUp size={13} aria-hidden="true" />回到顶部</a>
                 <Link to="/" className="inline-flex min-h-11 items-center hover:text-brand-text">返回概览</Link>

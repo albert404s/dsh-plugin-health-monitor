@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: 'refresh: collect once; pause/resume: change future automatic updates'
+        description: 'refresh: collect once; pause/resume: automatic switch; configure: save limits only'
         required: true
         default: refresh
         type: choice
@@ -15,6 +15,19 @@ on:
           - refresh
           - pause
           - resume
+          - configure
+      max_plugins:
+        description: 'configure only: maximum verified plugins per run (1-1000); blank keeps saved value'
+        type: string
+        required: false
+      max_requests:
+        description: 'configure only: total HTTP request ceiling (1-10000), including retries'
+        type: string
+        required: false
+      github_reserve:
+        description: 'configure only: stop at this GitHub remaining quota (0-1000)'
+        type: string
+        required: false
 
 permissions:
   contents: read
@@ -58,6 +71,9 @@ jobs:
         env:
           COLLECTION_EVENT: ${{ github.event_name }}
           COLLECTION_ACTION: ${{ inputs.action }}
+          COLLECTION_MAX_PLUGINS: ${{ inputs.max_plugins }}
+          COLLECTION_MAX_REQUESTS: ${{ inputs.max_requests }}
+          COLLECTION_GITHUB_RESERVE: ${{ inputs.github_reserve }}
         run: node scripts/collection-control.ts gate --data-dir data-store
 
       - name: Stage existing data for control-only deployment
@@ -102,6 +118,14 @@ jobs:
           path: data-store
           persist-credentials: false
 
+      - name: Restore cross-run public API cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: .data-cache/http
+          key: ${{ runner.os }}-orbit-public-http-v1-${{ github.repository_id }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            ${{ runner.os }}-orbit-public-http-v1-${{ github.repository_id }}-
+
       - name: Collect data
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -130,7 +154,7 @@ jobs:
     name: Build static site
     runs-on: ubuntu-latest
     needs: [gate, collect]
-    # collect is deliberately skipped for pause/resume; a paused schedule has no artifact.
+    # collect is skipped for pause/resume/configure; a paused schedule has no artifact.
     if: >-
       ${{ !cancelled() && needs.gate.result == 'success' &&
       (needs.collect.result == 'success' || needs.gate.outputs.control_changed == 'true') }}
@@ -206,7 +230,12 @@ jobs:
           CONTROL_ONLY: ${{ needs.gate.outputs.control_changed }}
         run: |
           cp ../downloaded-data/collection-control.json .
-          git add collection-control.json
+          cp ../downloaded-data/collection-settings.json .
+          git add collection-control.json collection-settings.json
+          if [ -f ../downloaded-data/collection-report.json ]; then
+            cp ../downloaded-data/collection-report.json .
+            git add collection-report.json
+          fi
           if [ "$CONTROL_ONLY" != "true" ]; then
             cp ../downloaded-data/latest.json .
             cp ../downloaded-data/history.json .

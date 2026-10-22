@@ -4,7 +4,7 @@ const {
   decideCollectionAction,
   readCollectionControl,
   stageCollectionArtifact,
-  writeCollectionControl,
+  writeCollectionControl, readCollectionSettings, writeCollectionSettings,
 } = await import(decodeURI(new URL('./lib/collection-control.ts', import.meta.url).href)) as typeof import('./lib/collection-control');
 
 function argument(name: string): string | undefined {
@@ -32,7 +32,17 @@ async function main(): Promise<void> {
     current,
     process.env.GITHUB_ACTOR,
   );
-  if (decision.controlChanged) await writeCollectionControl(dataDir, decision.control);
+  const storedSettings = await readCollectionSettings(dataDir);
+  if (decision.action === 'configure') {
+    const parse = (value: string | undefined, fallback: number): number | string => value?.trim() ? value.trim() : fallback;
+    await writeCollectionSettings(dataDir, {
+      ...storedSettings,
+      maxPlugins: parse(process.env.COLLECTION_MAX_PLUGINS, storedSettings.maxPlugins) as number,
+      maxRequests: parse(process.env.COLLECTION_MAX_REQUESTS, storedSettings.maxRequests) as number,
+      githubReserve: parse(process.env.COLLECTION_GITHUB_RESERVE, storedSettings.githubReserve) as number,
+      updatedAt: new Date().toISOString(), updatedBy: process.env.GITHUB_ACTOR ?? null,
+    });
+  } else if (decision.controlChanged) await writeCollectionControl(dataDir, decision.control);
   console.log('[collection-control] ' + decision.message);
   if (process.env.GITHUB_OUTPUT) {
     // Only closed-set enum and Boolean values are emitted; no user string interpolation.

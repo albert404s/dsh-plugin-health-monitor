@@ -264,12 +264,6 @@ export function maintenanceScore(plugin: PluginSeed, now: Date): MaintenanceScor
               : 12;
   const issueRate = pct(github.issues.closureRate);
   const prRate = pct(github.pullRequests.mergeRate);
-  const openIssueRatio =
-    github.issues.opened90d > 0
-      ? github.issues.openNow / github.issues.opened90d
-      : github.issues.openNow > 0
-        ? 1
-        : null;
   const releaseDays = daysSince(github.latestRelease?.publishedAt ?? null, now);
   const releaseScore =
     releaseDays === null
@@ -285,18 +279,16 @@ export function maintenanceScore(plugin: PluginSeed, now: Date): MaintenanceScor
               : releaseDays <= 365
                 ? 40
                 : 18;
-  const backlogScore =
-    openIssueRatio === null ? null : clamp(100 - openIssueRatio * 100);
 
   const issueSampleScale = Math.min(1, github.issues.opened90d / 5);
   const prSampleScale = Math.min(1, github.pullRequests.opened90d / 3);
-  const backlogSampleScale = Math.min(1, github.issues.openNow / 5);
   const commitCadenceIncluded =
     availability.commits || (github.commits30dTruncated && github.commits30d >= 12);
 
+  // Remove the overlapping backlog score; preserve the remaining 30:15:20:15:10 design ratios.
   const weighted: WeightedEvidence[] = [
     {
-      designWeight: 0.3,
+      designWeight: 0.3 / 0.9,
       sampleScale: 1,
       component: buildComponent({
         key: 'commitRecency',
@@ -305,7 +297,7 @@ export function maintenanceScore(plugin: PluginSeed, now: Date): MaintenanceScor
           recencyDays === null ? '未取得' : `${Math.floor(recencyDays)} 天前`,
         rawValue: recencyDays,
         normalized: commitRecency,
-        weight: 0.3,
+        weight: 0.3 / 0.9,
         included: commitRecency !== null,
         explanation:
           '距最近一次非合并提交的天数。使用提交记录的实际 committed date，而不是仓库 pushed_at。',
@@ -313,7 +305,7 @@ export function maintenanceScore(plugin: PluginSeed, now: Date): MaintenanceScor
       }),
     },
     {
-      designWeight: 0.15,
+      designWeight: 0.15 / 0.9,
       sampleScale: 1,
       component: buildComponent({
         key: 'commitCadence',
@@ -321,7 +313,7 @@ export function maintenanceScore(plugin: PluginSeed, now: Date): MaintenanceScor
         rawLabel: `${github.commits30d}${github.commits30dTruncated ? '+' : ''} 次`,
         rawValue: github.commits30d,
         normalized: cadence,
-        weight: 0.15,
+        weight: 0.15 / 0.9,
         included: commitCadenceIncluded,
         explanation:
           '近 30 天非合并提交次数的分档映射。达到分页上限时按已取得的提交数作下限计分；提交多只说明活动频繁，不代表代码质量更高。',
@@ -329,7 +321,7 @@ export function maintenanceScore(plugin: PluginSeed, now: Date): MaintenanceScor
       }),
     },
     {
-      designWeight: 0.2,
+      designWeight: 0.2 / 0.9,
       sampleScale: issueSampleScale,
       component: buildComponent({
         key: 'issueHandling',
@@ -340,7 +332,7 @@ export function maintenanceScore(plugin: PluginSeed, now: Date): MaintenanceScor
             : `${github.issues.closed90d}/${github.issues.opened90d} 已关闭 · ${issueRate ?? '—'}%`,
         rawValue: issueRate,
         normalized: issueRate,
-        weight: 0.2,
+        weight: 0.2 / 0.9,
         included:
           availability.issues &&
           !github.issues.truncated &&
@@ -353,28 +345,7 @@ export function maintenanceScore(plugin: PluginSeed, now: Date): MaintenanceScor
       }),
     },
     {
-      designWeight: 0.1,
-      sampleScale: backlogSampleScale,
-      component: buildComponent({
-        key: 'issueBacklog',
-        label: '开放 Issue 积压',
-        rawLabel:
-          github.issues.openNow === 0
-            ? '当前无开放 Issue'
-            : `${github.issues.openNow} 条开放 / 90 天新开 ${github.issues.opened90d} 条`,
-        rawValue: openIssueRatio,
-        normalized: backlogScore,
-        weight: 0.1,
-        included:
-          availability.issues && !github.issues.openTruncated && backlogScore !== null,
-        sampleSize: github.issues.opened90d,
-        explanation:
-          '当前开放 Issue 数相对近 90 天新开 Issue 数的比例越低越好。该比例不依赖仓库是否已满 90 天；当前无开放 Issue 时不参与计分。',
-        evidenceUrl: github.issuesUrl,
-      }),
-    },
-    {
-      designWeight: 0.15,
+      designWeight: 0.15 / 0.9,
       sampleScale: prSampleScale,
       component: buildComponent({
         key: 'pullRequests',
@@ -386,7 +357,7 @@ export function maintenanceScore(plugin: PluginSeed, now: Date): MaintenanceScor
             : `${github.pullRequests.merged90d}/${github.pullRequests.opened90d} 已合并 · ${prRate ?? '—'}%`,
         rawValue: prRate,
         normalized: prRate,
-        weight: 0.15,
+        weight: 0.15 / 0.9,
         included:
           availability.pullRequests &&
           github.pullRequests.available &&
@@ -400,7 +371,7 @@ export function maintenanceScore(plugin: PluginSeed, now: Date): MaintenanceScor
       }),
     },
     {
-      designWeight: 0.1,
+      designWeight: 0.1 / 0.9,
       sampleScale: 1,
       component: buildComponent({
         key: 'release',
@@ -413,7 +384,7 @@ export function maintenanceScore(plugin: PluginSeed, now: Date): MaintenanceScor
               : `${Math.floor(releaseDays)} 天前`,
         rawValue: releaseDays,
         normalized: releaseScore,
-        weight: 0.1,
+        weight: 0.1 / 0.9,
         included: availability.releases && releaseScore !== null,
         explanation:
           '最近一次 Release 的时间分档。没有 Release 不等于未维护，因此该项仅在存在 Release 时参与。',
@@ -482,7 +453,15 @@ export function riskAssessment(
   const hasLongOpenFlag = flags.some(
     (flag) => flag.level !== 'info' && flag.code.startsWith('issue-backlog'),
   );
-  if (!hasLongOpenFlag && github.issues.openNow > 0) {
+  // Ratios from tiny or truncated samples cannot support a maintenance alert.
+  // Keep raw counts and independent long-open/archive/OSV evidence available.
+  const reliableIssueSample =
+    plugin.availability.issues &&
+    !github.issues.truncated &&
+    !github.issues.openTruncated &&
+    github.issues.opened90d >= 5 &&
+    github.issues.openNow >= 5;
+  if (!hasLongOpenFlag && reliableIssueSample) {
     const ratioText =
       openIssueRatio === null
         ? ''
@@ -574,19 +553,19 @@ export function riskAssessment(
 
   const label =
     level === 'high'
-      ? '高风险信号'
+      ? '建议先了解'
       : level === 'medium'
-        ? '需要关注'
+        ? '有选用提醒'
         : level === 'low'
-          ? '未见公开风险记录'
-          : '风险信息不完整';
+          ? '暂无额外提醒'
+          : '信息待补充';
 
   return {
     level,
     label,
     flags,
     limitations: [
-      '风险提示来自公开元数据与 OSV 记录，不构成安全审计，也不代表不存在未披露问题。',
+      '选用提醒来自公开元数据与 OSV 记录，不构成安全审计，也不代表不存在未披露问题。',
       '未执行插件代码、安装或运行时兼容性验证；版本兼容性只展示项目声明。',
       'Issue 积压与归档是维护信号，不应单独推导出“质量差”结论。',
     ],

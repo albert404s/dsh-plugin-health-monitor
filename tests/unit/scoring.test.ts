@@ -113,7 +113,7 @@ describe('maintenance score', () => {
     expect(pr.rawLabel).toBe('PR 功能不可用');
   });
 
-  it('does not drop below 45% coverage because of floating point addition', () => {
+  it('preserves the commit-only evidence after renormalizing the remaining design weights', () => {
     const seed = makeSeed({
       openIssues: 0,
       issuesOpened90d: 0,
@@ -122,21 +122,39 @@ describe('maintenance score', () => {
       lastCommitDaysAgo: 7,
     });
     const score = maintenanceScore(seed, NOW);
-    expect(score.coverage).toBe(0.45);
+    expect(score.coverage).toBe(0.5);
     expect(score.status).toBe('scored');
   });
 
-  it('uses the open/new issue ratio for the backlog component', () => {
+  it('does not count open/new Issue backlog twice or alter a score only because openNow changes', () => {
     const busy = makeSeed({ issuesOpened90d: 10, issuesClosed90d: 8, openIssues: 8 });
     const quiet = makeSeed({ issuesOpened90d: 10, issuesClosed90d: 8, openIssues: 2 });
-    const busyBacklog = maintenanceScore(busy, NOW).components.find(
-      (component) => component.key === 'issueBacklog',
-    )!;
-    const quietBacklog = maintenanceScore(quiet, NOW).components.find(
-      (component) => component.key === 'issueBacklog',
-    )!;
-    expect(busyBacklog.normalized).toBe(20);
-    expect(quietBacklog.normalized).toBe(80);
+    const a = maintenanceScore(busy, NOW), b = maintenanceScore(quiet, NOW);
+    expect(a.components.map(component => component.key)).not.toContain('issueBacklog');
+    expect(a.score).toBe(b.score);
+    expect(a.components.reduce((sum, component) => sum + component.weight, 0)).toBeCloseTo(1);
+    [30 / 90, 15 / 90, 20 / 90, 15 / 90, 10 / 90].forEach((weight, index) => expect(a.components[index].weight).toBeCloseTo(weight));
+    expect(a.methodVersion).toBe('2.0.0');
+  });
+
+  it.each([1, 4, 5, 20])('keeps %i Issue observations and reduces the effective evidence below five', (sample) => {
+    const seed = makeSeed({ issuesOpened90d: sample, issuesClosed90d: 0, openIssues: sample });
+    const score = maintenanceScore(seed, NOW);
+    const component = score.components.find(item => item.key === 'issueHandling')!;
+    expect(component.sampleSize).toBe(sample);
+    expect(component.rawValue).toBe(0);
+    expect(component.included).toBe(true);
+    expect(score.coverage).toBeCloseTo(Math.round((70 / 90 + 20 / 90 * Math.min(1, sample / 5)) * 100) / 100);
+    if (sample < 5) expect(component.effectiveWeight).toBeLessThan(component.weight);
+  });
+
+  it('does not score a truncated Issue ratio, while retaining its raw count', () => {
+    const seed = makeSeed({ issuesOpened90d: 20, issuesClosed90d: 0, openIssues: 20 });
+    seed.github.issues.truncated = true;
+    const issue = maintenanceScore(seed, NOW).components.find(item => item.key === 'issueHandling')!;
+    expect(issue.sampleSize).toBe(20);
+    expect(issue.included).toBe(false);
+    expect(issue.effectiveWeight).toBe(0);
   });
 
   it('keeps a truncated commit count as a scored lower bound', () => {
@@ -157,7 +175,7 @@ describe('risk assessment', () => {
   it('keeps risk unknown when OSV matching is unavailable', () => {
     const score = riskAssessment(makeSeed({ securityStatus: 'unavailable' }), NOW);
     expect(score.level).toBe('unknown');
-    expect(score.label).toBe('风险信息不完整');
+    expect(score.label).toBe('信息待补充');
   });
 
   it('raises high risk for an archived repo or a high-severity OSV record', () => {
@@ -173,8 +191,62 @@ describe('risk assessment', () => {
   it('does not label an empty OSV result as safe or zero risk', () => {
     const score = riskAssessment(makeSeed(), NOW);
     expect(score.level).toBe('low');
-    expect(score.label).toBe('未见公开风险记录');
+    expect(score.label).toBe('暂无额外提醒');
     expect(score.limitations.join(' ')).toContain('不构成安全审计');
+  });
+
+  it.each([1, 4])('does not escalate a %i-Issue sample based on its ratio', (sample) => {
+    const result = riskAssessment(makeSeed({ issuesOpened90d: sample, issuesClosed90d: 0, openIssues: sample }), NOW);
+    expect(result.flags.some(flag => flag.code.startsWith('open-issues-'))).toBe(false);
+    expect(result.level).toBe('low');
+  });
+
+  it.each([5, 20])('allows a complete %i-Issue sample to produce a ratio reminder', (sample) => {
+    const result = riskAssessment(makeSeed({ issuesOpened90d: sample, issuesClosed90d: 0, openIssues: sample }), NOW);
+    expect(result.flags.map(flag => flag.code)).toContain('open-issues-high');
+  });
+
+  it('requires both the new-Issue sample and the number currently open to be at least five', () => {
+    for (const [opened, open] of [[4, 100], [20, 4]]) {
+      const result = riskAssessment(makeSeed({ issuesOpened90d: opened, issuesClosed90d: 0, openIssues: open }), NOW);
+      expect(result.flags.some(flag => flag.code.startsWith('open-issues-'))).toBe(false);
+    }
+    const medium = riskAssessment(makeSeed({ issuesOpened90d: 10, issuesClosed90d: 5, openIssues: 5 }), NOW);
+    expect(medium.flags.map(flag => flag.code)).toContain('open-issues-medium');
+  });
+
+  it('does not infer a ratio when no new Issues exist', () => {
+    const result = riskAssessment(makeSeed({ issuesOpened90d: 0, issuesClosed90d: 0, openIssues: 100 }), NOW);
+    expect(result.flags.some(flag => flag.code.startsWith('open-issues-'))).toBe(false);
+    const score = maintenanceScore(makeSeed({ issuesOpened90d: 0, issuesClosed90d: 0 }), NOW);
+    expect(score.components.find(item => item.key === 'issueHandling')!.included).toBe(false);
+  });
+
+  it.each(['truncated', 'openTruncated'] as const)('does not infer proportion-based reminders from %s Issue results', (field) => {
+    const seed = makeSeed({ issuesOpened90d: 20, issuesClosed90d: 0, openIssues: 20 });
+    seed.github.issues[field] = true;
+    const result = riskAssessment(seed, NOW);
+    expect(result.flags.some(flag => flag.code.startsWith('open-issues-'))).toBe(false);
+    expect(result.level).toBe('low');
+  });
+
+  it('keeps an independently observed twenty long-open Issues alert even when current ratios are unusable', () => {
+    const seed = makeSeed({ issuesOpened90d: 1, issuesClosed90d: 0, openIssues: 21, longOpen: 20 });
+    seed.github.issues.truncated = true;
+    const result = riskAssessment(seed, NOW);
+    expect(result.flags.map(flag => flag.code)).toContain('issue-backlog-high');
+    expect(result.level).toBe('high');
+  });
+
+  it('keeps archive and verified vulnerability evidence with a tiny Issue sample', () => {
+    for (const seed of [
+      makeSeed({ issuesOpened90d: 1, issuesClosed90d: 0, openIssues: 1, archived: true }),
+      makeSeed({ issuesOpened90d: 1, issuesClosed90d: 0, openIssues: 1, securityVulns: [vulnerability('critical')] }),
+    ]) {
+      const result = riskAssessment(seed, NOW);
+      expect(result.level).toBe('high');
+      expect(result.flags.some(flag => flag.code === 'archived' || flag.code.startsWith('osv-OSV'))).toBe(true);
+    }
   });
 
   it('flags a large open-issue backlog even for a repository younger than 90 days', () => {

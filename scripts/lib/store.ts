@@ -3,7 +3,8 @@ import path from 'node:path';
 import type { HistoryFile, HistoryPoint, LatestData, StatusFile } from '../../src/lib/types';
 import { latestSchema, historySchema, statusSchema, parseLatest, parseHistory, parseStatus } from '../../src/lib/contracts';
 import { computeStats } from '../../src/lib/scoring';
-import { readCollectionControl } from './collection-control';
+import { parseCollectionReport } from '../../src/lib/collection-report';
+import { readCollectionControl, readCollectionSettings } from './collection-control';
 import {
   HISTORY_SCHEMA_VERSION,
   LATEST_SCHEMA_VERSION,
@@ -217,11 +218,16 @@ export async function copyDataFiles(sourceDir: string, destinationDir: string): 
   assertHistory(history);
   assertStatus(status);
   const collectionControl = await readCollectionControl(sourceDir);
+  const collectionSettings = await readCollectionSettings(sourceDir);
+  let report = null;
+  try { report = parseCollectionReport(await readJson(path.join(sourceDir, 'collection-report.json'))); } catch { /* Optional telemetry cannot take down a valid snapshot. */ }
   await mkdir(destinationDir, { recursive: true });
   await Promise.all([
     atomicWriteJson(path.join(destinationDir, 'latest.json'), latest),
     atomicWriteJson(path.join(destinationDir, 'history.json'), history),
     atomicWriteJson(path.join(destinationDir, 'status.json'), status),
     atomicWriteJson(path.join(destinationDir, 'collection-control.json'), collectionControl),
+    atomicWriteJson(path.join(destinationDir, 'collection-settings.json'), collectionSettings),
+    atomicWriteJson(path.join(destinationDir, 'collection-report.json'), report),
   ]);
 }

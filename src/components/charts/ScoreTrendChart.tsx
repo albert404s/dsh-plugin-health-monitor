@@ -2,6 +2,8 @@ import { useMemo } from 'react';
 import type { EChartsOption } from 'echarts';
 import type { HistoryPoint } from '../../lib/types';
 import { formatDateTime } from '../../lib/format';
+import { escapeHtml } from '../../lib/html';
+import { splitScoreHistory } from '../../lib/score-history';
 import { useEChart } from '../../hooks/useEChart';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { chartTheme, tooltipChrome } from './chartTheme';
@@ -30,7 +32,7 @@ export function ScoreTrendChart({ points, height = 260 }: ScoreTrendChartProps):
     return {
       animationDuration: reducedMotion ? 0 : 200,
       backgroundColor: 'transparent',
-      aria: { enabled: true, label: { description: '插件关注度与维护活跃度历史趋势折线图' } },
+      aria: { enabled: true, label: { description: '插件关注度与维护活跃度历史趋势折线图；方法版本变化处断线，旧版快照仍保留' } },
       grid: { left: 40, right: 16, top: 32, bottom: 30, containLabel: true },
       tooltip: {
         trigger: 'axis',
@@ -52,13 +54,16 @@ export function ScoreTrendChart({ points, height = 260 }: ScoreTrendChartProps):
           if (!Array.isArray(params) || params.length === 0) return '';
           const index = params[0].dataIndex;
           const point = points[index];
-          const rows = params
-            .map(
-              (item) =>
-                `<div style="display:flex;gap:18px;justify-content:space-between;line-height:18px"><span style="color:${chartTheme.tooltip.muted}">${item.seriesName}</span><b style="color:${chartTheme.strong};font-family:${chartTheme.monoFamily};font-weight:600">${item.value === null ? '—' : item.value.toFixed(1)}</b></div>`,
-            )
-            .join('');
-          return `<div style="min-width:190px;padding:10px 12px;font-family:${chartTheme.fontFamily}"><div style="color:${chartTheme.tooltip.title};font-size:13px;font-weight:600;margin-bottom:6px">${point ? formatDateTime(point.t) : ''}</div>${rows}</div>`;
+          if (!point) return '';
+          // Read the selected snapshot directly: segmented series share labels, so
+          // enumerating every series would duplicate rows or show null placeholders.
+          const rows = [
+            { name: '维护活跃度', value: point.maintenance },
+            { name: '关注度', value: point.popularity },
+          ].map(item =>
+            `<div style="display:flex;gap:18px;justify-content:space-between;line-height:18px"><span style="color:${chartTheme.tooltip.muted}">${item.name}</span><b style="color:${chartTheme.strong};font-family:${chartTheme.monoFamily};font-weight:600">${item.value === null ? '—' : item.value.toFixed(1)}</b></div>`,
+          ).join('');
+          return `<div style="min-width:190px;padding:10px 12px;font-family:${chartTheme.fontFamily}"><div style="color:${chartTheme.tooltip.title};font-size:13px;font-weight:600;margin-bottom:6px">${formatDateTime(point.t)}</div><div style="color:${chartTheme.tooltip.muted};margin-bottom:6px">方法 ${escapeHtml(point.methodVersion)}</div>${rows}</div>`;
         },
       },
       legend: {
@@ -97,13 +102,14 @@ export function ScoreTrendChart({ points, height = 260 }: ScoreTrendChartProps):
         },
         splitLine: { lineStyle: { color: chartTheme.grid, type: 'solid', width: 1 } },
       },
-      series: [
+      series: splitScoreHistory(points).flatMap((segment, index) => [
         {
+          id: `maintenance-${index}`,
           name: '维护活跃度',
-          type: 'line',
-          data: points.map((point) => point.maintenance),
+          type: 'line' as const,
+          data: segment.maintenance,
           showSymbol: true,
-          symbol: 'circle',
+          symbol: 'circle' as const,
           symbolSize: 6,
           connectNulls: false,
           lineStyle: { color: chartTheme.series.maintenance, width: 2 },
@@ -113,15 +119,16 @@ export function ScoreTrendChart({ points, height = 260 }: ScoreTrendChartProps):
             borderWidth: 2,
           },
           areaStyle: { color: chartTheme.area },
-          emphasis: { focus: 'series' },
+          emphasis: { focus: 'series' as const },
           blur: { itemStyle: { opacity: 0.55 }, lineStyle: { opacity: 0.55 } },
         },
         {
+          id: `popularity-${index}`,
           name: '关注度',
-          type: 'line',
-          data: points.map((point) => point.popularity),
+          type: 'line' as const,
+          data: segment.popularity,
           showSymbol: true,
-          symbol: 'circle',
+          symbol: 'circle' as const,
           symbolSize: 6,
           connectNulls: false,
           lineStyle: { color: chartTheme.series.popularity, width: 2 },
@@ -130,10 +137,10 @@ export function ScoreTrendChart({ points, height = 260 }: ScoreTrendChartProps):
             borderColor: chartTheme.series.popularity,
             borderWidth: 2,
           },
-          emphasis: { focus: 'series' },
+          emphasis: { focus: 'series' as const },
           blur: { itemStyle: { opacity: 0.55 }, lineStyle: { opacity: 0.55 } },
         },
-      ],
+      ]),
     };
   }, [points, reducedMotion]);
 
@@ -144,7 +151,7 @@ export function ScoreTrendChart({ points, height = 260 }: ScoreTrendChartProps):
         ref={chartRef}
         className="h-full w-full"
         role="img"
-        aria-label="插件关注度与维护活跃度历史趋势"
+        aria-label="插件关注度与维护活跃度历史趋势，方法版本变化处断线"
       />
     </div>
   );

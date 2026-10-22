@@ -361,11 +361,7 @@ export function PluginDetailPage(): JSX.Element {
     () => findPlatformGapDates(data.latest.plugins.map((item) => item.npm)),
     [data.latest.plugins],
   );
-  const historyPoints = plugin
-    ? (data.history.plugins[plugin.id] ?? []).filter(
-        (point) => point.methodVersion === plugin.scores.maintenance.methodVersion,
-      )
-    : [];
+  const historyPoints = plugin ? (data.history.plugins[plugin.id] ?? []) : [];
   const historySpanHours =
     historyPoints.length >= 2
       ? (new Date(historyPoints[historyPoints.length - 1].t).getTime() -
@@ -418,7 +414,7 @@ export function PluginDetailPage(): JSX.Element {
     (warning) => warning.includes('周下载') || warning.includes('周变化'),
   );
   const otherWarnings = plugin.warnings.filter((warning) => !weeklyWarnings.includes(warning));
-  const trendReady = historyPoints.length >= 3 && historySpanHours >= 6;
+  const trendReady = historyPoints.length >= 2;
   const hasDownloadData = plugin.npm.status === 'verified' && plugin.npm.daily.length > 0;
   const splitCharts = trendReady && hasDownloadData;
   const completeness = plugin.scores.completeness;
@@ -737,7 +733,7 @@ export function PluginDetailPage(): JSX.Element {
         <SectionHeading
           eyebrow="时间序列"
           title={<span id="trend-title">趋势与下载</span>}
-          description="指数趋势来自 data 分支的历史快照；下载趋势来自 npm 最近 30 天日数据。历史不足时不画趋势线。"
+          description="趋势保留全部真实快照，评分方法切换处断线；下载来自 npm 日统计。"
         />
         <div className="panel mt-4 overflow-hidden">
           <div className={cn('grid', splitCharts && 'lg:grid-cols-2 lg:divide-x lg:divide-line')}>

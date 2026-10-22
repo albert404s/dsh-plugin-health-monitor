@@ -55,7 +55,7 @@ describe('runtime data contracts', () => {
 describe('score comparisons', () => {
   it('only computes a difference for the same method, included components and effective weights', () => {
     const [a,b] = latest().plugins; expect(compareScores(a.scores.maintenance,b.scores.maintenance).comparable).toBe(true);
-    b.scores.maintenance.methodVersion='2.0.0';
+    b.scores.maintenance.methodVersion='legacy-different-method';
     expect(comparisonText(a,b,'maintenance')).toContain('方法版本不同');
     b.scores.maintenance.methodVersion=a.scores.maintenance.methodVersion;
     b.scores.maintenance.components[0].effectiveWeight+=.01;

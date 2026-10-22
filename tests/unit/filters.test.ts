@@ -4,6 +4,8 @@ import {
   filterPlugins,
   hasActiveFilters,
   paginate,
+  rankPlugins,
+  parseRankingLimit,
   sortPlugins,
   stateFromSearchParams,
   stateToSearchParams,
@@ -102,6 +104,7 @@ describe('filter URL state', () => {
       data: 'high',
       downloads: 'available',
       sort: 'maintenance',
+      top: 2,
       page: 2,
     });
     const restored = stateFromSearchParams(params);
@@ -113,6 +116,7 @@ describe('filter URL state', () => {
       data: 'high',
       downloads: 'available',
       sort: 'maintenance',
+      top: 2,
       page: 2,
     });
 
@@ -125,6 +129,48 @@ describe('filter URL state', () => {
   it('detects active filters independently of sorting', () => {
     expect(hasActiveFilters(DEFAULT_FILTER_STATE)).toBe(false);
     expect(hasActiveFilters({ ...DEFAULT_FILTER_STATE, sort: 'stars' })).toBe(false);
+    expect(hasActiveFilters({ ...DEFAULT_FILTER_STATE, top: 10 })).toBe(false);
     expect(hasActiveFilters({ ...DEFAULT_FILTER_STATE, query: 'dsh' })).toBe(true);
+  });
+
+  it('accepts a bounded integer limit and keeps old links at all results', () => {
+    expect(stateFromSearchParams(new URLSearchParams('sort=stars')).top).toBe('all');
+    for (const value of ['1', '10', '37', '1000']) expect(parseRankingLimit(value)).toBe(Number(value));
+    for (const value of [null, '', 'all', '0', '-1', '1.5', '1e2', 'Infinity', 'NaN', '1001', '01', ' 20']) {
+      expect(stateFromSearchParams(new URLSearchParams(value === null ? '' : `top=${encodeURIComponent(value)}`)).top).toBe('all');
+    }
+    expect(stateToSearchParams(DEFAULT_FILTER_STATE).toString()).toBe('');
+    expect(stateToSearchParams({ ...DEFAULT_FILTER_STATE, top: 37 }).get('top')).toBe('37');
+  });
+});
+
+describe('limited rankings', () => {
+  const candidates = scorePlugins(Array.from({ length: 24 }, (_, index) => makeSeed({
+    id: `rank-${index}`,
+    name: `Rank ${String(index).padStart(2, '0')}`,
+    stars: index,
+    category: index % 2 === 0 ? 'agents' : 'context',
+    downloads30d: index === 23 ? null : index * 100,
+  })), NOW);
+
+  it('filters before taking top N and applies the limit before pagination', () => {
+    const ranking = rankPlugins(candidates, { ...DEFAULT_FILTER_STATE, category: 'agents', sort: 'stars', top: 10 });
+    expect(ranking.matched).toBe(12);
+    expect(ranking.items.map((plugin) => plugin.id)).toEqual(['rank-22', 'rank-20', 'rank-18', 'rank-16', 'rank-14', 'rank-12', 'rank-10', 'rank-8', 'rank-6', 'rank-4']);
+    const second = paginate(ranking.items, 2);
+    expect(second.totalPages).toBe(2);
+    expect(second.total).toBe(10);
+    expect(second.items.map((plugin) => plugin.id)).toEqual(['rank-6', 'rank-4']);
+    expect(paginate(ranking.items, 9).page).toBe(2);
+    expect(candidates[0].id).toBe('rank-0');
+  });
+
+  it('does not invent records or turn missing download counts into zero', () => {
+    const ranking = rankPlugins(candidates, { ...DEFAULT_FILTER_STATE, sort: 'downloads', top: 100 });
+    expect(ranking.matched).toBe(24);
+    expect(ranking.items).toHaveLength(24);
+    expect(ranking.items[0].id).toBe('rank-22');
+    expect(ranking.items.at(-1)?.npm.downloads30d).toBeNull();
+    expect(rankPlugins(candidates, { ...DEFAULT_FILTER_STATE, query: 'does-not-exist', top: 10 })).toEqual({ matched: 0, items: [] });
   });
 });

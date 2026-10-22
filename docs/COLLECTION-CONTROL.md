@@ -34,3 +34,14 @@ updatedAt 为 UTC，updatedBy 为执行操作的 GitHub 用户。旧 data 分支
 暂停只是减少不需要的请求，并不绕过平台规则。现有采集保留重试和限流退避。手动采集不应连续点击；先查看运行中的任务和上次更新时间。
 
 以后若加入“按维度发现前 N 个插件”，应把发现与全量指标采集分开：先检索候选，展示预估数量和请求开销，再确认采集上限。只扩大本地列表不会自动突破平台额度。GitHub 搜索和普通 API 有各自的限额，npm 和 OSV 也可能限制请求；实际额度以各平台返回的响应头和官方规则为准。
+
+
+## 采集范围与预算
+
+新增 configure 操作只保存设置，不调用数据源，也不改变自动开关。到 GitHub 时选择 action=configure，并填写 max_plugins、max_requests、github_reserve，空白沿用已保存值。设置在 data 分支 collection-settings.json，默认每轮最多100个已核验插件、600次请求、GitHub余量预留100。每轮优先未采集/最久未更新的项目，因此小范围会轮换覆盖；未纳入本轮的已有插件保留旧日期并标记，不制造新历史。这不是全 GitHub 搜索功能。
+
+每次真实 HTTP 请求都算入总预算，包括分页、重试、POST 与304验证；内存命中不计请求。总预算和平台剩余额度是两个不同概念。触及总上限、GitHub预留边界或其限流信号时停止后续网络，并保留整份上次 latest/history/snapshots，单独发布状态和 collection-report.json 用量记录。没有旧快照时停止并失败，不用半轮数据冒充完整结果。
+
+只有 GitHub 已确认公共的仓库 GET 使用跨轮条件缓存；npm/OSV仍调用各自API并共享总预算。缓存默认保存30天，下一轮携带ETag/Last-Modified验证，304复用旧body但保留body原始获取时间，不能将其解释为刚发生变化。没有验证器的端点默认仍请求网络；本轮没有开启直接TTL复用。GitHub轮换令牌使用明确workflow公共作用域，否则按认证身份隔离。Authorization、Token和不在白名单内的响应头不写缓存。
+
+Actions 使用固定版本官方cache保存 .data-cache/http；缓存不进入data分支或站点artifact，也不作为权威数据。缓存文件损坏降级为未命中，保存失败只记录提示，不覆盖有效快照。GitHub Actions缓存可能被清理，命中不作保证；请求预算仍独立生效。

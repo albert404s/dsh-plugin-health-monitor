@@ -5,13 +5,13 @@ import path from 'node:path';
 import { promisify } from 'node:util';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
-  COLLECTION_CONTROL_FILENAME,
+  COLLECTION_CONTROL_FILENAME, defaultCollectionSettings, parseCollectionSettings,
   defaultCollectionControl,
   parseCollectionControl,
   type CollectionControl,
 } from '../../src/lib/collection-control';
 import {
-  decideCollectionAction,
+  decideCollectionAction, readCollectionSettings, writeCollectionSettings,
   readCollectionControl,
   stageCollectionArtifact,
   writeCollectionControl,
@@ -199,4 +199,31 @@ describe('control-only artifact and workflow CLI', () => {
     await expect(readFile(output, 'utf8')).rejects.toMatchObject({ code: 'ENOENT' });
     expect(await readFile(path.join(source, COLLECTION_CONTROL_FILENAME), 'utf8')).toBe('{"automaticPaused":"no"}');
   });
+});
+
+it('validates saved collection limits without confusing a display limit with collection scope',async()=>{
+  const source=await directory();
+  expect(await readCollectionSettings(source)).toEqual(defaultCollectionSettings());
+  const settings={...defaultCollectionSettings(),maxPlugins:100,maxRequests:600,githubReserve:100};
+  await writeCollectionSettings(source,settings);
+  expect(await readCollectionSettings(source)).toEqual(settings);
+  for(const bad of [{...settings,maxPlugins:0},{...settings,maxRequests:'1e3'},{...settings,githubReserve:-1},{...settings,extra:true}]) {
+    expect(()=>parseCollectionSettings(bad)).toThrow();
+  }
+});
+it('configure selects a no-collection deployment without changing the automatic switch',()=>{
+  const result=decideCollectionAction('workflow_dispatch','configure',paused,'albert404s',now);
+  expect(result).toMatchObject({action:'configure',shouldCollect:false,controlChanged:true,control:paused});
+});
+it('the configure CLI saves bounded numeric settings and keeps snapshot and pause bytes',async()=>{
+  const source=await directory(),output=path.join(await directory(),'output');
+  await writeCollectionControl(source,paused);
+  await writeFile(path.join(source,'latest.json'),'previous-snapshot');
+  await execute(process.execPath,['scripts/collection-control.ts','gate','--data-dir',source],{cwd:process.cwd(),env:{
+    ...process.env,COLLECTION_EVENT:'workflow_dispatch',COLLECTION_ACTION:'configure',COLLECTION_MAX_PLUGINS:'50',COLLECTION_MAX_REQUESTS:'300',COLLECTION_GITHUB_RESERVE:'80',GITHUB_ACTOR:'albert404s',GITHUB_OUTPUT:output,GITHUB_STEP_SUMMARY:'',
+  }});
+  expect(await readCollectionControl(source)).toEqual(paused);
+  expect(await readFile(path.join(source,'latest.json'),'utf8')).toBe('previous-snapshot');
+  expect(await readCollectionSettings(source)).toMatchObject({maxPlugins:50,maxRequests:300,githubReserve:80,updatedBy:'albert404s'});
+  expect(await readFile(output,'utf8')).toContain('should_collect=false');
 });

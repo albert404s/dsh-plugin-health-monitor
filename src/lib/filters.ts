@@ -14,6 +14,7 @@ export type MaintenanceFilter = 'all' | 'active' | 'steady' | 'slow' | 'insuffic
 export type RiskFilter = 'all' | 'high' | 'medium' | 'unknown' | 'low';
 export type DataFilter = 'all' | 'high' | 'medium' | 'low';
 export type DownloadFilter = 'all' | 'available' | 'missing';
+export type RankingLimit = number | 'all';
 
 export interface PluginFilterState {
   query: string;
@@ -23,6 +24,7 @@ export interface PluginFilterState {
   data: DataFilter;
   downloads: DownloadFilter;
   sort: SortKey;
+  top: RankingLimit;
   page: number;
 }
 
@@ -34,10 +36,17 @@ export const DEFAULT_FILTER_STATE: PluginFilterState = {
   data: 'all',
   downloads: 'all',
   sort: 'popularity',
+  top: 'all',
   page: 1,
 };
 
 export const PAGE_SIZE = 8;
+
+export function parseRankingLimit(value: string | null): RankingLimit {
+  if (!value || !/^[1-9]\d{0,3}$/.test(value)) return 'all';
+  const count = Number(value);
+  return count <= 1000 ? count : 'all';
+}
 
 export function maintenanceBand(plugin: PluginRecord): Exclude<MaintenanceFilter, 'all'> {
   if (plugin.scores.maintenance.status === 'insufficient') return 'insufficient';
@@ -172,6 +181,15 @@ export function paginate<T>(items: T[], page: number, pageSize = PAGE_SIZE): {
   };
 }
 
+/** Apply the display limit after filtering and sorting, before pagination. */
+export function rankPlugins(plugins: PluginRecord[], state: PluginFilterState): {
+  items: PluginRecord[];
+  matched: number;
+} {
+  const sorted = sortPlugins(filterPlugins(plugins, state), state.sort);
+  return { items: state.top === 'all' ? sorted : sorted.slice(0, state.top), matched: sorted.length };
+}
+
 export function categories(plugins: PluginRecord[]): string[] {
   return [...new Set(plugins.map((plugin) => plugin.category))].sort((a, b) =>
     a.localeCompare(b, 'zh-CN'),
@@ -198,6 +216,7 @@ export function stateToSearchParams(state: PluginFilterState): URLSearchParams {
   if (state.data !== 'all') params.set('data', state.data);
   if (state.downloads !== 'all') params.set('downloads', state.downloads);
   if (state.sort !== 'popularity') params.set('sort', state.sort);
+  if (state.top !== 'all') params.set('top', String(state.top));
   if (state.page > 1) params.set('page', String(state.page));
   return params;
 }
@@ -234,6 +253,7 @@ export function stateFromSearchParams(params: URLSearchParams): PluginFilterStat
     ].includes(sort ?? '')
       ? (sort as SortKey)
       : 'popularity',
+    top: parseRankingLimit(params.get('top')),
     page: Number.isFinite(page) && page > 0 ? Math.floor(page) : 1,
   };
 }

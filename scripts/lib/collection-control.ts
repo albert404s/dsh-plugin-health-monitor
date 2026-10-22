@@ -1,13 +1,13 @@
 import { copyFile, cp, mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import type { CollectionControl } from '../../src/lib/collection-control';
+import type { CollectionControl, CollectionSettings } from '../../src/lib/collection-control';
 
 // Explicit file URLs also work with Node 24's native TypeScript execution.
 const {
   COLLECTION_CONTROL_FILENAME,
   collectionControlSchema,
   defaultCollectionControl,
-  parseCollectionControl,
+  parseCollectionControl, defaultCollectionSettings, parseCollectionSettings, COLLECTION_SETTINGS_FILENAME,
 } = await import(decodeURI(new URL('../../src/lib/collection-control.ts', import.meta.url).href)) as typeof import('../../src/lib/collection-control');
 
 export {
@@ -18,7 +18,7 @@ export {
 };
 export type { CollectionControl } from '../../src/lib/collection-control';
 
-export type CollectionAction = 'scheduled' | 'refresh' | 'pause' | 'resume';
+export type CollectionAction = 'scheduled' | 'refresh' | 'pause' | 'resume' | 'configure';
 
 export interface CollectionDecision {
   action: CollectionAction;
@@ -73,7 +73,11 @@ export function decideCollectionAction(
       message: '手动采集一次；不改变自动更新开关。',
     };
   }
-  if (action !== 'pause' && action !== 'resume') throw new Error('action 只支持 refresh、pause 或 resume');
+  if (action === 'configure') return {
+    action, shouldCollect: false, controlChanged: true, control,
+    message: '保存后续采集范围与预算；本次不重新采集，也不改变自动开关。',
+  };
+  if (action !== 'pause' && action !== 'resume') throw new Error('action 只支持 refresh、pause、resume 或 configure');
   const updated = parseCollectionControl({
     ...control,
     automaticPaused: action === 'pause',
@@ -103,6 +107,7 @@ export async function writeCollectionControl(dataDir: string, value: CollectionC
 /** Carry the last snapshot unchanged through pause/resume deployments. */
 export async function stageCollectionArtifact(dataDir: string, artifactDir: string): Promise<void> {
   const control = await readCollectionControl(dataDir);
+  const settings = await readCollectionSettings(dataDir);
   await mkdir(artifactDir, { recursive: true });
   for (const filename of ['latest.json', 'history.json', 'status.json']) {
     await copyFile(path.join(dataDir, filename), path.join(artifactDir, filename));
@@ -114,4 +119,21 @@ export async function stageCollectionArtifact(dataDir: string, artifactDir: stri
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
   }
   await writeCollectionControl(artifactDir, control);
+  await writeCollectionSettings(artifactDir, settings);
+  try { await copyFile(path.join(dataDir, 'collection-report.json'), path.join(artifactDir, 'collection-report.json')); } catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
+}
+
+export async function readCollectionSettings(dataDir: string): Promise<CollectionSettings> {
+  try { return parseCollectionSettings(JSON.parse(await readFile(path.join(dataDir, COLLECTION_SETTINGS_FILENAME), 'utf8'))); }
+  catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return defaultCollectionSettings();
+    throw new Error('采集设置不可用，已阻止操作。', { cause: error });
+  }
+}
+export async function writeCollectionSettings(dataDir: string, value: CollectionSettings): Promise<void> {
+  const settings = parseCollectionSettings(value);
+  await mkdir(dataDir, { recursive: true });
+  const file = path.join(dataDir, COLLECTION_SETTINGS_FILENAME), temporary = file + '.' + process.pid + '.tmp';
+  await writeFile(temporary, JSON.stringify(settings, null, 2) + '\n', 'utf8');
+  await rename(temporary, file);
 }
