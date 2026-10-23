@@ -1,7 +1,14 @@
 import { expect, test, type Page } from '@playwright/test';
+import { computeStats } from '../../src/lib/scoring';
 const control={version:1,automaticPaused:true,updatedAt:'2026-10-22T01:00:00.000Z',updatedBy:'maintainer'};
 const settings={version:1,maxPlugins:100,maxRequests:600,githubReserve:100,updatedAt:null,updatedBy:null};
 async function state(page:Page) {
+ // These cases deliberately compare a 20-record published snapshot with larger targets.
+ await page.route('**/data/latest.json',async route=>{
+  const response=await route.fetch(),json=await response.json();
+  json.plugins=json.plugins.slice(0,20);json.stats=computeStats(json.plugins);
+  await route.fulfill({response,json});
+ });
  await page.route('**/data/collection-control.json', route=>route.fulfill({json:control}));
  await page.route('**/data/collection-settings.json',route=>route.fulfill({json:settings}));
  await page.route('**/data/collection-report.json',route=>route.fulfill({json:null}));
@@ -68,9 +75,30 @@ test('run usage reflects an older preserved snapshot rather than claiming a fres
  const summary=dialog.locator('summary').filter({hasText:'上次采集记录 · 300 次请求'});await summary.click();
  await expect(dialog).toContainText('本轮触及预算或平台限制，已保留上次有效快照。');
  await expect(dialog).toContainText('300 / 300');
- await expect(dialog).toContainText('未达到收录目标：已核验 20 个，目标 100 个。');
+ await expect(dialog).toContainText('当前快照实际发布 20 个，本轮目标 100 个。');
  await expect(dialog).toContainText('本轮预算已用完，下次继续核验。');
  await expect(dialog.getByRole('status')).toHaveText('仅手动采集');
+});
+test('a fully verified catalog still explains fewer published records and keeps run completion separate',async({page})=>{
+ await state(page);
+ await page.route('**/data/latest.json',async route=>{
+  const response=await route.fetch(),json=await response.json();
+  json.plugins=json.plugins.slice(0,20);
+  await route.fulfill({response,json});
+ });
+ await page.route('**/data/collection-settings.json',route=>route.fulfill({json:{...settings,targetPlugins:50}}));
+ await page.route('**/data/collection-report.json',route=>route.fulfill({json:{
+  version:1,startedAt:'2026-10-23T08:49:00.000Z',completedAt:'2026-10-23T08:52:00.000Z',
+  configuredPlugins:50,selectedPlugins:50,completedPlugins:49,deferredPlugins:0,maxPlugins:100,maxRequests:600,githubReserve:100,
+  requestsMade:450,memoryCacheHits:0,revalidatedCacheHits:0,persistentCacheHits:0,githubRemaining:350,githubResetAt:null,stopped:false,stopReason:null,
+  discovery:{target:50,verified:50,added:30,candidatesChecked:35,reason:'部分插件未取得有效数据，仅发布实际可用记录。'},
+ }}));
+ await page.goto('/#collection-controls');const dialog=page.getByRole('dialog',{name:'数据更新',exact:true});
+ await dialog.locator('summary').filter({hasText:'上次采集记录 · 450 次请求'}).click();
+ await expect(dialog.locator('.orbit-collection-target')).toContainText('当前实际收录 20 个');
+ await expect(dialog).toContainText('当前快照实际发布 20 个，本轮目标 50 个。部分插件未取得有效数据，仅发布实际可用记录。');
+ await expect(dialog.locator('.orbit-collection-report>div').filter({hasText:'已完成 / 本轮范围'})).toContainText('49 / 50');
+ await expect(dialog.locator('.orbit-collection-report>div').filter({hasText:'核验收录 / 目标'})).toContainText('50 / 50');
 });
 test('historic method versions remain visible as separated points after a scoring upgrade',async({page})=>{
  await page.route('**/data/history.json',async route=>{

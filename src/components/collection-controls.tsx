@@ -116,7 +116,7 @@ function CollectionDialog({ onClose }: { onClose: () => void }): JSX.Element {
           {report.discovery && <div><dt>本次新增 / 检查候选</dt><dd>{report.discovery.added} / {report.discovery.candidatesChecked}</dd></div>}
         </dl>
         {report.stopped && <p className="text-warning">本轮触及预算或平台限制，已保留上次有效快照。</p>}
-        {report.discovery && report.discovery.verified < report.discovery.target && <p>未达到收录目标：已核验 {report.discovery.verified} 个，目标 {report.discovery.target} 个。{report.discovery.reason ?? '尚未找到足够的已核验 DSH 插件。'}</p>}
+        {report.discovery && (report.discovery.reason || report.discovery.verified < report.discovery.target || (collectedCount !== undefined && collectedCount < report.discovery.target)) && <p>当前快照实际发布 {collectedCount ?? '—'} 个，本轮目标 {report.discovery.target} 个。{report.discovery.reason ?? '尚未取得足够的有效插件数据。'}</p>}
       </details>}
       <div className="orbit-collection-instructions">
         <p>在 GitHub 确认执行（需要仓库写入权限）：</p>

@@ -69,8 +69,11 @@ test('invalid top links recover to all results and a large valid top never inven
   await expect(explorer.getByLabel('自定义展示数量')).toHaveValue('1000');
   await expect(explorer.getByRole('status', { name: '榜单数量' })).toContainText(`展示 ${snapshot.plugins.length} 个`);
   await expect(explorer.getByTestId('ranking-shortfall')).toContainText(`全库已收录 ${snapshot.plugins.length} 个，目标前 1000 个需先扩充收录。`);
-  await explorer.getByRole('button', { name: '下一页' }).click();
-  await explorer.getByRole('button', { name: '下一页' }).click();
+  const pages = Math.ceil(snapshot.plugins.length / 8);
+  for(let current=1;current<pages;current++) {
+    await explorer.getByRole('button', { name: '下一页' }).click();
+    await expect(explorer.getByRole('navigation', { name: '插件列表分页' })).toContainText('第 '+(current+1)+' / '+pages+' 页');
+  }
   await expect(explorer.getByRole('button', { name: '下一页' })).toBeDisabled();
   await expect(explorer.locator('tbody tr')).toHaveCount(snapshot.plugins.length % 8 || 8);
 });

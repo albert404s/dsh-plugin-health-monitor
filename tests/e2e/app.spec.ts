@@ -23,6 +23,8 @@ test('overview shows real data, decorative fallback and the ecosystem chart', as
 });
 
 test('library search, sorting, filters, pagination and clear persist in URL', async({page})=>{
+  const snapshot:LatestData=await (await page.request.get('/data/latest.json')).json();
+  const missingIds=new Set(snapshot.plugins.filter(plugin=>plugin.npm.status!=='verified'||plugin.npm.downloads30d===null).map(plugin=>plugin.id));
   await page.goto('/plugins'); const explorer=page.locator('#all-plugins');
   await explorer.getByRole('searchbox',{name:'搜索插件',exact:true}).fill('context');
   await expect(page).toHaveURL(/q=context/);
@@ -31,7 +33,10 @@ test('library search, sorting, filters, pagination and clear persist in URL', as
   await explorer.getByLabel('排序方式').selectOption('maintenance');
   await expect(page).toHaveURL(/sort=maintenance/);
   await explorer.getByLabel('按下载数据可用性筛选').selectOption('missing');
-  await expect(explorer.locator('tbody tr')).toHaveCount(2);
+  await expect(explorer.locator('tbody tr')).toHaveCount(Math.min(8,missingIds.size));
+  for(const href of await explorer.locator('tbody tr a[href*="/plugins/"]').evaluateAll(links=>links.map(link=>link.getAttribute('href')))) {
+    expect(href&&missingIds.has(href.split('/plugins/')[1])).toBe(true);
+  }
   await page.reload(); await expect(explorer.getByLabel('按下载数据可用性筛选')).toHaveValue('missing');
   await explorer.getByRole('button',{name:/清除 \d+ 项/}).click();
   await expect(page).not.toHaveURL(/downloads=/);
