@@ -1,5 +1,6 @@
 {
   "version": 1,
+  "targetPlugins": 20,
   "maxPlugins": 100,
   "maxRequests": 600,
   "githubReserve": 100,
