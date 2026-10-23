@@ -1,29 +1,29 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-23T03:27:56.182Z",
-  "lastAttemptAt": "2026-10-23T03:27:56.182Z",
-  "lastSuccessAt": "2026-10-23T03:27:56.182Z",
-  "runId": "2026-10-23T03:27:56.182Z-3a1d3d5c",
+  "generatedAt": "2026-10-23T08:18:04.986Z",
+  "lastAttemptAt": "2026-10-23T08:18:04.986Z",
+  "lastSuccessAt": "2026-10-23T08:18:04.986Z",
+  "runId": "2026-10-23T08:18:04.986Z-664716ad",
   "sources": {
     "github": {
       "status": "ok",
-      "fetchedAt": "2026-10-23T03:27:56.182Z",
+      "fetchedAt": "2026-10-23T08:18:04.986Z",
       "message": "20 成功 / 0 失败"
     },
     "npm": {
       "status": "ok",
-      "fetchedAt": "2026-10-23T03:27:56.182Z",
+      "fetchedAt": "2026-10-23T08:18:04.986Z",
       "message": "18/18 个包映射通过，0 个无法映射，0 个不可用，0 个缺少下载数据，0 个请求失败"
     },
     "osv": {
       "status": "ok",
-      "fetchedAt": "2026-10-23T03:27:56.182Z",
+      "fetchedAt": "2026-10-23T08:18:04.986Z",
       "message": "18 个精确版本检查完成，0 个失败"
     }
   },
   "stats": {
     "pluginCount": 20,
-    "totalStars": 46917,
+    "totalStars": 47187,
     "totalDownloads": 2633323,
     "maintainedCount": 19,
     "highRiskCount": 2,
@@ -54,16 +54,16 @@
         "language": "TypeScript",
         "license": "Apache-2.0",
         "createdAt": "2026-08-15T08:59:02.000Z",
-        "pushedAt": "2026-10-23T02:15:00.000Z",
+        "pushedAt": "2026-10-23T06:06:41.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 169,
-        "forks": 16,
+        "stars": 171,
+        "forks": 19,
         "openIssues": 2,
         "openPullRequests": 0,
-        "commits30d": 113,
+        "commits30d": 119,
         "commits30dTruncated": false,
         "issues": {
           "opened90d": 29,
@@ -86,14 +86,14 @@
           "queryUrl": "https://github.com/MichengAI/dsh-agency-agents/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-25"
         },
         "latestRelease": {
-          "version": "v1.2.10",
-          "tagName": "v1.2.10",
-          "publishedAt": "2026-10-22T03:43:37.000Z",
-          "url": "https://github.com/MichengAI/dsh-agency-agents/releases/tag/v1.2.10"
+          "version": "v1.2.11",
+          "tagName": "v1.2.11",
+          "publishedAt": "2026-10-23T06:09:02.000Z",
+          "url": "https://github.com/MichengAI/dsh-agency-agents/releases/tag/v1.2.11"
         },
-        "releases90d": 58,
-        "lastCommitAt": "2026-10-23T02:14:58.000Z",
-        "lastCommitUrl": "https://github.com/MichengAI/dsh-agency-agents/commit/1d7d308c0619b686483f1942bdf85b89deeb5d82",
+        "releases90d": 59,
+        "lastCommitAt": "2026-10-23T06:03:56.000Z",
+        "lastCommitUrl": "https://github.com/MichengAI/dsh-agency-agents/commit/294daac981bad9b7e32dc0816b458ff820a7940a",
         "commitsUrl": "https://github.com/MichengAI/dsh-agency-agents/commits/main",
         "issuesUrl": "https://github.com/MichengAI/dsh-agency-agents/issues",
         "pullsUrl": "https://github.com/MichengAI/dsh-agency-agents/pulls",
@@ -102,8 +102,8 @@
       "npm": {
         "status": "verified",
         "packageName": "@michengai/dsh-agency-agents",
-        "latestVersion": "1.2.10",
-        "publishedAt": "2026-10-22T03:46:42.924Z",
+        "latestVersion": "1.2.11",
+        "publishedAt": "2026-10-23T06:11:25.919Z",
         "downloads30d": 147552,
         "downloads7d": null,
         "previous7d": null,
@@ -364,24 +364,24 @@
         "mappingEvidence": "npm registry repository=git+https://github.com/MichengAI/dsh-agency-agents.git ↔ GitHub MichengAI/dsh-agency-agents",
         "enginesNode": "^22.19.0 || >=24.0.0",
         "dshPeerRange": "0.2.0-rc.1 || 0.2.0-rc.2 || 0.2.1-rc.1 || 0.2.1-rc.2",
-        "fetchedAt": "2026-10-23T03:27:56.182Z",
+        "fetchedAt": "2026-10-23T08:18:04.986Z",
         "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
         "status": "checked",
         "exactMatch": true,
         "packageName": "@michengai/dsh-agency-agents",
-        "version": "1.2.10",
+        "version": "1.2.11",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-23T03:27:56.182Z",
+        "checkedAt": "2026-10-23T08:18:04.986Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=%40michengai%2Fdsh-agency-agents"
       },
       "compatibility": {
         "nodeEngine": "^22.19.0 || >=24.0.0",
         "dshPeerRange": "0.2.0-rc.1 || 0.2.0-rc.2 || 0.2.1-rc.1 || 0.2.1-rc.2",
-        "npmVersion": "1.2.10",
-        "evidenceUrl": "https://www.npmjs.com/package/@michengai/dsh-agency-agents/v/1.2.10",
+        "npmVersion": "1.2.11",
+        "evidenceUrl": "https://www.npmjs.com/package/@michengai/dsh-agency-agents/v/1.2.11",
         "note": "仅展示包声明与公开元数据；本项目未安装、执行或运行时验证被检测插件，因此不构成兼容性保证。"
       },
       "availability": {
@@ -397,10 +397,10 @@
       "warnings": [
         "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-23T03:27:56.182Z",
+      "lastUpdatedAt": "2026-10-23T08:18:04.986Z",
       "scores": {
         "popularity": {
-          "score": 50.5,
+          "score": 50.6,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -408,12 +408,12 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "169 stars",
-              "rawValue": 169,
-              "normalized": 30,
+              "rawLabel": "171 stars",
+              "rawValue": 171,
+              "normalized": 30.2,
               "weight": 0.45,
               "effectiveWeight": 0.45,
-              "contribution": 13.5,
+              "contribution": 13.6,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
@@ -448,7 +448,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "0 天前",
-              "rawValue": 0.05067340277777778,
+              "rawValue": 0.09315956018518519,
               "normalized": 100,
               "weight": 0.3333333333333333,
               "effectiveWeight": 0.375,
@@ -456,13 +456,13 @@
               "included": true,
               "sampleSize": null,
               "explanation": "距最近一次非合并提交的天数。使用提交记录的实际 committed date，而不是仓库 pushed_at。",
-              "evidenceUrl": "https://github.com/MichengAI/dsh-agency-agents/commit/1d7d308c0619b686483f1942bdf85b89deeb5d82"
+              "evidenceUrl": "https://github.com/MichengAI/dsh-agency-agents/commit/294daac981bad9b7e32dc0816b458ff820a7940a"
             },
             {
               "key": "commitCadence",
               "label": "近 30 天提交频率",
-              "rawLabel": "113 次",
-              "rawValue": 113,
+              "rawLabel": "119 次",
+              "rawValue": 119,
               "normalized": 100,
               "weight": 0.16666666666666666,
               "effectiveWeight": 0.187,
@@ -504,7 +504,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "0 天前",
-              "rawValue": 0.9891109027777778,
+              "rawValue": 0.08961789351851852,
               "normalized": 100,
               "weight": 0.11111111111111112,
               "effectiveWeight": 0.125,
@@ -565,8 +565,8 @@
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 199,
-        "forks": 16,
+        "stars": 201,
+        "forks": 17,
         "openIssues": 2,
         "openPullRequests": 0,
         "commits30d": 138,
@@ -870,7 +870,7 @@
         "mappingEvidence": "npm registry repository=git+https://github.com/MichengAI/dsh-codex-ui.git ↔ GitHub MichengAI/dsh-codex-ui",
         "enginesNode": "^22.19.0 || >=24.0.0",
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-23T03:27:56.182Z",
+        "fetchedAt": "2026-10-23T08:18:04.986Z",
         "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
@@ -879,7 +879,7 @@
         "packageName": "@michengai/dsh-codex-ui",
         "version": "1.1.47",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-23T03:27:56.182Z",
+        "checkedAt": "2026-10-23T08:18:04.986Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=%40michengai%2Fdsh-codex-ui"
       },
@@ -903,7 +903,7 @@
       "warnings": [
         "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-23T03:27:56.182Z",
+      "lastUpdatedAt": "2026-10-23T08:18:04.986Z",
       "scores": {
         "popularity": {
           "score": 58.5,
@@ -914,9 +914,9 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "199 stars",
-              "rawValue": 199,
-              "normalized": 33,
+              "rawLabel": "201 stars",
+              "rawValue": 201,
+              "normalized": 33.1,
               "weight": 0.45,
               "effectiveWeight": 0.45,
               "contribution": 14.9,
@@ -954,7 +954,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "0 天前",
-              "rawValue": 0.638833125,
+              "rawValue": 0.840323912037037,
               "normalized": 100,
               "weight": 0.3333333333333333,
               "effectiveWeight": 0.333,
@@ -1010,7 +1010,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "0 天前",
-              "rawValue": 0.6411016435185185,
+              "rawValue": 0.8425924305555555,
               "normalized": 100,
               "weight": 0.11111111111111112,
               "effectiveWeight": 0.111,
@@ -1066,16 +1066,16 @@
         "language": "JavaScript",
         "license": "Apache-2.0",
         "createdAt": "2026-08-15T05:54:34.000Z",
-        "pushedAt": "2026-10-23T02:12:06.000Z",
+        "pushedAt": "2026-10-23T04:03:55.000Z",
         "archived": false,
         "defaultBranch": "master"
       },
       "github": {
-        "stars": 295,
+        "stars": 297,
         "forks": 17,
         "openIssues": 0,
         "openPullRequests": 0,
-        "commits30d": 127,
+        "commits30d": 129,
         "commits30dTruncated": false,
         "issues": {
           "opened90d": 49,
@@ -1098,14 +1098,14 @@
           "queryUrl": "https://github.com/MichengAI/dsh-skills-manager/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-25"
         },
         "latestRelease": {
-          "version": "v1.2.12",
-          "tagName": "v1.2.12",
-          "publishedAt": "2026-10-23T00:47:46.000Z",
-          "url": "https://github.com/MichengAI/dsh-skills-manager/releases/tag/v1.2.12"
+          "version": "v1.2.13",
+          "tagName": "v1.2.13",
+          "publishedAt": "2026-10-23T04:09:48.000Z",
+          "url": "https://github.com/MichengAI/dsh-skills-manager/releases/tag/v1.2.13"
         },
-        "releases90d": 66,
-        "lastCommitAt": "2026-10-23T02:12:05.000Z",
-        "lastCommitUrl": "https://github.com/MichengAI/dsh-skills-manager/commit/e1321689a5c50cf6014df7f21d30fb7050cc0ad9",
+        "releases90d": 67,
+        "lastCommitAt": "2026-10-23T04:03:40.000Z",
+        "lastCommitUrl": "https://github.com/MichengAI/dsh-skills-manager/commit/e455c11d6ae138d9ce78c08aa403ea3d3996c6e5",
         "commitsUrl": "https://github.com/MichengAI/dsh-skills-manager/commits/master",
         "issuesUrl": "https://github.com/MichengAI/dsh-skills-manager/issues",
         "pullsUrl": "https://github.com/MichengAI/dsh-skills-manager/pulls",
@@ -1114,8 +1114,8 @@
       "npm": {
         "status": "verified",
         "packageName": "@michengai/dsh-skills-manager",
-        "latestVersion": "1.2.12",
-        "publishedAt": "2026-10-23T00:48:29.834Z",
+        "latestVersion": "1.2.13",
+        "publishedAt": "2026-10-23T04:10:32.330Z",
         "downloads30d": 212152,
         "downloads7d": null,
         "previous7d": null,
@@ -1376,24 +1376,24 @@
         "mappingEvidence": "npm registry repository=git+https://github.com/MichengAI/dsh-skills-manager.git ↔ GitHub MichengAI/dsh-skills-manager",
         "enginesNode": "^22.19.0 || >=24.0.0",
         "dshPeerRange": "0.2.0-rc.1 || 0.2.0-rc.2 || 0.2.1-rc.1 || 0.2.1-rc.2",
-        "fetchedAt": "2026-10-23T03:27:56.182Z",
+        "fetchedAt": "2026-10-23T08:18:04.986Z",
         "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
         "status": "checked",
         "exactMatch": true,
         "packageName": "@michengai/dsh-skills-manager",
-        "version": "1.2.12",
+        "version": "1.2.13",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-23T03:27:56.182Z",
+        "checkedAt": "2026-10-23T08:18:04.986Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=%40michengai%2Fdsh-skills-manager"
       },
       "compatibility": {
         "nodeEngine": "^22.19.0 || >=24.0.0",
         "dshPeerRange": "0.2.0-rc.1 || 0.2.0-rc.2 || 0.2.1-rc.1 || 0.2.1-rc.2",
-        "npmVersion": "1.2.12",
-        "evidenceUrl": "https://www.npmjs.com/package/@michengai/dsh-skills-manager/v/1.2.12",
+        "npmVersion": "1.2.13",
+        "evidenceUrl": "https://www.npmjs.com/package/@michengai/dsh-skills-manager/v/1.2.13",
         "note": "仅展示包声明与公开元数据；本项目未安装、执行或运行时验证被检测插件，因此不构成兼容性保证。"
       },
       "availability": {
@@ -1409,7 +1409,7 @@
       "warnings": [
         "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-23T03:27:56.182Z",
+      "lastUpdatedAt": "2026-10-23T08:18:04.986Z",
       "scores": {
         "popularity": {
           "score": 59.4,
@@ -1420,9 +1420,9 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "295 stars",
-              "rawValue": 295,
-              "normalized": 40,
+              "rawLabel": "297 stars",
+              "rawValue": 297,
+              "normalized": 40.1,
               "weight": 0.45,
               "effectiveWeight": 0.45,
               "contribution": 18,
@@ -1460,7 +1460,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "0 天前",
-              "rawValue": 0.05267571759259259,
+              "rawValue": 0.1766780787037037,
               "normalized": 100,
               "weight": 0.3333333333333333,
               "effectiveWeight": 0.333,
@@ -1468,13 +1468,13 @@
               "included": true,
               "sampleSize": null,
               "explanation": "距最近一次非合并提交的天数。使用提交记录的实际 committed date，而不是仓库 pushed_at。",
-              "evidenceUrl": "https://github.com/MichengAI/dsh-skills-manager/commit/e1321689a5c50cf6014df7f21d30fb7050cc0ad9"
+              "evidenceUrl": "https://github.com/MichengAI/dsh-skills-manager/commit/e455c11d6ae138d9ce78c08aa403ea3d3996c6e5"
             },
             {
               "key": "commitCadence",
               "label": "近 30 天提交频率",
-              "rawLabel": "127 次",
-              "rawValue": 127,
+              "rawLabel": "129 次",
+              "rawValue": 129,
               "normalized": 100,
               "weight": 0.16666666666666666,
               "effectiveWeight": 0.167,
@@ -1516,7 +1516,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "0 天前",
-              "rawValue": 0.11122895833333334,
+              "rawValue": 0.17241881944444445,
               "normalized": 100,
               "weight": 0.11111111111111112,
               "effectiveWeight": 0.111,
@@ -1572,25 +1572,25 @@
         "language": "JavaScript",
         "license": "Apache-2.0",
         "createdAt": "2026-08-16T02:35:05.000Z",
-        "pushedAt": "2026-10-23T02:13:28.000Z",
+        "pushedAt": "2026-10-23T06:24:06.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 208,
-        "forks": 10,
-        "openIssues": 1,
+        "stars": 209,
+        "forks": 11,
+        "openIssues": 2,
         "openPullRequests": 0,
-        "commits30d": 103,
+        "commits30d": 106,
         "commits30dTruncated": false,
         "issues": {
-          "opened90d": 65,
+          "opened90d": 66,
           "closed90d": 64,
-          "closureRate": 0.9846153846153847,
+          "closureRate": 0.9696969696969697,
           "lowSample": false,
           "truncated": false,
           "longOpen": 0,
-          "openNow": 1,
+          "openNow": 2,
           "openTruncated": false,
           "queryUrl": "https://github.com/MichengAI/dsh-archive-manager/issues?q=is%3Aissue%20created%3A%3E%3D2026-07-25"
         },
@@ -1604,14 +1604,14 @@
           "queryUrl": "https://github.com/MichengAI/dsh-archive-manager/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-25"
         },
         "latestRelease": {
-          "version": "v1.1.7",
-          "tagName": "v1.1.7",
-          "publishedAt": "2026-10-22T06:19:43.000Z",
-          "url": "https://github.com/MichengAI/dsh-archive-manager/releases/tag/v1.1.7"
+          "version": "v1.1.8",
+          "tagName": "v1.1.8",
+          "publishedAt": "2026-10-23T06:08:26.000Z",
+          "url": "https://github.com/MichengAI/dsh-archive-manager/releases/tag/v1.1.8"
         },
-        "releases90d": 64,
-        "lastCommitAt": "2026-10-23T02:13:26.000Z",
-        "lastCommitUrl": "https://github.com/MichengAI/dsh-archive-manager/commit/1d52c3830e1ce44ca70048602393e24d15aed878",
+        "releases90d": 65,
+        "lastCommitAt": "2026-10-23T06:23:59.000Z",
+        "lastCommitUrl": "https://github.com/MichengAI/dsh-archive-manager/commit/d601a42eb0cbdadc4d81848a9261fe36190b6011",
         "commitsUrl": "https://github.com/MichengAI/dsh-archive-manager/commits/main",
         "issuesUrl": "https://github.com/MichengAI/dsh-archive-manager/issues",
         "pullsUrl": "https://github.com/MichengAI/dsh-archive-manager/pulls",
@@ -1620,8 +1620,8 @@
       "npm": {
         "status": "verified",
         "packageName": "@michengai/dsh-archive-manager",
-        "latestVersion": "1.1.7",
-        "publishedAt": "2026-10-22T06:18:56.171Z",
+        "latestVersion": "1.1.8",
+        "publishedAt": "2026-10-23T06:07:47.480Z",
         "downloads30d": 179275,
         "downloads7d": null,
         "previous7d": null,
@@ -1882,24 +1882,24 @@
         "mappingEvidence": "npm registry repository=git+https://github.com/MichengAI/dsh-archive-manager.git ↔ GitHub MichengAI/dsh-archive-manager",
         "enginesNode": "^22.19.0 || >=24.0.0",
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-23T03:27:56.182Z",
+        "fetchedAt": "2026-10-23T08:18:04.986Z",
         "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
         "status": "checked",
         "exactMatch": true,
         "packageName": "@michengai/dsh-archive-manager",
-        "version": "1.1.7",
+        "version": "1.1.8",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-23T03:27:56.182Z",
+        "checkedAt": "2026-10-23T08:18:04.986Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=%40michengai%2Fdsh-archive-manager"
       },
       "compatibility": {
         "nodeEngine": "^22.19.0 || >=24.0.0",
         "dshPeerRange": null,
-        "npmVersion": "1.1.7",
-        "evidenceUrl": "https://www.npmjs.com/package/@michengai/dsh-archive-manager/v/1.1.7",
+        "npmVersion": "1.1.8",
+        "evidenceUrl": "https://www.npmjs.com/package/@michengai/dsh-archive-manager/v/1.1.8",
         "note": "仅展示包声明与公开元数据；本项目未安装、执行或运行时验证被检测插件，因此不构成兼容性保证。"
       },
       "availability": {
@@ -1915,7 +1915,7 @@
       "warnings": [
         "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-23T03:27:56.182Z",
+      "lastUpdatedAt": "2026-10-23T08:18:04.986Z",
       "scores": {
         "popularity": {
           "score": 54.5,
@@ -1926,8 +1926,8 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "208 stars",
-              "rawValue": 208,
+              "rawLabel": "209 stars",
+              "rawValue": 209,
               "normalized": 33.8,
               "weight": 0.45,
               "effectiveWeight": 0.45,
@@ -1957,7 +1957,7 @@
           "methodVersion": "2.0.0"
         },
         "maintenance": {
-          "score": 97.3,
+          "score": 97,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -1966,7 +1966,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "0 天前",
-              "rawValue": 0.051738217592592596,
+              "rawValue": 0.07923594907407408,
               "normalized": 100,
               "weight": 0.3333333333333333,
               "effectiveWeight": 0.333,
@@ -1974,13 +1974,13 @@
               "included": true,
               "sampleSize": null,
               "explanation": "距最近一次非合并提交的天数。使用提交记录的实际 committed date，而不是仓库 pushed_at。",
-              "evidenceUrl": "https://github.com/MichengAI/dsh-archive-manager/commit/1d52c3830e1ce44ca70048602393e24d15aed878"
+              "evidenceUrl": "https://github.com/MichengAI/dsh-archive-manager/commit/d601a42eb0cbdadc4d81848a9261fe36190b6011"
             },
             {
               "key": "commitCadence",
               "label": "近 30 天提交频率",
-              "rawLabel": "103 次",
-              "rawValue": 103,
+              "rawLabel": "106 次",
+              "rawValue": 106,
               "normalized": 100,
               "weight": 0.16666666666666666,
               "effectiveWeight": 0.167,
@@ -1993,14 +1993,14 @@
             {
               "key": "issueHandling",
               "label": "近期 Issue 关闭率",
-              "rawLabel": "64/65 已关闭 · 98.5%",
-              "rawValue": 98.5,
-              "normalized": 98.5,
+              "rawLabel": "64/66 已关闭 · 97%",
+              "rawValue": 97,
+              "normalized": 97,
               "weight": 0.22222222222222224,
               "effectiveWeight": 0.222,
-              "contribution": 21.9,
+              "contribution": 21.6,
               "included": true,
-              "sampleSize": 65,
+              "sampleSize": 66,
               "explanation": "近 90 天创建的非 PR Issue 中，当前已关闭的比例。少于 5 条时降低该分项权重；0 条新 Issue 不扣分，也不代表处理能力强。",
               "evidenceUrl": "https://github.com/MichengAI/dsh-archive-manager/issues?q=is%3Aissue%20created%3A%3E%3D2026-07-25"
             },
@@ -2022,7 +2022,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "0 天前",
-              "rawValue": 0.880708125,
+              "rawValue": 0.09003456018518519,
               "normalized": 100,
               "weight": 0.11111111111111112,
               "effectiveWeight": 0.111,
@@ -2078,16 +2078,16 @@
         "language": "JavaScript",
         "license": "Apache-2.0",
         "createdAt": "2026-08-16T08:47:06.000Z",
-        "pushedAt": "2026-10-22T12:24:07.000Z",
+        "pushedAt": "2026-10-23T04:28:51.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 83,
-        "forks": 18,
+        "stars": 84,
+        "forks": 19,
         "openIssues": 2,
-        "openPullRequests": 1,
-        "commits30d": 180,
+        "openPullRequests": 0,
+        "commits30d": 188,
         "commits30dTruncated": false,
         "issues": {
           "opened90d": 36,
@@ -2103,21 +2103,21 @@
         "pullRequests": {
           "available": true,
           "opened90d": 11,
-          "merged90d": 6,
-          "mergeRate": 0.5454545454545454,
+          "merged90d": 7,
+          "mergeRate": 0.6363636363636364,
           "lowSample": false,
           "truncated": false,
           "queryUrl": "https://github.com/MichengAI/dsh-im-connect/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-25"
         },
         "latestRelease": {
-          "version": "v1.0.12",
-          "tagName": "v1.0.12",
-          "publishedAt": "2026-10-21T15:13:04.000Z",
-          "url": "https://github.com/MichengAI/dsh-im-connect/releases/tag/v1.0.12"
+          "version": "v1.0.14",
+          "tagName": "v1.0.14",
+          "publishedAt": "2026-10-23T04:30:39.000Z",
+          "url": "https://github.com/MichengAI/dsh-im-connect/releases/tag/v1.0.14"
         },
-        "releases90d": 67,
-        "lastCommitAt": "2026-10-22T12:10:04.000Z",
-        "lastCommitUrl": "https://github.com/MichengAI/dsh-im-connect/commit/f8da6af91c7e97e226d9a8e87827cf79698d6335",
+        "releases90d": 69,
+        "lastCommitAt": "2026-10-23T04:28:32.000Z",
+        "lastCommitUrl": "https://github.com/MichengAI/dsh-im-connect/commit/f557740bb2f6c35d559e390d12e1706ace53ddf0",
         "commitsUrl": "https://github.com/MichengAI/dsh-im-connect/commits/main",
         "issuesUrl": "https://github.com/MichengAI/dsh-im-connect/issues",
         "pullsUrl": "https://github.com/MichengAI/dsh-im-connect/pulls",
@@ -2126,8 +2126,8 @@
       "npm": {
         "status": "verified",
         "packageName": "@michengai/dsh-im-connect",
-        "latestVersion": "1.0.12",
-        "publishedAt": "2026-10-21T15:14:32.584Z",
+        "latestVersion": "1.0.14",
+        "publishedAt": "2026-10-23T04:31:22.810Z",
         "downloads30d": 138931,
         "downloads7d": null,
         "previous7d": null,
@@ -2388,24 +2388,24 @@
         "mappingEvidence": "npm registry repository=git+https://github.com/MichengAI/dsh-im-connect.git ↔ GitHub MichengAI/dsh-im-connect",
         "enginesNode": "^22.19.0 || >=24.0.0",
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-23T03:27:56.182Z",
+        "fetchedAt": "2026-10-23T08:18:04.986Z",
         "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
         "status": "checked",
         "exactMatch": true,
         "packageName": "@michengai/dsh-im-connect",
-        "version": "1.0.12",
+        "version": "1.0.14",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-23T03:27:56.182Z",
+        "checkedAt": "2026-10-23T08:18:04.986Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=%40michengai%2Fdsh-im-connect"
       },
       "compatibility": {
         "nodeEngine": "^22.19.0 || >=24.0.0",
         "dshPeerRange": null,
-        "npmVersion": "1.0.12",
-        "evidenceUrl": "https://www.npmjs.com/package/@michengai/dsh-im-connect/v/1.0.12",
+        "npmVersion": "1.0.14",
+        "evidenceUrl": "https://www.npmjs.com/package/@michengai/dsh-im-connect/v/1.0.14",
         "note": "仅展示包声明与公开元数据；本项目未安装、执行或运行时验证被检测插件，因此不构成兼容性保证。"
       },
       "availability": {
@@ -2421,10 +2421,10 @@
       "warnings": [
         "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-23T03:27:56.182Z",
+      "lastUpdatedAt": "2026-10-23T08:18:04.986Z",
       "scores": {
         "popularity": {
-          "score": 44,
+          "score": 44.1,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -2432,12 +2432,12 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "83 stars",
-              "rawValue": 83,
-              "normalized": 17.4,
+              "rawLabel": "84 stars",
+              "rawValue": 84,
+              "normalized": 17.6,
               "weight": 0.45,
               "effectiveWeight": 0.45,
-              "contribution": 7.8,
+              "contribution": 7.9,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
@@ -2463,7 +2463,7 @@
           "methodVersion": "2.0.0"
         },
         "maintenance": {
-          "score": 91.2,
+          "score": 92.7,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -2472,7 +2472,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "0 天前",
-              "rawValue": 0.6374095138888889,
+              "rawValue": 0.15940956018518518,
               "normalized": 100,
               "weight": 0.3333333333333333,
               "effectiveWeight": 0.333,
@@ -2480,13 +2480,13 @@
               "included": true,
               "sampleSize": null,
               "explanation": "距最近一次非合并提交的天数。使用提交记录的实际 committed date，而不是仓库 pushed_at。",
-              "evidenceUrl": "https://github.com/MichengAI/dsh-im-connect/commit/f8da6af91c7e97e226d9a8e87827cf79698d6335"
+              "evidenceUrl": "https://github.com/MichengAI/dsh-im-connect/commit/f557740bb2f6c35d559e390d12e1706ace53ddf0"
             },
             {
               "key": "commitCadence",
               "label": "近 30 天提交频率",
-              "rawLabel": "180 次",
-              "rawValue": 180,
+              "rawLabel": "188 次",
+              "rawValue": 188,
               "normalized": 100,
               "weight": 0.16666666666666666,
               "effectiveWeight": 0.167,
@@ -2513,12 +2513,12 @@
             {
               "key": "pullRequests",
               "label": "近期 PR 合并率",
-              "rawLabel": "6/11 已合并 · 54.5%",
-              "rawValue": 54.5,
-              "normalized": 54.5,
+              "rawLabel": "7/11 已合并 · 63.6%",
+              "rawValue": 63.6,
+              "normalized": 63.6,
               "weight": 0.16666666666666666,
               "effectiveWeight": 0.167,
-              "contribution": 9.1,
+              "contribution": 10.6,
               "included": true,
               "sampleSize": 11,
               "explanation": "近 90 天创建 PR 中已合并的比例。只统计 PR，不把 Issue 混入；少于 3 条时降低权重。仓库禁用 PR 时该维度被排除，而不是记 0。",
@@ -2527,8 +2527,8 @@
             {
               "key": "release",
               "label": "最近版本发布",
-              "rawLabel": "1 天前",
-              "rawValue": 1.5103261805555555,
+              "rawLabel": "0 天前",
+              "rawValue": 0.15793965277777777,
               "normalized": 100,
               "weight": 0.11111111111111112,
               "effectiveWeight": 0.111,
@@ -2894,7 +2894,7 @@
         "mappingEvidence": "npm registry repository=git+https://github.com/MichengAI/dsh-automation.git ↔ GitHub MichengAI/dsh-automation",
         "enginesNode": "^22.19.0 || >=24.0.0",
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-23T03:27:56.182Z",
+        "fetchedAt": "2026-10-23T08:18:04.986Z",
         "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
@@ -2903,7 +2903,7 @@
         "packageName": "@michengai/dsh-automation",
         "version": "1.0.6",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-23T03:27:56.182Z",
+        "checkedAt": "2026-10-23T08:18:04.986Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=%40michengai%2Fdsh-automation"
       },
@@ -2927,7 +2927,7 @@
       "warnings": [
         "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-23T03:27:56.182Z",
+      "lastUpdatedAt": "2026-10-23T08:18:04.986Z",
       "scores": {
         "popularity": {
           "score": 35.6,
@@ -2978,7 +2978,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "0 天前",
-              "rawValue": 0.6264604398148148,
+              "rawValue": 0.8279512268518519,
               "normalized": 100,
               "weight": 0.3333333333333333,
               "effectiveWeight": 0.333,
@@ -3034,7 +3034,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "0 天前",
-              "rawValue": 0.6245970138888889,
+              "rawValue": 0.8260878009259259,
               "normalized": 100,
               "weight": 0.11111111111111112,
               "effectiveWeight": 0.111,
@@ -3400,7 +3400,7 @@
         "mappingEvidence": "npm registry repository=git+https://github.com/MichengAI/dsh-btw.git ↔ GitHub MichengAI/dsh-btw",
         "enginesNode": ">=22",
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-23T03:27:56.182Z",
+        "fetchedAt": "2026-10-23T08:18:04.986Z",
         "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
@@ -3409,7 +3409,7 @@
         "packageName": "@michengai/dsh-btw",
         "version": "1.0.4",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-23T03:27:56.182Z",
+        "checkedAt": "2026-10-23T08:18:04.986Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=%40michengai%2Fdsh-btw"
       },
@@ -3433,7 +3433,7 @@
       "warnings": [
         "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-23T03:27:56.182Z",
+      "lastUpdatedAt": "2026-10-23T08:18:04.986Z",
       "scores": {
         "popularity": {
           "score": 31.1,
@@ -3484,7 +3484,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "0 天前",
-              "rawValue": 0.6481039583333333,
+              "rawValue": 0.8495947453703704,
               "normalized": 100,
               "weight": 0.3333333333333333,
               "effectiveWeight": 0.333,
@@ -3540,7 +3540,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "0 天前",
-              "rawValue": 0.6469002546296296,
+              "rawValue": 0.8483910416666667,
               "normalized": 100,
               "weight": 0.11111111111111112,
               "effectiveWeight": 0.111,
@@ -3597,25 +3597,25 @@
         "language": "TypeScript",
         "license": "Apache-2.0",
         "createdAt": "2026-08-14T08:23:28.000Z",
-        "pushedAt": "2026-10-23T03:05:05.000Z",
+        "pushedAt": "2026-10-23T08:16:52.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 3416,
-        "forks": 135,
-        "openIssues": 4,
-        "openPullRequests": 3,
-        "commits30d": 370,
+        "stars": 3439,
+        "forks": 136,
+        "openIssues": 6,
+        "openPullRequests": 2,
+        "commits30d": 366,
         "commits30dTruncated": false,
         "issues": {
-          "opened90d": 124,
-          "closed90d": 120,
-          "closureRate": 0.967741935483871,
+          "opened90d": 127,
+          "closed90d": 121,
+          "closureRate": 0.952755905511811,
           "lowSample": false,
           "truncated": false,
           "longOpen": 0,
-          "openNow": 4,
+          "openNow": 6,
           "openTruncated": false,
           "queryUrl": "https://github.com/bowenliang123/dsh-context/issues?q=is%3Aissue%20created%3A%3E%3D2026-07-25"
         },
@@ -3635,8 +3635,8 @@
           "url": "https://github.com/bowenliang123/dsh-context/releases/tag/v0.74.0"
         },
         "releases90d": 100,
-        "lastCommitAt": "2026-10-23T03:04:57.000Z",
-        "lastCommitUrl": "https://github.com/bowenliang123/dsh-context/commit/209ab97d3fc009dc14253b31eff9554e6c79b418",
+        "lastCommitAt": "2026-10-23T08:16:44.000Z",
+        "lastCommitUrl": "https://github.com/bowenliang123/dsh-context/commit/6d66730e4d91d4cb238d8a4f887e4605e0ef27e5",
         "commitsUrl": "https://github.com/bowenliang123/dsh-context/commits/main",
         "issuesUrl": "https://github.com/bowenliang123/dsh-context/issues",
         "pullsUrl": "https://github.com/bowenliang123/dsh-context/pulls",
@@ -3907,7 +3907,7 @@
         "mappingEvidence": "npm registry repository=git+https://github.com/bowenliang123/dsh-context.git ↔ GitHub bowenliang123/dsh-context",
         "enginesNode": "^22.19.0 || >=24.0.0",
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-23T03:27:56.182Z",
+        "fetchedAt": "2026-10-23T08:18:04.986Z",
         "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
@@ -3916,7 +3916,7 @@
         "packageName": "dsh-context",
         "version": "0.74.0",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-23T03:27:56.182Z",
+        "checkedAt": "2026-10-23T08:18:04.986Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=dsh-context"
       },
@@ -3940,7 +3940,7 @@
       "warnings": [
         "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-23T03:27:56.182Z",
+      "lastUpdatedAt": "2026-10-23T08:18:04.986Z",
       "scores": {
         "popularity": {
           "score": 76.1,
@@ -3951,8 +3951,8 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "3,416 stars",
-              "rawValue": 3416,
+              "rawLabel": "3,439 stars",
+              "rawValue": 3439,
               "normalized": 84,
               "weight": 0.45,
               "effectiveWeight": 0.45,
@@ -3982,7 +3982,7 @@
           "methodVersion": "2.0.0"
         },
         "maintenance": {
-          "score": 89,
+          "score": 88.7,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -3991,7 +3991,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "0 天前",
-              "rawValue": 0.01596275462962963,
+              "rawValue": 0.000937337962962963,
               "normalized": 100,
               "weight": 0.3333333333333333,
               "effectiveWeight": 0.333,
@@ -3999,13 +3999,13 @@
               "included": true,
               "sampleSize": null,
               "explanation": "距最近一次非合并提交的天数。使用提交记录的实际 committed date，而不是仓库 pushed_at。",
-              "evidenceUrl": "https://github.com/bowenliang123/dsh-context/commit/209ab97d3fc009dc14253b31eff9554e6c79b418"
+              "evidenceUrl": "https://github.com/bowenliang123/dsh-context/commit/6d66730e4d91d4cb238d8a4f887e4605e0ef27e5"
             },
             {
               "key": "commitCadence",
               "label": "近 30 天提交频率",
-              "rawLabel": "370 次",
-              "rawValue": 370,
+              "rawLabel": "366 次",
+              "rawValue": 366,
               "normalized": 100,
               "weight": 0.16666666666666666,
               "effectiveWeight": 0.167,
@@ -4018,14 +4018,14 @@
             {
               "key": "issueHandling",
               "label": "近期 Issue 关闭率",
-              "rawLabel": "120/124 已关闭 · 96.8%",
-              "rawValue": 96.8,
-              "normalized": 96.8,
+              "rawLabel": "121/127 已关闭 · 95.3%",
+              "rawValue": 95.3,
+              "normalized": 95.3,
               "weight": 0.22222222222222224,
               "effectiveWeight": 0.222,
-              "contribution": 21.5,
+              "contribution": 21.2,
               "included": true,
-              "sampleSize": 124,
+              "sampleSize": 127,
               "explanation": "近 90 天创建的非 PR Issue 中，当前已关闭的比例。少于 5 条时降低该分项权重；0 条新 Issue 不扣分，也不代表处理能力强。",
               "evidenceUrl": "https://github.com/bowenliang123/dsh-context/issues?q=is%3Aissue%20created%3A%3E%3D2026-07-25"
             },
@@ -4046,8 +4046,8 @@
             {
               "key": "release",
               "label": "最近版本发布",
-              "rawLabel": "1 天前",
-              "rawValue": 1.868219699074074,
+              "rawLabel": "2 天前",
+              "rawValue": 2.069710486111111,
               "normalized": 100,
               "weight": 0.11111111111111112,
               "effectiveWeight": 0.111,
@@ -4106,28 +4106,28 @@
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 8295,
-        "forks": 326,
-        "openIssues": 41,
-        "openPullRequests": 1,
-        "commits30d": 359,
+        "stars": 8358,
+        "forks": 328,
+        "openIssues": 43,
+        "openPullRequests": 3,
+        "commits30d": 358,
         "commits30dTruncated": false,
         "issues": {
-          "opened90d": 504,
-          "closed90d": 463,
-          "closureRate": 0.9186507936507936,
+          "opened90d": 507,
+          "closed90d": 464,
+          "closureRate": 0.9151873767258383,
           "lowSample": false,
           "truncated": false,
           "longOpen": 0,
-          "openNow": 41,
+          "openNow": 43,
           "openTruncated": false,
           "queryUrl": "https://github.com/dsh-market/dsh-market/issues?q=is%3Aissue%20created%3A%3E%3D2026-07-25"
         },
         "pullRequests": {
           "available": true,
-          "opened90d": 478,
+          "opened90d": 480,
           "merged90d": 396,
-          "mergeRate": 0.8284518828451883,
+          "mergeRate": 0.825,
           "lowSample": false,
           "truncated": false,
           "queryUrl": "https://github.com/dsh-market/dsh-market/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-25"
@@ -4411,7 +4411,7 @@
         "mappingEvidence": "npm registry repository=git+https://github.com/dsh-market/dsh-market.git ↔ GitHub dsh-market/dsh-market",
         "enginesNode": null,
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-23T03:27:56.182Z",
+        "fetchedAt": "2026-10-23T08:18:04.986Z",
         "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
@@ -4420,7 +4420,7 @@
         "packageName": "dshmarket",
         "version": "1.69.0",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-23T03:27:56.182Z",
+        "checkedAt": "2026-10-23T08:18:04.986Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=dshmarket"
       },
@@ -4444,7 +4444,7 @@
       "warnings": [
         "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-23T03:27:56.182Z",
+      "lastUpdatedAt": "2026-10-23T08:18:04.986Z",
       "scores": {
         "popularity": {
           "score": 100,
@@ -4455,8 +4455,8 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "8,295 stars",
-              "rawValue": 8295,
+              "rawLabel": "8,358 stars",
+              "rawValue": 8358,
               "normalized": 100,
               "weight": 0.45,
               "effectiveWeight": 0.45,
@@ -4486,7 +4486,7 @@
           "methodVersion": "2.0.0"
         },
         "maintenance": {
-          "score": 95.3,
+          "score": 95.2,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -4495,7 +4495,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "0 天前",
-              "rawValue": 0.2728030324074074,
+              "rawValue": 0.47429381944444443,
               "normalized": 100,
               "weight": 0.3333333333333333,
               "effectiveWeight": 0.333,
@@ -4508,8 +4508,8 @@
             {
               "key": "commitCadence",
               "label": "近 30 天提交频率",
-              "rawLabel": "359 次",
-              "rawValue": 359,
+              "rawLabel": "358 次",
+              "rawValue": 358,
               "normalized": 100,
               "weight": 0.16666666666666666,
               "effectiveWeight": 0.167,
@@ -4522,28 +4522,28 @@
             {
               "key": "issueHandling",
               "label": "近期 Issue 关闭率",
-              "rawLabel": "463/504 已关闭 · 91.9%",
-              "rawValue": 91.9,
-              "normalized": 91.9,
+              "rawLabel": "464/507 已关闭 · 91.5%",
+              "rawValue": 91.5,
+              "normalized": 91.5,
               "weight": 0.22222222222222224,
               "effectiveWeight": 0.222,
-              "contribution": 20.4,
+              "contribution": 20.3,
               "included": true,
-              "sampleSize": 504,
+              "sampleSize": 507,
               "explanation": "近 90 天创建的非 PR Issue 中，当前已关闭的比例。少于 5 条时降低该分项权重；0 条新 Issue 不扣分，也不代表处理能力强。",
               "evidenceUrl": "https://github.com/dsh-market/dsh-market/issues?q=is%3Aissue%20created%3A%3E%3D2026-07-25"
             },
             {
               "key": "pullRequests",
               "label": "近期 PR 合并率",
-              "rawLabel": "396/478 已合并 · 82.8%",
-              "rawValue": 82.8,
-              "normalized": 82.8,
+              "rawLabel": "396/480 已合并 · 82.5%",
+              "rawValue": 82.5,
+              "normalized": 82.5,
               "weight": 0.16666666666666666,
               "effectiveWeight": 0.167,
               "contribution": 13.8,
               "included": true,
-              "sampleSize": 478,
+              "sampleSize": 480,
               "explanation": "近 90 天创建 PR 中已合并的比例。只统计 PR，不把 Issue 混入；少于 3 条时降低权重。仓库禁用 PR 时该维度被排除，而不是记 0。",
               "evidenceUrl": "https://github.com/dsh-market/dsh-market/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-25"
             },
@@ -4551,7 +4551,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "0 天前",
-              "rawValue": 0.2722127546296296,
+              "rawValue": 0.47370354166666667,
               "normalized": 100,
               "weight": 0.11111111111111112,
               "effectiveWeight": 0.111,
@@ -4611,21 +4611,21 @@
         "language": "TypeScript",
         "license": "MIT",
         "createdAt": "2026-08-13T12:49:31.000Z",
-        "pushedAt": null,
+        "pushedAt": "2026-10-23T08:16:01.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 5278,
-        "forks": 285,
+        "stars": 5356,
+        "forks": 286,
         "openIssues": 67,
         "openPullRequests": 8,
         "commits30d": 669,
         "commits30dTruncated": false,
         "issues": {
-          "opened90d": 686,
-          "closed90d": 619,
-          "closureRate": 0.902332361516035,
+          "opened90d": 690,
+          "closed90d": 623,
+          "closureRate": 0.9028985507246376,
           "lowSample": false,
           "truncated": false,
           "longOpen": 0,
@@ -4635,9 +4635,9 @@
         },
         "pullRequests": {
           "available": true,
-          "opened90d": 946,
+          "opened90d": 947,
           "merged90d": 718,
-          "mergeRate": 0.758985200845666,
+          "mergeRate": 0.7581837381203802,
           "lowSample": false,
           "truncated": false,
           "queryUrl": "https://github.com/ccch1mneyyy/dsh-TUI/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-25"
@@ -4921,7 +4921,7 @@
         "mappingEvidence": "npm registry repository=git+https://github.com/ccch1mneyyy/dsh-TUI.git ↔ GitHub ccch1mneyyy/dsh-TUI",
         "enginesNode": "^22.19 || >=24",
         "dshPeerRange": "^0.1.0-rc.6 || ^0.1.1-rc.1 || 0.1.2-alpha.3 || 0.1.2-alpha.4 || 0.1.2-alpha.5 || 0.1.2-rc.1 || 0.1.3-alpha.2 || 0.1.5-alpha.1 || 0.1.5-alpha.2 || 0.1.5-rc.1 || 0.1.7-rc.1 || 0.1.7-rc.2 || 0.2.0-rc.1 || 0.2.0-rc.2 || 0.2.1-rc.2",
-        "fetchedAt": "2026-10-23T03:27:56.182Z",
+        "fetchedAt": "2026-10-23T08:18:04.986Z",
         "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
@@ -4930,7 +4930,7 @@
         "packageName": "@deepseek-harness-tui/dsh-tui",
         "version": "0.16.1",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-23T03:27:56.182Z",
+        "checkedAt": "2026-10-23T08:18:04.986Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=%40deepseek-harness-tui%2Fdsh-tui"
       },
@@ -4952,10 +4952,9 @@
       },
       "dataStatus": "partial",
       "warnings": [
-        "仓库推送 时间异常，未参与相关判断。",
         "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-23T03:27:56.182Z",
+      "lastUpdatedAt": "2026-10-23T08:18:04.986Z",
       "scores": {
         "popularity": {
           "score": 64.6,
@@ -4966,9 +4965,9 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "5,278 stars",
-              "rawValue": 5278,
-              "normalized": 91.9,
+              "rawLabel": "5,356 stars",
+              "rawValue": 5356,
+              "normalized": 92,
               "weight": 0.45,
               "effectiveWeight": 0.45,
               "contribution": 41.4,
@@ -5006,7 +5005,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "0 天前",
-              "rawValue": 0.4883354398148148,
+              "rawValue": 0.6898262268518518,
               "normalized": 100,
               "weight": 0.3333333333333333,
               "effectiveWeight": 0.333,
@@ -5033,28 +5032,28 @@
             {
               "key": "issueHandling",
               "label": "近期 Issue 关闭率",
-              "rawLabel": "619/686 已关闭 · 90.2%",
-              "rawValue": 90.2,
-              "normalized": 90.2,
+              "rawLabel": "623/690 已关闭 · 90.3%",
+              "rawValue": 90.3,
+              "normalized": 90.3,
               "weight": 0.22222222222222224,
               "effectiveWeight": 0.222,
-              "contribution": 20,
+              "contribution": 20.1,
               "included": true,
-              "sampleSize": 686,
+              "sampleSize": 690,
               "explanation": "近 90 天创建的非 PR Issue 中，当前已关闭的比例。少于 5 条时降低该分项权重；0 条新 Issue 不扣分，也不代表处理能力强。",
               "evidenceUrl": "https://github.com/ccch1mneyyy/dsh-TUI/issues?q=is%3Aissue%20created%3A%3E%3D2026-07-25"
             },
             {
               "key": "pullRequests",
               "label": "近期 PR 合并率",
-              "rawLabel": "718/946 已合并 · 75.9%",
-              "rawValue": 75.9,
-              "normalized": 75.9,
+              "rawLabel": "718/947 已合并 · 75.8%",
+              "rawValue": 75.8,
+              "normalized": 75.8,
               "weight": 0.16666666666666666,
               "effectiveWeight": 0.167,
-              "contribution": 12.7,
+              "contribution": 12.6,
               "included": true,
-              "sampleSize": 946,
+              "sampleSize": 947,
               "explanation": "近 90 天创建 PR 中已合并的比例。只统计 PR，不把 Issue 混入；少于 3 条时降低权重。仓库禁用 PR 时该维度被排除，而不是记 0。",
               "evidenceUrl": "https://github.com/ccch1mneyyy/dsh-TUI/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-25"
             },
@@ -5062,7 +5061,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "5 天前",
-              "rawValue": 5.246147939814815,
+              "rawValue": 5.447638726851852,
               "normalized": 100,
               "weight": 0.11111111111111112,
               "effectiveWeight": 0.111,
@@ -5127,15 +5126,15 @@
         "language": "TypeScript",
         "license": "MIT",
         "createdAt": "2026-08-07T16:04:00.000Z",
-        "pushedAt": "2026-10-17T16:15:27.000Z",
+        "pushedAt": "2026-10-23T04:38:38.000Z",
         "archived": false,
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 4451,
-        "forks": 422,
+        "stars": 4456,
+        "forks": 425,
         "openIssues": 155,
-        "openPullRequests": 79,
+        "openPullRequests": 80,
         "commits30d": 335,
         "commits30dTruncated": false,
         "issues": {
@@ -5151,9 +5150,9 @@
         },
         "pullRequests": {
           "available": true,
-          "opened90d": 577,
-          "merged90d": 289,
-          "mergeRate": 0.5008665511265165,
+          "opened90d": 578,
+          "merged90d": 288,
+          "mergeRate": 0.4982698961937716,
           "lowSample": false,
           "truncated": false,
           "queryUrl": "https://github.com/omdsh-dev/DSH-better-sidebar/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-25"
@@ -5437,7 +5436,7 @@
         "mappingEvidence": "npm registry repository=https://github.com/omdsh-dev/DSH-better-sidebar ↔ GitHub omdsh-dev/DSH-better-sidebar",
         "enginesNode": ">=20",
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-23T03:27:56.182Z",
+        "fetchedAt": "2026-10-23T08:18:04.986Z",
         "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
@@ -5446,7 +5445,7 @@
         "packageName": "dsh-better-sidebar",
         "version": "0.28.0",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-23T03:27:56.182Z",
+        "checkedAt": "2026-10-23T08:18:04.986Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=dsh-better-sidebar"
       },
@@ -5470,10 +5469,10 @@
       "warnings": [
         "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-23T03:27:56.182Z",
+      "lastUpdatedAt": "2026-10-23T08:18:04.986Z",
       "scores": {
         "popularity": {
-          "score": 82.1,
+          "score": 82,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -5481,12 +5480,12 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "4,451 stars",
-              "rawValue": 4451,
-              "normalized": 88.8,
+              "rawLabel": "4,456 stars",
+              "rawValue": 4456,
+              "normalized": 88.7,
               "weight": 0.45,
               "effectiveWeight": 0.45,
-              "contribution": 40,
+              "contribution": 39.9,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
@@ -5512,7 +5511,7 @@
           "methodVersion": "2.0.0"
         },
         "maintenance": {
-          "score": 84.2,
+          "score": 84.1,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -5520,8 +5519,8 @@
             {
               "key": "commitRecency",
               "label": "最近代码提交",
-              "rawLabel": "5 天前",
-              "rawValue": 5.892062291666667,
+              "rawLabel": "6 天前",
+              "rawValue": 6.093553078703704,
               "normalized": 100,
               "weight": 0.3333333333333333,
               "effectiveWeight": 0.333,
@@ -5562,22 +5561,22 @@
             {
               "key": "pullRequests",
               "label": "近期 PR 合并率",
-              "rawLabel": "289/577 已合并 · 50.1%",
-              "rawValue": 50.1,
-              "normalized": 50.1,
+              "rawLabel": "288/578 已合并 · 49.8%",
+              "rawValue": 49.8,
+              "normalized": 49.8,
               "weight": 0.16666666666666666,
               "effectiveWeight": 0.167,
-              "contribution": 8.4,
+              "contribution": 8.3,
               "included": true,
-              "sampleSize": 577,
+              "sampleSize": 578,
               "explanation": "近 90 天创建 PR 中已合并的比例。只统计 PR，不把 Issue 混入；少于 3 条时降低权重。仓库禁用 PR 时该维度被排除，而不是记 0。",
               "evidenceUrl": "https://github.com/omdsh-dev/DSH-better-sidebar/pulls?q=is%3Apr%20created%3A%3E%3D2026-07-25"
             },
             {
               "key": "release",
               "label": "最近版本发布",
-              "rawLabel": "5 天前",
-              "rawValue": 5.877791458333333,
+              "rawLabel": "6 天前",
+              "rawValue": 6.07928224537037,
               "normalized": 100,
               "weight": 0.11111111111111112,
               "effectiveWeight": 0.111,
@@ -5661,8 +5660,8 @@
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 4411,
-        "forks": 134,
+        "stars": 4416,
+        "forks": 135,
         "openIssues": 6,
         "openPullRequests": 0,
         "commits30d": 22,
@@ -5966,7 +5965,7 @@
         "mappingEvidence": "npm registry repository=git+https://github.com/liustack/modlens.git ↔ GitHub liustack/modlens",
         "enginesNode": ">=22.19",
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-23T03:27:56.182Z",
+        "fetchedAt": "2026-10-23T08:18:04.986Z",
         "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
@@ -5975,7 +5974,7 @@
         "packageName": "@liustack/modlens",
         "version": "3.27.1",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-23T03:27:56.182Z",
+        "checkedAt": "2026-10-23T08:18:04.986Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=%40liustack%2Fmodlens"
       },
@@ -6001,10 +6000,10 @@
         "仓库未启用 Pull Requests（API 返回 404）；PR 指标不参与评分，也不记为 0。",
         "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-23T03:27:56.182Z",
+      "lastUpdatedAt": "2026-10-23T08:18:04.986Z",
       "scores": {
         "popularity": {
-          "score": 72.4,
+          "score": 72.3,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -6012,12 +6011,12 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "4,411 stars",
-              "rawValue": 4411,
-              "normalized": 88.6,
+              "rawLabel": "4,416 stars",
+              "rawValue": 4416,
+              "normalized": 88.5,
               "weight": 0.45,
               "effectiveWeight": 0.45,
-              "contribution": 39.9,
+              "contribution": 39.8,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
@@ -6052,7 +6051,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "7 天前",
-              "rawValue": 7.339145625,
+              "rawValue": 7.540636412037037,
               "normalized": 92,
               "weight": 0.3333333333333333,
               "effectiveWeight": 0.4,
@@ -6108,7 +6107,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "7 天前",
-              "rawValue": 7.338555347222222,
+              "rawValue": 7.540046134259259,
               "normalized": 100,
               "weight": 0.11111111111111112,
               "effectiveWeight": 0.133,
@@ -6181,20 +6180,20 @@
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 5802,
-        "forks": 187,
-        "openIssues": 81,
+        "stars": 5826,
+        "forks": 189,
+        "openIssues": 85,
         "openPullRequests": 37,
         "commits30d": 25,
         "commits30dTruncated": false,
         "issues": {
-          "opened90d": 174,
-          "closed90d": 93,
-          "closureRate": 0.5344827586206896,
+          "opened90d": 179,
+          "closed90d": 94,
+          "closureRate": 0.5251396648044693,
           "lowSample": false,
           "truncated": false,
           "longOpen": 0,
-          "openNow": 81,
+          "openNow": 85,
           "openTruncated": false,
           "queryUrl": "https://github.com/MeteorNOX/DeepSeek-Balance-Whale-Widget/issues?q=is%3Aissue%20created%3A%3E%3D2026-07-25"
         },
@@ -6486,7 +6485,7 @@
         "mappingEvidence": "npm registry repository=git+https://github.com/MeteorNOX/DeepSeek-Balance-Whale-Widget.git ↔ GitHub MeteorNOX/DeepSeek-Balance-Whale-Widget",
         "enginesNode": null,
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-23T03:27:56.182Z",
+        "fetchedAt": "2026-10-23T08:18:04.986Z",
         "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
@@ -6495,7 +6494,7 @@
         "packageName": "dsh-whale-widget",
         "version": "0.4.2",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-23T03:27:56.182Z",
+        "checkedAt": "2026-10-23T08:18:04.986Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=dsh-whale-widget"
       },
@@ -6519,7 +6518,7 @@
       "warnings": [
         "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-23T03:27:56.182Z",
+      "lastUpdatedAt": "2026-10-23T08:18:04.986Z",
       "scores": {
         "popularity": {
           "score": 83.2,
@@ -6530,9 +6529,9 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "5,802 stars",
-              "rawValue": 5802,
-              "normalized": 93.6,
+              "rawLabel": "5,826 stars",
+              "rawValue": 5826,
+              "normalized": 93.5,
               "weight": 0.45,
               "effectiveWeight": 0.45,
               "contribution": 42.1,
@@ -6561,7 +6560,7 @@
           "methodVersion": "2.0.0"
         },
         "maintenance": {
-          "score": 73.5,
+          "score": 73.3,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -6570,7 +6569,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "11 天前",
-              "rawValue": 11.626969699074074,
+              "rawValue": 11.82846048611111,
               "normalized": 92,
               "weight": 0.3333333333333333,
               "effectiveWeight": 0.333,
@@ -6597,14 +6596,14 @@
             {
               "key": "issueHandling",
               "label": "近期 Issue 关闭率",
-              "rawLabel": "93/174 已关闭 · 53.4%",
-              "rawValue": 53.4,
-              "normalized": 53.4,
+              "rawLabel": "94/179 已关闭 · 52.5%",
+              "rawValue": 52.5,
+              "normalized": 52.5,
               "weight": 0.22222222222222224,
               "effectiveWeight": 0.222,
-              "contribution": 11.9,
+              "contribution": 11.7,
               "included": true,
-              "sampleSize": 174,
+              "sampleSize": 179,
               "explanation": "近 90 天创建的非 PR Issue 中，当前已关闭的比例。少于 5 条时降低该分项权重；0 条新 Issue 不扣分，也不代表处理能力强。",
               "evidenceUrl": "https://github.com/MeteorNOX/DeepSeek-Balance-Whale-Widget/issues?q=is%3Aissue%20created%3A%3E%3D2026-07-25"
             },
@@ -6626,7 +6625,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "11 天前",
-              "rawValue": 11.62639099537037,
+              "rawValue": 11.827881782407408,
               "normalized": 100,
               "weight": 0.11111111111111112,
               "effectiveWeight": 0.111,
@@ -6649,7 +6648,7 @@
               "code": "open-issues-medium",
               "level": "medium",
               "title": "开放 Issue 偏多",
-              "detail": "当前有 81 条开放 Issue，约为近 90 天新开 Issue 数的 47%。请结合问题内容和项目规模判断。",
+              "detail": "当前有 85 条开放 Issue，约为近 90 天新开 Issue 数的 47%。请结合问题内容和项目规模判断。",
               "evidenceUrl": "https://github.com/MeteorNOX/DeepSeek-Balance-Whale-Widget/issues"
             }
           ],
@@ -6693,20 +6692,20 @@
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 3876,
+        "stars": 3924,
         "forks": 110,
-        "openIssues": 39,
+        "openIssues": 40,
         "openPullRequests": 15,
         "commits30d": 467,
         "commits30dTruncated": false,
         "issues": {
-          "opened90d": 178,
+          "opened90d": 179,
           "closed90d": 139,
-          "closureRate": 0.7808988764044944,
+          "closureRate": 0.776536312849162,
           "lowSample": false,
           "truncated": false,
           "longOpen": 0,
-          "openNow": 39,
+          "openNow": 40,
           "openTruncated": false,
           "queryUrl": "https://github.com/T-Auto/dsh-ops/issues?q=is%3Aissue%20created%3A%3E%3D2026-07-25"
         },
@@ -6998,7 +6997,7 @@
         "mappingEvidence": "npm registry repository=git+https://github.com/T-Auto/dsh-ops.git ↔ GitHub T-Auto/dsh-ops",
         "enginesNode": "^22.19 || >=24",
         "dshPeerRange": "^0.2.0-rc.2",
-        "fetchedAt": "2026-10-23T03:27:56.182Z",
+        "fetchedAt": "2026-10-23T08:18:04.986Z",
         "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
@@ -7007,7 +7006,7 @@
         "packageName": "dsh-ops",
         "version": "0.4.1",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-23T03:27:56.182Z",
+        "checkedAt": "2026-10-23T08:18:04.986Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=dsh-ops"
       },
@@ -7031,10 +7030,10 @@
       "warnings": [
         "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-23T03:27:56.182Z",
+      "lastUpdatedAt": "2026-10-23T08:18:04.986Z",
       "scores": {
         "popularity": {
-          "score": 52.7,
+          "score": 52.8,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -7042,12 +7041,12 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "3,876 stars",
-              "rawValue": 3876,
-              "normalized": 86.3,
+              "rawLabel": "3,924 stars",
+              "rawValue": 3924,
+              "normalized": 86.4,
               "weight": 0.45,
               "effectiveWeight": 0.45,
-              "contribution": 38.8,
+              "contribution": 38.9,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
@@ -7073,7 +7072,7 @@
           "methodVersion": "2.0.0"
         },
         "maintenance": {
-          "score": 90.9,
+          "score": 90.8,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -7082,7 +7081,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "1 天前",
-              "rawValue": 1.5175136805555556,
+              "rawValue": 1.7190044675925926,
               "normalized": 100,
               "weight": 0.3333333333333333,
               "effectiveWeight": 0.333,
@@ -7109,14 +7108,14 @@
             {
               "key": "issueHandling",
               "label": "近期 Issue 关闭率",
-              "rawLabel": "139/178 已关闭 · 78.1%",
-              "rawValue": 78.1,
-              "normalized": 78.1,
+              "rawLabel": "139/179 已关闭 · 77.7%",
+              "rawValue": 77.7,
+              "normalized": 77.7,
               "weight": 0.22222222222222224,
               "effectiveWeight": 0.222,
-              "contribution": 17.4,
+              "contribution": 17.3,
               "included": true,
-              "sampleSize": 178,
+              "sampleSize": 179,
               "explanation": "近 90 天创建的非 PR Issue 中，当前已关闭的比例。少于 5 条时降低该分项权重；0 条新 Issue 不扣分，也不代表处理能力强。",
               "evidenceUrl": "https://github.com/T-Auto/dsh-ops/issues?q=is%3Aissue%20created%3A%3E%3D2026-07-25"
             },
@@ -7138,7 +7137,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "2 天前",
-              "rawValue": 2.7587636805555555,
+              "rawValue": 2.9602544675925926,
               "normalized": 100,
               "weight": 0.11111111111111112,
               "effectiveWeight": 0.111,
@@ -7205,7 +7204,7 @@
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 2253,
+        "stars": 2268,
         "forks": 100,
         "openIssues": 3,
         "openPullRequests": 3,
@@ -7510,7 +7509,7 @@
         "mappingEvidence": "npm registry repository=git+https://github.com/shaobeichen/dsh-pocket.git ↔ GitHub shaobeichen/dsh-pocket",
         "enginesNode": ">=22",
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-23T03:27:56.182Z",
+        "fetchedAt": "2026-10-23T08:18:04.986Z",
         "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
@@ -7519,7 +7518,7 @@
         "packageName": "dsh-pocket",
         "version": "2.12.0",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-23T03:27:56.182Z",
+        "checkedAt": "2026-10-23T08:18:04.986Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=dsh-pocket"
       },
@@ -7543,7 +7542,7 @@
       "warnings": [
         "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-23T03:27:56.182Z",
+      "lastUpdatedAt": "2026-10-23T08:18:04.986Z",
       "scores": {
         "popularity": {
           "score": 43.6,
@@ -7554,8 +7553,8 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "2,253 stars",
-              "rawValue": 2253,
+              "rawLabel": "2,268 stars",
+              "rawValue": 2268,
               "normalized": 76.6,
               "weight": 0.45,
               "effectiveWeight": 0.45,
@@ -7594,7 +7593,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "5 天前",
-              "rawValue": 5.735638680555556,
+              "rawValue": 5.937129467592593,
               "normalized": 100,
               "weight": 0.3333333333333333,
               "effectiveWeight": 0.333,
@@ -7650,7 +7649,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "5 天前",
-              "rawValue": 5.735569236111111,
+              "rawValue": 5.937060023148148,
               "normalized": 100,
               "weight": 0.11111111111111112,
               "effectiveWeight": 0.111,
@@ -7712,7 +7711,7 @@
         "defaultBranch": "main"
       },
       "github": {
-        "stars": 586,
+        "stars": 587,
         "forks": 48,
         "openIssues": 16,
         "openPullRequests": 0,
@@ -8017,7 +8016,7 @@
         "mappingEvidence": "npm registry repository=git+https://github.com/dream-num/dsh-univer-office.git ↔ GitHub dream-num/dsh-univer-office",
         "enginesNode": ">=22.19.0",
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-23T03:27:56.182Z",
+        "fetchedAt": "2026-10-23T08:18:04.986Z",
         "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
@@ -8026,7 +8025,7 @@
         "packageName": "dsh-univer-office",
         "version": "0.3.7",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-23T03:27:56.182Z",
+        "checkedAt": "2026-10-23T08:18:04.986Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=dsh-univer-office"
       },
@@ -8050,7 +8049,7 @@
       "warnings": [
         "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-23T03:27:56.182Z",
+      "lastUpdatedAt": "2026-10-23T08:18:04.986Z",
       "scores": {
         "popularity": {
           "score": 46.6,
@@ -8061,8 +8060,8 @@
             {
               "key": "stars",
               "label": "GitHub Stars",
-              "rawLabel": "586 stars",
-              "rawValue": 586,
+              "rawLabel": "587 stars",
+              "rawValue": 587,
               "normalized": 52.3,
               "weight": 0.45,
               "effectiveWeight": 0.45,
@@ -8101,7 +8100,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "14 天前",
-              "rawValue": 14.788219699074075,
+              "rawValue": 14.989710486111111,
               "normalized": 82,
               "weight": 0.3333333333333333,
               "effectiveWeight": 0.333,
@@ -8157,7 +8156,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "14 天前",
-              "rawValue": 14.78215488425926,
+              "rawValue": 14.983645671296296,
               "normalized": 100,
               "weight": 0.11111111111111112,
               "effectiveWeight": 0.111,
@@ -8526,7 +8525,7 @@
         "mappingEvidence": "npm registry repository=git+https://github.com/Ychris12138/dsh-usage-stats.git ↔ GitHub Ychris12138/dsh-usage-stats",
         "enginesNode": null,
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-23T03:27:56.182Z",
+        "fetchedAt": "2026-10-23T08:18:04.986Z",
         "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
@@ -8535,7 +8534,7 @@
         "packageName": "@ychris12138/dsh-usage-stats",
         "version": "0.3.6",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-23T03:27:56.182Z",
+        "checkedAt": "2026-10-23T08:18:04.986Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=%40ychris12138%2Fdsh-usage-stats"
       },
@@ -8559,10 +8558,10 @@
       "warnings": [
         "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-23T03:27:56.182Z",
+      "lastUpdatedAt": "2026-10-23T08:18:04.986Z",
       "scores": {
         "popularity": {
-          "score": 14.2,
+          "score": 14.1,
           "status": "scored",
           "confidence": "high",
           "coverage": 1,
@@ -8572,10 +8571,10 @@
               "label": "GitHub Stars",
               "rawLabel": "183 stars",
               "rawValue": 183,
-              "normalized": 31.5,
+              "normalized": 31.4,
               "weight": 0.45,
               "effectiveWeight": 0.45,
-              "contribution": 14.2,
+              "contribution": 14.1,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
@@ -8610,7 +8609,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "2 天前",
-              "rawValue": 2.0936942361111113,
+              "rawValue": 2.2951850231481483,
               "normalized": 100,
               "weight": 0.3333333333333333,
               "effectiveWeight": 0.333,
@@ -8666,7 +8665,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "3 天前",
-              "rawValue": 3.038242847222222,
+              "rawValue": 3.239733634259259,
               "normalized": 100,
               "weight": 0.11111111111111112,
               "effectiveWeight": 0.111,
@@ -9033,7 +9032,7 @@
         "mappingEvidence": "npm registry repository=git+https://github.com/hkkz9522/dsh-session-manager.git ↔ GitHub hkkz9522/dsh-session-manager",
         "enginesNode": "^22.15.0 || >=24.0.0",
         "dshPeerRange": null,
-        "fetchedAt": "2026-10-23T03:27:56.182Z",
+        "fetchedAt": "2026-10-23T08:18:04.986Z",
         "reason": "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       },
       "security": {
@@ -9042,7 +9041,7 @@
         "packageName": "dsh-session-manager",
         "version": "0.7.5",
         "vulnerabilities": [],
-        "checkedAt": "2026-10-23T03:27:56.182Z",
+        "checkedAt": "2026-10-23T08:18:04.986Z",
         "reason": null,
         "queryUrl": "https://osv.dev/list?ecosystem=npm&q=dsh-session-manager"
       },
@@ -9066,7 +9065,7 @@
       "warnings": [
         "周下载窗口包含疑似平台统计缺失的零值日，周变化暂不可用。"
       ],
-      "lastUpdatedAt": "2026-10-23T03:27:56.182Z",
+      "lastUpdatedAt": "2026-10-23T08:18:04.986Z",
       "scores": {
         "popularity": {
           "score": 14.1,
@@ -9117,7 +9116,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "0 天前",
-              "rawValue": 0.6698053472222222,
+              "rawValue": 0.8712961342592592,
               "normalized": 100,
               "weight": 0.3333333333333333,
               "effectiveWeight": 0.375,
@@ -9341,7 +9340,7 @@
       },
       "dataStatus": "partial",
       "warnings": [],
-      "lastUpdatedAt": "2026-10-23T03:27:56.182Z",
+      "lastUpdatedAt": "2026-10-23T08:18:04.986Z",
       "scores": {
         "popularity": {
           "score": 39.2,
@@ -9394,7 +9393,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "14 天前",
-              "rawValue": 14.737432662037037,
+              "rawValue": 14.938923449074075,
               "normalized": 82,
               "weight": 0.3333333333333333,
               "effectiveWeight": 0.333,
@@ -9449,8 +9448,8 @@
             {
               "key": "release",
               "label": "最近版本发布",
-              "rawLabel": "33 天前",
-              "rawValue": 33.932617847222225,
+              "rawLabel": "34 天前",
+              "rawValue": 34.134108634259256,
               "normalized": 92,
               "weight": 0.11111111111111112,
               "effectiveWeight": 0.111,
@@ -9538,7 +9537,7 @@
       },
       "github": {
         "stars": 6992,
-        "forks": 192,
+        "forks": 193,
         "openIssues": 157,
         "openPullRequests": 21,
         "commits30d": 0,
@@ -9631,10 +9630,10 @@
       },
       "dataStatus": "partial",
       "warnings": [],
-      "lastUpdatedAt": "2026-10-23T03:27:56.182Z",
+      "lastUpdatedAt": "2026-10-23T08:18:04.986Z",
       "scores": {
         "popularity": {
-          "score": 96.9,
+          "score": 96.8,
           "status": "scored",
           "confidence": "medium",
           "coverage": 0.45,
@@ -9644,10 +9643,10 @@
               "label": "GitHub Stars",
               "rawLabel": "6,992 stars",
               "rawValue": 6992,
-              "normalized": 96.9,
+              "normalized": 96.8,
               "weight": 0.45,
               "effectiveWeight": 1,
-              "contribution": 96.9,
+              "contribution": 96.8,
               "included": true,
               "sampleSize": null,
               "explanation": "对 Star 数做 log10 变换后，在本榜单有效样本内做 min-max 归一化。",
@@ -9684,7 +9683,7 @@
               "key": "commitRecency",
               "label": "最近代码提交",
               "rawLabel": "34 天前",
-              "rawValue": 34.17846275462963,
+              "rawValue": 34.379953541666666,
               "normalized": 68,
               "weight": 0.3333333333333333,
               "effectiveWeight": 0.333,
@@ -9740,7 +9739,7 @@
               "key": "release",
               "label": "最近版本发布",
               "rawLabel": "50 天前",
-              "rawValue": 50.412768310185186,
+              "rawValue": 50.614259097222224,
               "normalized": 92,
               "weight": 0.11111111111111112,
               "effectiveWeight": 0.111,
