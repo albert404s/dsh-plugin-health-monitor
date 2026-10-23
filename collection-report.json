@@ -1,20 +1,27 @@
 {
   "version": 1,
-  "startedAt": "2026-10-23T08:18:04.986Z",
-  "completedAt": "2026-10-23T08:21:35.309Z",
-  "configuredPlugins": 20,
-  "selectedPlugins": 20,
-  "completedPlugins": 20,
+  "startedAt": "2026-10-23T08:49:35.652Z",
+  "completedAt": "2026-10-23T08:58:35.363Z",
+  "configuredPlugins": 50,
+  "selectedPlugins": 50,
+  "completedPlugins": 49,
   "deferredPlugins": 0,
-  "maxPlugins": 100,
-  "maxRequests": 600,
+  "maxPlugins": 50,
+  "maxRequests": 1800,
   "githubReserve": 100,
-  "requestsMade": 336,
-  "memoryCacheHits": 0,
+  "requestsMade": 968,
+  "memoryCacheHits": 30,
   "revalidatedCacheHits": 0,
   "persistentCacheHits": 0,
-  "githubRemaining": 4736,
+  "githubRemaining": 3957,
   "githubResetAt": "2026-10-23T09:18:05.000Z",
   "stopped": false,
-  "stopReason": null
+  "stopReason": null,
+  "discovery": {
+    "target": 50,
+    "verified": 50,
+    "added": 30,
+    "candidatesChecked": 71,
+    "reason": "部分插件未取得有效数据，仅发布实际可用记录。"
+  }
 }

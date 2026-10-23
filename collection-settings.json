@@ -1,9 +1,9 @@
 {
   "version": 1,
-  "targetPlugins": 20,
-  "maxPlugins": 100,
-  "maxRequests": 600,
+  "targetPlugins": 50,
+  "maxPlugins": 50,
+  "maxRequests": 1800,
   "githubReserve": 100,
-  "updatedAt": null,
-  "updatedBy": null
+  "updatedAt": "2026-10-23T08:49:35.652Z",
+  "updatedBy": "Yi-xin-Li"
 }

@@ -1,28 +1,31 @@
 {
   "schemaVersion": 1,
-  "runId": "2026-10-23T08:18:04.986Z-664716ad",
-  "lastAttemptAt": "2026-10-23T08:18:04.986Z",
-  "lastSuccessAt": "2026-10-23T08:18:04.986Z",
+  "runId": "2026-10-23T08:49:35.652Z-dc76d8ab",
+  "lastAttemptAt": "2026-10-23T08:49:35.652Z",
+  "lastSuccessAt": "2026-10-23T08:49:35.652Z",
   "outcome": "partial",
   "sources": {
     "github": {
-      "status": "ok",
-      "fetchedAt": "2026-10-23T08:18:04.986Z",
-      "message": "20 成功 / 0 失败"
+      "status": "partial",
+      "fetchedAt": "2026-10-23T08:49:35.652Z",
+      "message": "49 成功 / 1 失败"
     },
     "npm": {
       "status": "ok",
-      "fetchedAt": "2026-10-23T08:18:04.986Z",
-      "message": "18/18 个包映射通过，0 个无法映射，0 个不可用，0 个缺少下载数据，0 个请求失败"
+      "fetchedAt": "2026-10-23T08:49:35.652Z",
+      "message": "42/42 个包映射通过，0 个无法映射，0 个不可用，0 个缺少下载数据，0 个请求失败"
     },
     "osv": {
       "status": "ok",
-      "fetchedAt": "2026-10-23T08:18:04.986Z",
-      "message": "18 个精确版本检查完成，0 个失败"
+      "fetchedAt": "2026-10-23T08:49:35.652Z",
+      "message": "42 个精确版本检查完成，0 个失败"
     }
   },
-  "errorCount": 0,
+  "errorCount": 2,
   "messages": [
+    "GitHub Nwflower/dsh-claude-style: GitHub 窗口记录时间异常：2026-10-23T08:52:48Z",
+    "ccch1mneyyy-dsh-tui: 仓库推送 时间异常，未参与相关判断。",
+    "部分插件未取得有效数据，仅发布实际可用记录。",
     "评分方法版本 2.0.0"
   ],
   "nextRunHint": "GitHub Actions 计划每 6 小时运行；npm 与 OSV 随同刷新。"
