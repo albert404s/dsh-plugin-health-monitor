@@ -56,7 +56,7 @@ function fallbackStatus(latest: LatestData): StatusFile {
     sources: latest.sources,
     errorCount: 0,
     messages: ['status.json 不可用，状态由 latest.json 推导。'],
-    nextRunHint: 'GitHub Actions 每 6 小时更新',
+    nextRunHint: '仅手动采集',
   };
 }
 

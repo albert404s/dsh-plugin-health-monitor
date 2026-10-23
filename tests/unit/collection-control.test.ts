@@ -52,12 +52,13 @@ afterEach(async () => {
 });
 
 describe('collection control decisions', () => {
-  it('keeps legacy data branches enabled without inventing an operator or change time', async () => {
-    expect(await readCollectionControl(await directory())).toEqual(defaultCollectionControl());
+  it('defaults missing controls to manual-only without inventing an operator or change time', async () => {
+    expect(await readCollectionControl(await directory())).toEqual({ version: 1, automaticPaused: true, updatedAt: null, updatedBy: null });
+    expect(parseCollectionControl(defaultCollectionControl())).toEqual(defaultCollectionControl());
   });
 
-  it('runs scheduled collection when enabled and skips all collection when paused', () => {
-    expect(decideCollectionAction('schedule', undefined, defaultCollectionControl(), undefined, now).shouldCollect).toBe(true);
+  it('always skips scheduled collection, including legacy enabled controls', () => {
+    expect(decideCollectionAction('schedule', undefined, { ...defaultCollectionControl(), automaticPaused: false }, undefined, now).shouldCollect).toBe(false);
     expect(decideCollectionAction('schedule', 'resume', paused, undefined, now)).toMatchObject({
       action: 'scheduled', shouldCollect: false, controlChanged: false, control: paused,
     });
@@ -71,13 +72,14 @@ describe('collection control decisions', () => {
 
   it.each([
     ['pause', true],
-    ['resume', false],
-  ] as const)('%s changes only the automatic switch and audit fields without collecting', (action, automaticPaused) => {
-    const decision = decideCollectionAction('workflow_dispatch', action, defaultCollectionControl(), 'albert404s', now);
+    ['resume', true],
+  ] as const)('%s keeps automatic collection disabled and updates audit fields without collecting', (action, automaticPaused) => {
+    const decision = decideCollectionAction('workflow_dispatch', action, { ...defaultCollectionControl(), automaticPaused: false }, 'albert404s', now);
     expect(decision).toMatchObject({
       action, shouldCollect: false, controlChanged: true,
       control: { version: 1, automaticPaused, updatedAt: now.toISOString(), updatedBy: 'albert404s' },
     });
+    if (action === 'resume') expect(decision.message).toContain('仅支持手动采集');
   });
 
   it('rejects unknown actions, unsupported triggers and invalid operators', () => {
@@ -94,7 +96,6 @@ describe('collection control decisions', () => {
     { ...paused, updatedAt: '2026-02-30T04:00:00Z' },
     { ...paused, updatedAt: '2026-10-22T12:00:00+08:00' },
     { ...paused, updatedBy: null },
-    { ...paused, updatedAt: null, updatedBy: null },
     { ...paused, unexpected: true },
   ])('rejects ambiguous or invalid stored control state %#', (value) => {
     expect(() => parseCollectionControl(value)).toThrow('校验失败');
@@ -179,6 +180,22 @@ describe('control-only artifact and workflow CLI', () => {
     expect(await readFile(output, 'utf8')).toContain('should_collect=false');
     expect(await readFile(output, 'utf8')).toContain('control_changed=false');
     expect(await readFile(path.join(source, COLLECTION_CONTROL_FILENAME), 'utf8')).toBe(before);
+  });
+
+  it('ignores a queued schedule even if the stored legacy switch remains enabled', async () => {
+    const source = await directory(), output = path.join(await directory(), 'outputs');
+    await writeCollectionControl(source, { ...paused, automaticPaused: false });
+    const before = await readFile(path.join(source, COLLECTION_CONTROL_FILENAME), 'utf8');
+    const result = await runGate(source, 'schedule', '', output);
+    expect(result.stdout).toContain('仅支持手动采集');
+    expect(await readFile(output, 'utf8')).toContain('should_collect=false');
+    expect(await readFile(path.join(source, COLLECTION_CONTROL_FILENAME), 'utf8')).toBe(before);
+  });
+
+  it('has no scheduled workflow trigger or resume option after migration to manual-only collection', async () => {
+    const workflow = await readFile(path.resolve('.github/workflows/update-data.yml'), 'utf8');
+    expect(workflow).toContain('  workflow_dispatch:');
+    expect(workflow).not.toMatch(/^\s*(schedule:|- cron:|- resume\s*$)/m);
   });
 
   it('persists only the local control change for a manual pause and emits the control-only route', async () => {

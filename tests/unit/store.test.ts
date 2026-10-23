@@ -185,11 +185,11 @@ async function controlTestDirectory(): Promise<string> {
   return directory;
 }
 
-it('publishes the automatic update default for legacy data without a control file',async()=>{
+it('publishes the manual-only default for legacy data without a control file',async()=>{
   const source=await controlTestDirectory(),destination=await temporaryDirectory();
   await copyDataFiles(source,destination);
   expect(JSON.parse(await readFile(path.join(destination,'collection-control.json'),'utf8'))).toEqual({
-    version:1,automaticPaused:false,updatedAt:null,updatedBy:null,
+    version:1,automaticPaused:true,updatedAt:null,updatedBy:null,
   });
 });
 

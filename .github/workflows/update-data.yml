@@ -1,20 +1,16 @@
 name: Update plugin data
 
 on:
-  schedule:
-    # The gate checks the data branch before any provider API is called.
-    - cron: '0 */6 * * *'
   workflow_dispatch:
     inputs:
       action:
-        description: 'refresh: save limits and collect; pause/resume: automatic switch; configure: save limits only'
+        description: 'refresh: save limits and collect manually; pause: keep automatic collection disabled; configure: save limits only'
         required: true
         default: refresh
         type: choice
         options:
           - refresh
           - pause
-          - resume
           - configure
       target_plugins:
         description: 'refresh/configure: target catalog size (1-1000), discovers verified DSH plugins; blank keeps saved target'

@@ -56,8 +56,7 @@ async function main(): Promise<void> {
   }
   if (process.env.GITHUB_STEP_SUMMARY) {
     await appendFile(process.env.GITHUB_STEP_SUMMARY,
-      '### ORBIT 采集控制\n\n' + decision.message + '\n\n自动更新：**'
-      + (decision.control.automaticPaused ? '已暂停' : '已开启') + '**\n',
+      '### ORBIT 采集控制\n\n' + decision.message + '\n\n自动采集：**关闭，仅手动**\n',
     );
   }
 }

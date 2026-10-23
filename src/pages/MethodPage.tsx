@@ -14,7 +14,7 @@ const TOC = [
   { href: '#maintenance', label: '维护活跃度怎么看' },
   { href: '#risk', label: '关注事项怎么看' },
   { href: '#completeness', label: '数据完整度' },
-  { href: '#pipeline', label: '更新与暂停' },
+  { href: '#pipeline', label: '手动更新' },
   { href: '#limits', label: '使用边界' },
 ];
 
@@ -244,8 +244,8 @@ export function MethodPage(): JSX.Element {
               </MoreDetails>
             </MethodSection>
 
-            <MethodSection id="pipeline" index="07" title="更新与暂停">
-              <p>默认每 6 小时采集一次。网站会自动检查已发布的新数据；维护者也能手动采集。</p>
+            <MethodSection id="pipeline" index="07" title="手动更新">
+              <p>采集只由维护者手动触发。网页每 60 秒检查已发布的新快照，不会因此调用采集 API。</p>
               <ol className="mt-4 list-decimal space-y-2 pl-5">
                 <li>打开“数据更新”，填写收录目标，按需调整每轮上限和预算。</li>
                 <li>点“到 GitHub 更新数据”，登录有写入权限的账号，选择 main 和 refresh，照页面参数运行。</li>
@@ -259,13 +259,13 @@ export function MethodPage(): JSX.Element {
                 ].map(([title,text])=><div key={title} className="rounded-panel border border-line bg-surface p-3"><dt className="font-medium text-content-primary">{title}</dt><dd className="mt-1 text-xs leading-6">{text}</dd></div>)}
               </dl>
               <p className="mt-3 text-xs text-content-muted">目标设为 50 不代表已有 50 个。发现不足、核验未通过或预算不足时，显示实际收录数和原因，保留已有数据。</p>
-              <p className="mt-3 text-xs text-content-muted">暂停与恢复只影响后续自动采集，不取消正在运行的任务；暂停时仍可手动更新。“只保存设置”会等待下次采集。</p>
+              <p className="mt-3 text-xs text-content-muted">“只保存设置”不会开始采集；下次更新仍需维护者手动执行。</p>
               <Link to="/#collection-controls" className="mt-4 inline-flex min-h-11 items-center gap-1 font-medium text-brand-text hover:text-content-primary">
                 打开数据更新入口 <ArrowUpRight size={14} aria-hidden="true" />
               </Link>
               <MoreDetails title="刷新、调用限制和保存方式">
                 <p>右上角的“刷新页面数据”只重读已发布快照，不触发采集。重新请求 GitHub、npm 和 OSV，需要使用“手动采集”。</p>
-                <p>API 有调用限制。增加收录数量或频繁采集会增加请求，单个仓库还可能需要多次分页；“20 个插件”不等于“20 次请求”。暂停定时采集可以减少后续请求，但不能绕过平台限额。</p>
+                <p>API 有调用限制。增加收录数量或频繁手动采集会增加请求，单个仓库还可能需要多次分页；“20 个插件”不等于“20 次请求”。每轮上限和预算用于控制用量，不能绕过平台限额。</p>
                 <p>每次真实请求都计数，包括分页、重试和 304 验证；内存复用不计请求。触及总预算、GitHub 预留边界或平台限流时，保留整份上次快照。已有的跨轮 GitHub 公共数据缓存先向平台验证变化，不直接冒充新数据。</p>
                 <p>源码保存在 main，数据保存在 data 分支。网页只读取静态 JSON，GitHub Token 不进入前端；历史保留 90 天，单插件最多 400 个点，完整快照最多 120 份。</p>
               </MoreDetails>

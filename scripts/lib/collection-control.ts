@@ -54,12 +54,11 @@ export function decideCollectionAction(
   if (eventName === 'schedule') {
     return {
       action: 'scheduled',
-      shouldCollect: !control.automaticPaused,
+      // Fail closed even if an older queued schedule or legacy enabled control reaches this gate.
+      shouldCollect: false,
       controlChanged: false,
       control,
-      message: control.automaticPaused
-        ? '自动采集已暂停。本次定时任务跳过采集、构建和部署，不调用数据 API。'
-        : '自动采集已开启。本次定时任务继续采集。',
+      message: '当前仅支持手动采集。本次定时任务跳过采集、构建和部署，不调用数据 API。',
     };
   }
   if (eventName !== 'workflow_dispatch') throw new Error('不支持的采集触发事件');
@@ -70,17 +69,17 @@ export function decideCollectionAction(
       shouldCollect: true,
       controlChanged: false,
       control,
-      message: '手动采集一次；不改变自动更新开关。',
+      message: '手动采集一次；不会开启定时采集。',
     };
   }
   if (action === 'configure') return {
     action, shouldCollect: false, controlChanged: true, control,
-    message: '保存后续采集范围与预算；本次不重新采集，也不改变自动开关。',
+    message: '保存后续手动采集范围与预算；本次不重新采集。',
   };
   if (action !== 'pause' && action !== 'resume') throw new Error('action 只支持 refresh、pause、resume 或 configure');
   const updated = parseCollectionControl({
     ...control,
-    automaticPaused: action === 'pause',
+    automaticPaused: true,
     updatedAt: now.toISOString(),
     updatedBy: actor,
   });
@@ -91,7 +90,7 @@ export function decideCollectionAction(
     control: updated,
     message: action === 'pause'
       ? '暂停后续定时采集；保留现有快照和历史，本次不采集新数据。已经运行的任务不会被取消。'
-      : '恢复后续定时采集；保留现有快照和历史，本次不采集新数据。',
+      : '当前仅支持手动采集，自动更新保持关闭；本次不采集新数据。',
   };
 }
 

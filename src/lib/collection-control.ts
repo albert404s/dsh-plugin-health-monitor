@@ -36,7 +36,6 @@ export function parseCollectionControl(value: unknown): CollectionControl {
     return invalid('updatedBy 必须是 GitHub 操作人或 null');
   }
   if ((timestamp === null) !== (actor === null)) return invalid('更新时间和操作人必须同时存在或同时为空');
-  if (timestamp === null && record.automaticPaused) return invalid('暂停状态必须包含更新时间和操作人');
   return {
     version: COLLECTION_CONTROL_VERSION,
     automaticPaused: record.automaticPaused,
@@ -56,9 +55,9 @@ export const collectionControlSchema = {
   },
 };
 
-/** Only a missing file represents the legacy, not-yet-configured state. */
+/** Missing legacy controls also default to manual-only collection, without inventing audit fields. */
 export function defaultCollectionControl(): CollectionControl {
-  return { version: COLLECTION_CONTROL_VERSION, automaticPaused: false, updatedAt: null, updatedBy: null };
+  return { version: COLLECTION_CONTROL_VERSION, automaticPaused: true, updatedAt: null, updatedBy: null };
 }
 
 export const COLLECTION_SETTINGS_FILENAME = 'collection-settings.json';

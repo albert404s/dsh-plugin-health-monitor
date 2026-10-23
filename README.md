@@ -7,7 +7,7 @@
 - 真实数据：20 个经人工核验的 DSH 插件仓库
 - 四个独立维度：关注度、维护活跃度、关注事项、数据完整度
 - 导航：概览、插件库、生态分布、插件对比、数据与方法；插件详情从内容进入
-- 自动化：GitHub Actions 每 6 小时采集，独立 `data` 分支保留历史，构建并部署 GitHub Pages
+- 自动化：GitHub Actions 仅手动采集，独立 `data` 分支保留历史，构建并部署 GitHub Pages
 - 缺失数据不当 0：无法核验时明确显示原因，而不是伪精确评分
 
 ![首页桌面端](docs/screenshots/home-desktop.png)
@@ -148,13 +148,12 @@ tests/e2e/     Playwright 浏览器验收
 
 ## 数据更新控制
 
-顶栏“数据更新”提供三个维护操作：
+顶栏“数据更新”用于维护者手动采集，已删除六小时定时计划：
 
-- **重新采集一次**：获取新数据，即使自动更新暂停也可使用。
-- **暂停自动采集**：跳过后续六小时定时采集，保留已有数据。
-- **恢复自动采集**：恢复后续定时计划。
+- **重新采集一次**：保存本次收录目标和预算，再采集并发布。
+- **保存采集设置**：只保存下次手动操作的设置，不开始采集。
 
-选操作后前往 GitHub，点 Run workflow，分支选 main，action 选 refresh / pause / resume，再确认执行。需要仓库写入权限；网站不保存 Token。选择操作不会立即改变开关，完成情况以 Actions 为准；暂停不取消正在运行的采集。
+前往GitHub后点Run workflow，分支选main，action选refresh，按页面表格填写参数并执行。需要仓库写入权限；网站不保存Token。
 
 “刷新已发布数据”只重新读取网站快照，不会调用采集 API。控制细节见 [数据采集控制](docs/COLLECTION-CONTROL.md)。展开“采集范围与预算”可准备 configure 操作，分别设置每轮插件上限、请求上限、GitHub 预留额度；configure只保存设置；refresh可一次保存并采集。旧设置兼容为目标20，每轮上限100、600次请求、GitHub预留100。目标与上限分别可改。
 
@@ -162,13 +161,13 @@ tests/e2e/     Playwright 浏览器验收
 
 插件库支持排序、筛选及前 N 项展示，数量写入 URL。展示数量不增加 API 请求，实际采集上限独立设置，按最久未更新优先轮换。新增“收录目标”，超出当前目录时会搜索并核验DSH插件，目录跨轮保存；不足目标如实显示数量和原因，不宣称覆盖整个GitHub。
 
-## 自动更新与部署
+## 手动采集与部署
 
 工作流：
 
 - `.github/workflows/ci.yml`：TypeScript、Vitest、生产构建、Token 扫描、Playwright
 - `.github/workflows/deploy.yml`：`main` 更新后先跑 TypeScript/单测，再从 `data` 分支取数据构建并部署 Pages
-- `.github/workflows/update-data.yml`：每 6 小时或手动采集，构建校验成功后才提交 `data` 分支并部署 Pages
+- `.github/workflows/update-data.yml`：仅维护者手动采集，构建校验成功后才提交 `data` 分支并部署 Pages
 
 数据隔离原则：
 
@@ -191,7 +190,7 @@ tests/e2e/     Playwright 浏览器验收
 
 截至 2026-10-22，本地 codex/data-controls；数据仍为 2026-10-20 18:57（UTC+8）的 20 个插件快照：
 
-- TypeScript 检查通过；12 个文件、**163 个单元测试**通过。
+- TypeScript 检查通过；12 个文件、**164 个单元测试**通过。
 - Chromium **47 个浏览器测试**通过，包含筛选/分页/返回/刷新、旧链接、双选对比、坏数据隔离、局部历史降级及 WebGL 正常与失败路径。
 - 生产构建与产物检查通过；当前预览无控制台错误。
 - 390、768、1024、1366×768、1440×900、1920×1080 检查无页面横向溢出。

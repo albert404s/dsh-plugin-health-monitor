@@ -551,7 +551,7 @@ export async function runCollection(argv = process.argv.slice(2)): Promise<void>
         ...(npmErrors > 0 ? [`npm 请求失败 ${npmErrors} 个`] : []),
         ...(osvErrors > 0 ? [`OSV 请求失败 ${osvErrors} 个`] : []),
       ],
-      nextRunHint: 'GitHub Actions 计划每 6 小时运行；失败时保留上一次成功快照。',
+      nextRunHint: '仅手动采集；失败时保留上一次成功快照。',
     };
     await writeStatus(options.dataDir, status);
     console.error('[collect] GitHub collection failed for every repository; latest snapshot left untouched');
@@ -604,7 +604,7 @@ export async function runCollection(argv = process.argv.slice(2)): Promise<void>
       ...(discoverySummary.reason?[discoverySummary.reason]:[]),
       `评分方法版本 ${SCORE_METHOD_VERSION}`,
     ],
-    nextRunHint: 'GitHub Actions 计划每 6 小时运行；npm 与 OSV 随同刷新。',
+    nextRunHint: '仅手动采集；npm 与 OSV 随同刷新。',
   };
   await writeStatus(options.dataDir, status);
 

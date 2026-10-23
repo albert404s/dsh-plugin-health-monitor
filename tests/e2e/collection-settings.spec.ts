@@ -9,7 +9,7 @@ async function state(page:Page) {
 test('collection settings are separate from ranking and invalid values cannot be submitted',async({page})=>{
  await state(page);await page.goto('/#collection-controls');
  const dialog=page.getByRole('dialog',{name:'数据更新',exact:true});
- await expect(dialog.getByRole('status')).toHaveText('自动采集已暂停');
+ await expect(dialog.getByRole('status')).toHaveText('仅手动采集');
  await expect(dialog.getByLabel('收录目标')).toHaveValue('20');
  await dialog.getByLabel('收录目标').fill('50');
  await dialog.locator('summary').filter({hasText:'采集范围与预算'}).click();
@@ -20,7 +20,7 @@ test('collection settings are separate from ranking and invalid values cannot be
  await dialog.getByRole('button',{name:'准备保存采集设置'}).click();
  await expect(dialog.locator('code')).toHaveText('configure');
  await expect(dialog.locator('dl[aria-label="本次 GitHub 工作流参数"]')).toContainText('target_plugins50');
- await expect(dialog.getByRole('status')).toHaveText('自动采集已暂停');
+ await expect(dialog.getByRole('status')).toHaveText('仅手动采集');
  await expect(dialog.getByRole('link',{name:'到 GitHub保存采集设置'})).toHaveAttribute('href',/actions\/workflows\/update-data.yml$/);
  await dialog.getByLabel('每轮请求上限').fill('0');
  await expect(dialog.getByRole('alert')).toContainText('请求预算');
@@ -29,7 +29,7 @@ test('collection settings are separate from ranking and invalid values cannot be
 test('refresh includes a real collection target and explains the difference from the published count',async({page})=>{
  await state(page);await page.goto('/#collection-controls');
  const dialog=page.getByRole('dialog',{name:'数据更新',exact:true});
- await expect(dialog.getByRole('status')).toHaveText('自动采集已暂停');
+ await expect(dialog.getByRole('status')).toHaveText('仅手动采集');
  await dialog.getByLabel('收录目标').fill('50');
  await expect(dialog.locator('.orbit-collection-target')).toContainText('当前实际收录 20 个');
  await expect(dialog.locator('.orbit-collection-target')).toContainText('本次目标 50 个，将查找并核验更多 DSH 插件');
@@ -48,11 +48,11 @@ test('refresh includes a real collection target and explains the difference from
 test('checking newly published data does not replace a collection target being edited',async({page})=>{
  await state(page);await page.goto('/#collection-controls');
  const dialog=page.getByRole('dialog',{name:'数据更新',exact:true});
- await expect(dialog.getByRole('status')).toHaveText('自动采集已暂停');
+ await expect(dialog.getByRole('status')).toHaveText('仅手动采集');
  await dialog.getByLabel('收录目标').fill('50');
  await page.route('**/data/collection-settings.json',route=>route.fulfill({json:{...settings,targetPlugins:80}}));
  await dialog.getByRole('button',{name:'刷新已发布数据'}).click();
- await expect(dialog.getByRole('status')).toHaveText('自动采集已暂停');
+ await expect(dialog.getByRole('status')).toHaveText('仅手动采集');
  await expect(dialog.getByLabel('收录目标')).toHaveValue('50');
  await expect(dialog.locator('dl[aria-label="本次 GitHub 工作流参数"]')).toContainText('target_plugins50');
 });
@@ -70,7 +70,7 @@ test('run usage reflects an older preserved snapshot rather than claiming a fres
  await expect(dialog).toContainText('300 / 300');
  await expect(dialog).toContainText('未达到收录目标：已核验 20 个，目标 100 个。');
  await expect(dialog).toContainText('本轮预算已用完，下次继续核验。');
- await expect(dialog.getByRole('status')).toHaveText('自动采集已暂停');
+ await expect(dialog.getByRole('status')).toHaveText('仅手动采集');
 });
 test('historic method versions remain visible as separated points after a scoring upgrade',async({page})=>{
  await page.route('**/data/history.json',async route=>{

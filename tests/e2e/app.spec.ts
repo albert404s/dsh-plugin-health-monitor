@@ -1,4 +1,5 @@
 import { chromium, expect, test, type Page } from '@playwright/test';
+import type { LatestData } from '../../src/lib/types';
 
 function trackErrors(page: Page): string[] {
   const errors: string[] = [];
@@ -218,9 +219,41 @@ test('unavailable WebGL keeps the static scene and the primary chart usable',asy
 
 
 test('download missing days remain gaps instead of zero-valued chart averages',async({page})=>{
+  await page.route('**/data/latest.json',async route=>{
+    const response=await route.fetch(),json=await response.json() as LatestData;
+    const target=json.plugins.find(plugin=>plugin.id==='dsh-market-dsh-market');
+    if(!target)throw new Error('Missing download fixture base plugin');
+    const sources=[target,...json.plugins.filter(plugin=>plugin.id!==target.id).slice(0,4)];
+    expect(sources).toHaveLength(5);
+    const start=Date.parse(json.generatedAt.slice(0,10)+'T00:00:00.000Z')-14*86400000;
+    const dates=Array.from({length:14},(_,index)=>new Date(start+index*86400000).toISOString().slice(0,10));
+    const reason='周下载窗口包含平台性缺数日：'+dates[7]+'；本轮不计算周变化。';
+    json.plugins=sources.map((plugin,index)=>{
+      // Five verified sources agree on a missing day. Only the target has an
+      // isolated real zero on day one; that zero must still enter the mean.
+      const daily=dates.map((date,day)=>({date,downloads:day===7||(index===0&&day===0)?0:70}));
+      return {...plugin,npm:{...plugin.npm,status:'verified',packageName:plugin.npm.packageName??'fixture-download-'+index,
+        repositoryUrl:plugin.repository.url,daily,downloads30d:null,downloads7d:null,previous7d:index===0?420:490,weeklyChangePct:null,reason,
+        quality:{rawDaily:daily,conflictDates:[],invalidCount:0,notes:[reason],windowStart:dates[0],windowEnd:dates[13]},
+      },security:{...plugin.security,status:'unavailable',exactMatch:false},availability:{...plugin.availability,npm:true},
+        warnings:[...plugin.warnings.filter(warning=>!warning.includes('周下载')&&!warning.includes('周变化')),reason]};
+    });
+    await route.fulfill({response,json});
+  });
   await page.goto('/plugins/dsh-market-dsh-market');
   await expect(page.getByText('灰色/断点=疑似缺失，不按 0 计入均值')).toBeVisible();
   await expect(page.getByText(/周下载窗口包含平台性缺数日/).first()).toBeVisible();
+  const chart=page.getByRole('img',{name:/npm 最近 30 天下载量.*灰色区域为数据缺失日/});
+  await expect.poll(()=>chart.evaluate(async element=>{
+    const modulePath='/src/components/charts/echarts.ts';
+    const {echarts}=await import(modulePath);
+    const instance=echarts.getInstanceByDom(element);
+    if(!instance)return null;
+    const option=instance.getOption() as {series:Array<{name:string;data:Array<number|null>}>};
+    const bars=option.series.find(series=>series.name==='日下载量')?.data;
+    const average=option.series.find(series=>series.name==='7 日均值')?.data;
+    return {realZero:bars?.[0],gap:bars?.[7],completeMean:average?.[6],gapMeans:average?.slice(7)};
+  })).toEqual({realZero:0,gap:null,completeMean:60,gapMeans:Array(7).fill(null)});
 });
 
 
@@ -292,27 +325,28 @@ test('detail supporting metric and score notes use the same quiet hints',async({
   await expect(page.getByRole('tooltip')).toHaveText('GitHub 当前值');
 });
 
-test('collection controls distinguish published refresh from maintainer actions and restore focus',async({page})=>{
-  let paused=true;
+test('manual-only collection controls distinguish published refresh from maintainer actions and restore focus',async({page})=>{
+  let legacyPaused=true;
   const providerRequests:string[]=[];
   page.on('request',request=>{if(/api.github.com|registry.npmjs.org|api.npmjs.org|api.osv.dev/.test(request.url()))providerRequests.push(request.url());});
   await page.route('**/data/collection-control.json',route=>route.fulfill({json:{
-    version:1,automaticPaused:paused,updatedAt:'2026-10-22T10:00:00.000Z',updatedBy:'maintainer',
+    version:1,automaticPaused:legacyPaused,updatedAt:'2026-10-22T10:00:00.000Z',updatedBy:'maintainer',
   }}));
   await page.goto('/');
   const trigger=page.getByRole('button',{name:'数据更新',exact:true});
   await trigger.click();
   const dialog=page.getByRole('dialog',{name:'数据更新',exact:true});
-  await expect(dialog.getByRole('status')).toHaveText('自动采集已暂停');
-  await dialog.getByRole('radio',{name:/暂停自动采集/}).check();
-  await expect(dialog.locator('code')).toHaveText('pause');
-  await expect(dialog.getByRole('link',{name:'到 GitHub暂停自动采集'})).toHaveAttribute('href','https://github.com/albert404s/dsh-plugin-health-monitor/actions/workflows/update-data.yml');
-  await dialog.getByRole('radio',{name:/恢复自动采集/}).check();
-  await expect(dialog.locator('code')).toHaveText('resume');
-  await expect(dialog.getByRole('status')).toHaveText('自动采集已暂停');
-  paused=false;
+  await expect(dialog.getByRole('status')).toHaveText('仅手动采集');
+  await expect(dialog.getByRole('radio')).toHaveCount(1);
+  await expect(dialog.getByRole('radio',{name:/重新采集一次/})).toBeChecked();
+  await expect(dialog.locator('code')).toHaveText('refresh');
+  await expect(dialog.getByRole('link',{name:'到 GitHub更新数据'})).toHaveAttribute('href','https://github.com/albert404s/dsh-plugin-health-monitor/actions/workflows/update-data.yml');
+  await expect(dialog).toContainText('需要仓库写入权限');
+  await expect(dialog.getByRole('radio',{name:/暂停|恢复/})).toHaveCount(0);
+  legacyPaused=false;
   await dialog.getByRole('button',{name:'刷新已发布数据'}).click();
-  await expect(dialog.getByRole('status')).toHaveText('自动采集 · 每 6 小时');
+  await expect(dialog.getByRole('status')).toHaveText('仅手动采集');
+  await expect(dialog).not.toContainText('每 6 小时');
   expect(providerRequests).toEqual([]);
   await page.keyboard.press('Escape');
   await expect(dialog).toHaveCount(0);
@@ -324,7 +358,7 @@ test('invalid control status stays unknown without taking down published data',a
   await page.goto('/');
   await page.getByRole('button',{name:'数据更新',exact:true}).click();
   const dialog=page.getByRole('dialog',{name:'数据更新',exact:true});
-  await expect(dialog.getByRole('status')).toHaveText('自动采集状态待确认');
+  await expect(dialog.getByRole('status')).toHaveText('仅手动采集 · 配置状态待确认');
   await expect(dialog.getByRole('button',{name:'刷新已发布数据'})).toBeEnabled();
   await dialog.getByRole('button',{name:'关闭数据更新'}).click();
   await expect(page.locator('#home-title')).toBeVisible();
@@ -336,7 +370,7 @@ test('the method update entry opens usable collection controls at 390px',async({
   await page.goto('/#collection-controls');
   const dialog=page.getByRole('dialog',{name:'数据更新',exact:true});
   await expect(dialog).toBeVisible();
-  await expect(dialog.getByRole('status')).toHaveText('自动采集 · 每 6 小时');
+  await expect(dialog.getByRole('status')).toHaveText('仅手动采集');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(1);
   expect(await dialog.evaluate(el=>el.scrollWidth-el.clientWidth)).toBeLessThanOrEqual(1);
   await dialog.getByRole('radio',{name:/重新采集一次/}).check();
