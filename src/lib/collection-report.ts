@@ -7,6 +7,7 @@ export const collectionReportSchema = z.object({
   requestsMade: count, memoryCacheHits: count, revalidatedCacheHits: count, persistentCacheHits: count,
   githubRemaining: count.nullable(), githubResetAt: z.iso.datetime().nullable(),
   stopped: z.boolean(), stopReason: z.string().nullable(),
+  discovery: z.object({target: count.positive(),verified: count,added: count,candidatesChecked: count,reason: z.string().nullable()}).optional(),
 });
 export type CollectionReport = z.infer<typeof collectionReportSchema>;
 export function parseCollectionReport(value: unknown): CollectionReport | null {

@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: 'refresh: collect once; pause/resume: automatic switch; configure: save limits only'
+        description: 'refresh: save limits and collect; pause/resume: automatic switch; configure: save limits only'
         required: true
         default: refresh
         type: choice
@@ -16,16 +16,20 @@ on:
           - pause
           - resume
           - configure
+      target_plugins:
+        description: 'refresh/configure: target catalog size (1-1000), discovers verified DSH plugins; blank keeps saved target'
+        type: string
+        required: false
       max_plugins:
-        description: 'configure only: maximum verified plugins per run (1-1000); blank keeps saved value'
+        description: 'refresh/configure: maximum verified plugins per run (1-1000); blank keeps saved value'
         type: string
         required: false
       max_requests:
-        description: 'configure only: total HTTP request ceiling (1-10000), including retries'
+        description: 'refresh/configure: total HTTP request ceiling (1-10000), including retries'
         type: string
         required: false
       github_reserve:
-        description: 'configure only: stop at this GitHub remaining quota (0-1000)'
+        description: 'refresh/configure: stop at this GitHub remaining quota (0-1000)'
         type: string
         required: false
 
@@ -71,6 +75,7 @@ jobs:
         env:
           COLLECTION_EVENT: ${{ github.event_name }}
           COLLECTION_ACTION: ${{ inputs.action }}
+          COLLECTION_TARGET_PLUGINS: ${{ inputs.target_plugins }}
           COLLECTION_MAX_PLUGINS: ${{ inputs.max_plugins }}
           COLLECTION_MAX_REQUESTS: ${{ inputs.max_requests }}
           COLLECTION_GITHUB_RESERVE: ${{ inputs.github_reserve }}
@@ -129,6 +134,10 @@ jobs:
       - name: Collect data
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COLLECTION_TARGET_PLUGINS: ${{ inputs.target_plugins }}
+          COLLECTION_MAX_PLUGINS: ${{ inputs.max_plugins }}
+          COLLECTION_MAX_REQUESTS: ${{ inputs.max_requests }}
+          COLLECTION_GITHUB_RESERVE: ${{ inputs.github_reserve }}
         run: npm run collect -- --data-dir data-store
 
       - name: Stage data artifact
@@ -237,6 +246,10 @@ jobs:
             git add collection-report.json
           fi
           if [ "$CONTROL_ONLY" != "true" ]; then
+            if [ -f ../downloaded-data/catalog.json ]; then
+              cp ../downloaded-data/catalog.json .
+              git add catalog.json
+            fi
             cp ../downloaded-data/latest.json .
             cp ../downloaded-data/history.json .
             cp ../downloaded-data/status.json .

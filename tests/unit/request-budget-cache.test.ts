@@ -312,3 +312,16 @@ describe('public JSON persistent HTTP cache', () => {
     expect(await new DiskHttpCache({ directory: dir, maxAgeMs: 1000 }).get('d'.repeat(64))).toBeNull();
   });
 });
+
+it('keeps search quota separate from the larger core reserve',async()=>{
+ const budget=new RequestBudget({maxRequests:10,githubReserve:100});
+ let remaining=29;
+ vi.stubGlobal('fetch',vi.fn(async()=>json({items:[]},{'x-ratelimit-resource':'search','x-ratelimit-remaining':String(remaining),'x-ratelimit-limit':'30'})));
+ const client=createGithubClient('test',{budget});
+ await client.get('https://api.github.com/search/repositories?q=dsh',{cache:false});
+ expect(budget.isStopped).toBe(false);
+ remaining=1;
+ await client.get('https://api.github.com/search/repositories?q=dsh2',{cache:false});
+ expect(budget.isStopped).toBe(false);
+ expect(budget.getSummary().githubByResource.search.remaining).toBe(1);
+});

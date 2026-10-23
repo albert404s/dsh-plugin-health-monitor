@@ -63,6 +63,7 @@ function fallbackStatus(latest: LatestData): StatusFile {
 export function DataProvider({ children }: { children: ReactNode }): JSX.Element {
   const [data, setData] = useState<DataBundle | null>(null);
   const previousData = useRef<DataBundle | null>(null);
+  const lastRefreshCheck = useRef(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [warnings, setWarnings] = useState<string[]>([]);
@@ -73,7 +74,21 @@ export function DataProvider({ children }: { children: ReactNode }): JSX.Element
     setRequestVersion((version) => version + 1);
   }, []);
 
+  // Refresh published snapshots, never provider APIs. Hidden tabs stay idle.
   useEffect(() => {
+    const check = (): void => {
+      if (document.visibilityState !== 'visible' || Date.now() - lastRefreshCheck.current < 30000) return;
+      lastRefreshCheck.current = Date.now();
+      refresh();
+    };
+    const interval = window.setInterval(check, 60000);
+    document.addEventListener('visibilitychange', check);
+    window.addEventListener('focus', check);
+    return () => { window.clearInterval(interval); document.removeEventListener('visibilitychange', check); window.removeEventListener('focus', check); };
+  }, [refresh]);
+
+  useEffect(() => {
+    lastRefreshCheck.current = Date.now();
     const controller = new AbortController();
     let timedOut = false;
     const timeout = window.setTimeout(() => {

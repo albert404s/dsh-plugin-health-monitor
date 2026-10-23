@@ -33,10 +33,11 @@ async function main(): Promise<void> {
     process.env.GITHUB_ACTOR,
   );
   const storedSettings = await readCollectionSettings(dataDir);
-  if (decision.action === 'configure') {
+  if (decision.action === 'configure' || (decision.action === 'refresh' && ['COLLECTION_TARGET_PLUGINS','COLLECTION_MAX_PLUGINS','COLLECTION_MAX_REQUESTS','COLLECTION_GITHUB_RESERVE'].some(key => process.env[key]?.trim()))) {
     const parse = (value: string | undefined, fallback: number): number | string => value?.trim() ? value.trim() : fallback;
     await writeCollectionSettings(dataDir, {
       ...storedSettings,
+      targetPlugins: parse(process.env.COLLECTION_TARGET_PLUGINS, storedSettings.targetPlugins) as number,
       maxPlugins: parse(process.env.COLLECTION_MAX_PLUGINS, storedSettings.maxPlugins) as number,
       maxRequests: parse(process.env.COLLECTION_MAX_REQUESTS, storedSettings.maxRequests) as number,
       githubReserve: parse(process.env.COLLECTION_GITHUB_RESERVE, storedSettings.githubReserve) as number,

@@ -26,7 +26,8 @@ import { normalizeGithubRepository } from '../src/lib/data-quality';
 import { JsonClient, createGithubClient, createNpmClient } from './lib/http';
 import { RequestBudget } from './lib/request-budget';
 import { DiskHttpCache } from './lib/http-cache';
-import { readCollectionSettings } from './lib/collection-control';
+import { discoverPlugins } from './lib/discovery';
+import { readCollectionSettings, writeCollectionSettings } from './lib/collection-control';
 import { boundedCollectionInteger } from '../src/lib/collection-control';
 import { selectCollectionScope } from './lib/collection-scope';
 import type { CollectionReport } from '../src/lib/collection-report';
@@ -48,7 +49,7 @@ interface Options {
   dataDir: string;
   configPath: string;
   allowGhCliToken: boolean;
-  cacheDir: string; maxPlugins?: number; maxRequests?: number; githubReserve?: number;
+  cacheDir: string; targetPlugins?: number; maxPlugins?: number; maxRequests?: number; githubReserve?: number;
 }
 
 function parseArgs(argv: string[]): Options {
@@ -56,10 +57,10 @@ function parseArgs(argv: string[]): Options {
   let configPath = path.join(ROOT, 'config', 'plugins.json');
   let allowGhCliToken = false;
   let cacheDir = path.join(ROOT, '.data-cache', 'http');
-  const limits: { maxPlugins?: number; maxRequests?: number; githubReserve?: number } = {};
+  const limits: { targetPlugins?: number; maxPlugins?: number; maxRequests?: number; githubReserve?: number } = {};
   for (let index = 0; index < argv.length; index += 1) {
-    if (['--max-plugins', '--max-requests', '--github-reserve'].includes(argv[index])) {
-      const flag = argv[index], field = flag === '--max-plugins' ? 'maxPlugins' : flag === '--max-requests' ? 'maxRequests' : 'githubReserve';
+    if (['--target-plugins', '--max-plugins', '--max-requests', '--github-reserve'].includes(argv[index])) {
+      const flag = argv[index], field = flag === '--target-plugins' ? 'targetPlugins' : flag === '--max-plugins' ? 'maxPlugins' : flag === '--max-requests' ? 'maxRequests' : 'githubReserve';
       limits[field] = boundedCollectionInteger(argv[index + 1], flag, field === 'githubReserve' ? 0 : 1, field === 'maxRequests' ? 10000 : 1000);
       index += 1;
     } else if (argv[index] === '--cache-dir' && argv[index + 1]) {
@@ -170,20 +171,59 @@ function fallbackSecurity(
 export async function runCollection(argv = process.argv.slice(2)): Promise<void> {
   const startedAt = new Date();
   const options = parseArgs(argv);
-  const pluginsConfig = await loadConfig(options.configPath);
+  const configured = await loadConfig(options.configPath);
   const previous = await loadExisting(options.dataDir);
-  const settings = { ...await readCollectionSettings(options.dataDir), ...Object.fromEntries(Object.entries({maxPlugins:options.maxPlugins,maxRequests:options.maxRequests,githubReserve:options.githubReserve}).filter(([,value])=>value!==undefined)) };
-  const selectedConfigs = selectCollectionScope(pluginsConfig, previous.latest?.plugins ?? [], settings.maxPlugins);
-  const selectedIds = new Set(selectedConfigs.map(config => config.id));
+  const savedSettings = await readCollectionSettings(options.dataDir);
+  const limit = (explicit: number | undefined, env: string, fallback: number, max: number, min = 1): number =>
+    boundedCollectionInteger(explicit ?? (process.env[env]?.trim() || fallback), env, min, max);
+  const settings = { ...savedSettings,
+    targetPlugins: limit(options.targetPlugins,'COLLECTION_TARGET_PLUGINS',savedSettings.targetPlugins,1000),
+    maxPlugins: limit(options.maxPlugins,'COLLECTION_MAX_PLUGINS',savedSettings.maxPlugins,1000),
+    maxRequests: limit(options.maxRequests,'COLLECTION_MAX_REQUESTS',savedSettings.maxRequests,10000),
+    githubReserve: limit(options.githubReserve,'COLLECTION_GITHUB_RESERVE',savedSettings.githubReserve,1000,0),
+  };
+  if (['COLLECTION_TARGET_PLUGINS','COLLECTION_MAX_PLUGINS','COLLECTION_MAX_REQUESTS','COLLECTION_GITHUB_RESERVE'].some(key=>process.env[key]?.trim())) {
+    settings.updatedAt=startedAt.toISOString(); settings.updatedBy=process.env.GITHUB_ACTOR || savedSettings.updatedBy || 'local';
+    await writeCollectionSettings(options.dataDir,settings);
+  }
+  // The persisted verified catalog grows independently of the source seed list.
+  let catalog = configured;
+  try {
+    const savedCatalog = await loadConfig(path.join(options.dataDir,'catalog.json'));
+    const repos=new Set(configured.map(item=>item.repo.toLowerCase()));
+    const ids=new Set(configured.map(item=>item.id.toLowerCase()));
+    const packages=new Set(configured.flatMap(item=>item.npm?[item.npm.toLowerCase()]:[]));
+    catalog=[...configured];
+    for(const item of savedCatalog) if(!repos.has(item.repo.toLowerCase())&&!ids.has(item.id.toLowerCase())&&(!item.npm||!packages.has(item.npm.toLowerCase()))) {
+      catalog.push(item);repos.add(item.repo.toLowerCase());ids.add(item.id.toLowerCase());if(item.npm)packages.add(item.npm.toLowerCase());
+    }
+  } catch(error) { if((error as NodeJS.ErrnoException).code!=='ENOENT') console.warn('[collect] invalid catalog ignored; seed catalog retained'); }
   const previousById = new Map((previous.latest?.plugins ?? []).map((plugin) => [plugin.id, plugin]));
   const { token, note } = resolveGithubToken(options.allowGhCliToken);
-  console.log(`[collect] ${pluginsConfig.length} plugins; GitHub ${note}`);
+  console.log(`[collect] ${catalog.length} verified plugins; GitHub ${note}`);
   const deadline = startedAt.getTime() + 20 * 60 * 1000;
 
   const budget = new RequestBudget({ maxRequests: settings.maxRequests, githubReserve: settings.githubReserve, githubConcurrency: 1 });
   const githubClient: JsonClient = createGithubClient(token ?? undefined, { budget, cache: new DiskHttpCache({directory:options.cacheDir}), ...(process.env.GITHUB_REPOSITORY ? {cacheScope:'public-workflow:'+process.env.GITHUB_REPOSITORY} : {}) });
   const npmClient = createNpmClient({ budget });
   const osvClient = createNpmClient({ budget });
+  const discovery = await discoverPlugins(githubClient,catalog,settings.targetPlugins,deadline,{npmClient,maxCandidates:150,maxSearchPages:4});
+  const pluginsConfig = discovery.plugins;
+  // A verified catalog is not a metric snapshot; retaining it also permits a later budget-safe retry.
+  await atomicWriteJson(path.join(options.dataDir,'catalog.json'),{schemaVersion:1,verifiedAt:startedAt.toISOString(),plugins:pluginsConfig});
+  const selectedConfigs = selectCollectionScope(pluginsConfig,previous.latest?.plugins ?? [],settings.maxPlugins);
+  const selectedIds = new Set(selectedConfigs.map(config=>config.id));
+  const discoveryReasons: Record<string,string> = {
+    no_more_verified_plugins:'本次搜索未找到足够有安装依据的插件。',
+    candidate_limit:'本轮核验候选达到上限，可再次更新继续查找。',
+    search_limit:'本轮搜索次数已到上限；实际数量不代表完整生态。',
+    deadline:'本轮核验时间已到，保留已核验目录。',
+    request_budget:'本轮请求预算不足，已停止查找。',
+    search_failed:'插件搜索暂不可用，保留已有插件。',
+  };
+  const discoverySummary = {target:settings.targetPlugins,verified:pluginsConfig.length,added:discovery.report.addedPlugins,candidatesChecked:discovery.report.checkedCandidates,
+    reason:pluginsConfig.length>=settings.targetPlugins?null:(discoveryReasons[discovery.report.stopReason] ?? '本轮实际核验数量少于目标。')};
+
 
   const records: Array<Omit<PluginRecord, 'scores'>> = [];
   const errors: string[] = [];
@@ -403,6 +443,11 @@ export async function runCollection(argv = process.argv.slice(2)): Promise<void>
   try { await githubClient.flushCache(); } catch { console.warn('[collect] optional HTTP cache could not be saved; data collection remains usable'); }
   const usage = budget.getSummary();
   const core = usage.githubByResource.core;
+  if (!usage.stopped && !discoverySummary.reason && records.length < Math.min(settings.targetPlugins,pluginsConfig.length)) {
+    discoverySummary.reason = selectedConfigs.length < pluginsConfig.length
+      ? '目录已核验 '+pluginsConfig.length+' 个，本轮最多采集 '+selectedConfigs.length+' 个；其余分轮更新。'
+      : '部分插件未取得有效数据，仅发布实际可用记录。';
+  }
   const report: CollectionReport = {
     version:1, startedAt:startedAt.toISOString(), completedAt:new Date().toISOString(),
     configuredPlugins:pluginsConfig.length, selectedPlugins:selectedConfigs.length,
@@ -411,7 +456,7 @@ export async function runCollection(argv = process.argv.slice(2)): Promise<void>
     maxPlugins:settings.maxPlugins,maxRequests:settings.maxRequests,githubReserve:settings.githubReserve,
     requestsMade:usage.requestsMade,memoryCacheHits:usage.memoryCacheHits,revalidatedCacheHits:usage.revalidatedCacheHits,persistentCacheHits:usage.persistentCacheHits,
     githubRemaining:core?.remaining ?? null,githubResetAt:core?.resetAt ?? null,
-    stopped:usage.stopped,stopReason:usage.stopReason,
+    stopped:usage.stopped,stopReason:usage.stopReason,discovery:discoverySummary,
   };
   await atomicWriteJson(path.join(options.dataDir,'collection-report.json'),report);
   if (process.env.GITHUB_STEP_SUMMARY) {
@@ -556,6 +601,7 @@ export async function runCollection(argv = process.argv.slice(2)): Promise<void>
       ...errors.slice(0, 15),
       ...(npmErrors > 0 ? [`npm 请求失败 ${npmErrors} 个`] : []),
       ...(osvErrors > 0 ? [`OSV 请求失败 ${osvErrors} 个`] : []),
+      ...(discoverySummary.reason?[discoverySummary.reason]:[]),
       `评分方法版本 ${SCORE_METHOD_VERSION}`,
     ],
     nextRunHint: 'GitHub Actions 计划每 6 小时运行；npm 与 OSV 随同刷新。',

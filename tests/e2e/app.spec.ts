@@ -13,7 +13,7 @@ test('overview shows real data, decorative fallback and the ecosystem chart', as
   const errors=trackErrors(page); await page.goto('/');
   await expect(page.locator('#home-title')).toContainText('发现好插件');
   await expect(page.getByRole('img',{name:/DSH 插件关注度/})).toBeVisible();
-  await expect(page.getByText('已核验插件',{exact:true})).toBeVisible();
+  await expect(page.getByText('已收录插件',{exact:true})).toBeVisible();
   await page.getByLabel('搜索插件名称、功能或仓库').fill('context');
   await page.getByRole('button',{name:'查找插件'}).click();
   await expect(page).toHaveURL(/plugins\?q=context/);

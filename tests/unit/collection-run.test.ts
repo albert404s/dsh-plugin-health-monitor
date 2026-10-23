@@ -2,6 +2,7 @@ import { mkdtemp, readFile, writeFile, readdir, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, expect, it, vi } from 'vitest';
+import { discoverPlugins } from '../../scripts/lib/discovery';
 import { runCollection } from '../../scripts/collect';
 import { makeSeed, NOW } from './helpers';
 import { computeStats, scorePlugins } from '../../src/lib/scoring';
@@ -13,8 +14,9 @@ vi.mock('../../scripts/lib/github',()=>({collectGithub:vi.fn(async(repo:string,c
   const seed=makeSeed({id:repo.split('/')[1]});
   return {repository:seed.repository,github:seed.github,warnings:[],availability:{repository:true,commits:true,issues:true,pullRequests:true,releases:true}};
 })}));
-vi.mock('../../scripts/lib/npm',()=>({collectNpm:vi.fn(async()=>makeSeed().npm)}));
-vi.mock('../../scripts/lib/osv',()=>({collectOsv:vi.fn(async()=>makeSeed().security)}));
+vi.mock('../../scripts/lib/npm',()=>({collectNpm:vi.fn(async(_package:string|null,repo:string)=>makeSeed({id:repo.split('/')[1]}).npm)}));
+vi.mock('../../scripts/lib/osv',()=>({collectOsv:vi.fn(async(pkg:string)=>makeSeed({id:pkg.split('/').at(-1)}).security)}));
+vi.mock('../../scripts/lib/discovery',()=>({discoverPlugins:vi.fn(async(_client:any,existing:any[],target:number)=>({plugins:existing,report:{targetPlugins:target,previousPlugins:existing.length,totalPlugins:existing.length,addedPlugins:0,checkedCandidates:0,rejectedCandidates:0,searchRequests:0,exhausted:true,stopReason:'no_more_verified_plugins',warnings:[]}}))}));
 const dirs:string[]=[];
 afterEach(async()=>{vi.unstubAllGlobals();vi.unstubAllEnvs();process.exitCode=0;await Promise.all(dirs.splice(0).map(dir=>rm(dir,{recursive:true,force:true})));});
 async function setup(){
@@ -60,4 +62,18 @@ it('scope selection prioritizes never-fetched and then oldest records, without c
  const old=scorePlugins([makeSeed({id:'a'}),makeSeed({id:'b'})],NOW);old[0].lastUpdatedAt='2026-10-21T00:00:00Z';old[1].lastUpdatedAt='2026-10-19T00:00:00Z';
  expect(selectCollectionScope(configs,old,2).map(config=>config.id)).toEqual(['c','b']);
  expect(()=>selectCollectionScope(configs,old,0)).toThrow();
+});
+
+it('a discovered catalog expands real records to 50 and survives the next collection run',async()=>{
+ const {dir,config}=await setup();
+ const configs:PluginConfig[]=Array.from({length:50},(_,index)=>({id:index===0?'a':index===1?'b':'new-'+index,repo:'owner/'+(index===0?'a':index===1?'b':'new-'+index),npm:null,category:'workflow',installCommand:'dsh plugin --profile web add @owner/plugin-'+index,note:'Verified bundle test fixture'}));
+ vi.mocked(discoverPlugins).mockResolvedValueOnce({plugins:configs,report:{targetPlugins:50,previousPlugins:2,totalPlugins:50,addedPlugins:48,checkedCandidates:52,rejectedCandidates:4,searchRequests:1,exhausted:false,stopReason:'target_reached',warnings:[]}});
+ await runCollection(['--data-dir',dir,'--config',config,'--cache-dir',path.join(dir,'cache'),'--target-plugins','50','--max-plugins','50','--max-requests','100','--github-reserve','0']);
+ const latest=JSON.parse(await readFile(path.join(dir,'latest.json'),'utf8'));
+ expect(latest.plugins).toHaveLength(50);expect(latest.stats.pluginCount).toBe(50);
+ expect(new Set(latest.plugins.map((item:any)=>item.repo)).size).toBe(50);
+ expect(JSON.parse(await readFile(path.join(dir,'catalog.json'),'utf8')).plugins).toHaveLength(50);
+ expect(JSON.parse(await readFile(path.join(dir,'collection-report.json'),'utf8')).discovery).toMatchObject({target:50,verified:50,added:48});
+ await runCollection(['--data-dir',dir,'--config',config,'--cache-dir',path.join(dir,'cache'),'--max-plugins','1','--max-requests','100','--github-reserve','0']);
+ expect(JSON.parse(await readFile(path.join(dir,'latest.json'),'utf8')).plugins).toHaveLength(50);
 });

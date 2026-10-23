@@ -165,6 +165,6 @@ export class RequestBudget {
       }
     }
     if (rateLimited) this.stop('github_rate_limit');
-    else if (remaining !== null && remaining <= this.githubReserve) this.stop('github_reserve');
+    else if (resource === 'core' && remaining !== null && remaining <= this.githubReserve) this.stop('github_reserve');
   }
 }

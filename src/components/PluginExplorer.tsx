@@ -267,10 +267,9 @@ export function PluginExplorer({
             浏览结果
           </h2>
         </div>
-        <p className="tnum text-xs text-content-secondary" aria-live="polite">
-          共 {plugins.length} 个插件
-          {active ? <span className="ml-2 text-content-muted">· 匹配 {ranking.matched} 个</span> : null}
-          {state.top !== 'all' ? <span className="ml-2 text-brand-text">· 最多前 {state.top} 个，实际 {ranking.items.length} 个</span> : null}
+        <p className="tnum text-xs text-content-secondary" role="status" aria-atomic="true" aria-label="榜单数量">
+          <span className="font-medium text-brand-text">展示 {ranking.items.length} 个</span>
+          <span className="ml-2 text-content-muted">· 匹配 {ranking.matched} 个 · 全库 {plugins.length} 个</span>
         </p>
       </div>
 
@@ -278,7 +277,7 @@ export function PluginExplorer({
         <div className="border-b border-line px-4 py-3.5 md:px-5 lg:sticky lg:top-[var(--header-h)] lg:z-20 lg:bg-surface">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <h3 className="text-xs font-semibold text-content-primary"><QuietHint text="先筛选，再按所选维度排序，最后取前 N 个。设置保存在网址中，展示数量不会增加或减少 API 采集。">榜单设置</QuietHint></h3>
-            <span className="text-2xs text-content-muted">仅展示已收录快照</span>
+            <Link to={{ pathname: '/plugins', search: searchParams.toString(), hash: '#collection-controls' }} className="inline-flex min-h-8 items-center gap-1 text-2xs text-brand-text hover:underline">扩充收录与更新 <ArrowRight size={12} aria-hidden="true" /></Link>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <label className="relative block min-w-0 flex-1 basis-full lg:basis-auto">
@@ -392,6 +391,12 @@ export function PluginExplorer({
               </button>
             </div>
           </div>
+
+          {state.top !== 'all' && ranking.items.length < state.top ? (
+            <p className="mt-3 text-xs leading-5 text-content-secondary" data-testid="ranking-shortfall">
+              {plugins.length < state.top ? `全库已收录 ${plugins.length} 个，目标前 ${state.top} 个需先扩充收录。` : `当前筛选仅匹配 ${ranking.matched} 个，已全部展示。`}
+            </p>
+          ) : null}
 
           {customTopOpen ? <form className="mt-3 flex flex-wrap items-center gap-2" onSubmit={(event) => { event.preventDefault(); applyCustomTop(); }}>
             <label className="text-2xs text-content-secondary" htmlFor="ranking-top">展示前</label>
@@ -510,9 +515,6 @@ export function PluginExplorer({
             </div>
           ) : null}
 
-          <p className="sr-only" aria-live="polite">
-            当前筛选匹配 {ranking.matched} 个插件，榜单展示 {ranking.items.length} 个。
-          </p>
         </div>
 
         {ranking.items.length === 0 ? (

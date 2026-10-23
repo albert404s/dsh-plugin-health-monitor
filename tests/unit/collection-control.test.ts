@@ -227,3 +227,21 @@ it('the configure CLI saves bounded numeric settings and keeps snapshot and paus
   expect(await readCollectionSettings(source)).toMatchObject({maxPlugins:50,maxRequests:300,githubReserve:80,updatedBy:'albert404s'});
   expect(await readFile(output,'utf8')).toContain('should_collect=false');
 });
+
+it('legacy settings migrate without mistaking the per-run ceiling for a catalog target',()=>{
+ const defaults=defaultCollectionSettings();
+ const {targetPlugins:_target,...legacy}=defaults;
+ expect(parseCollectionSettings(legacy)).toMatchObject({targetPlugins:20,maxPlugins:100});
+ for(const targetPlugins of [0,null,1.5,1001,'oops']) expect(()=>parseCollectionSettings({...legacy,targetPlugins})).toThrow();
+ expect(parseCollectionSettings({...legacy,targetPlugins:50})).toMatchObject({targetPlugins:50,maxPlugins:100});
+});
+it('refresh accepts a target and budget in one run without changing the paused switch',async()=>{
+ const source=await directory(),output=path.join(await directory(),'output');
+ await writeCollectionControl(source,paused);
+ await execute(process.execPath,['scripts/collection-control.ts','gate','--data-dir',source],{cwd:process.cwd(),env:{
+ ...process.env,COLLECTION_EVENT:'workflow_dispatch',COLLECTION_ACTION:'refresh',COLLECTION_TARGET_PLUGINS:'50',COLLECTION_MAX_PLUGINS:'25',COLLECTION_MAX_REQUESTS:'800',COLLECTION_GITHUB_RESERVE:'100',GITHUB_ACTOR:'albert404s',GITHUB_OUTPUT:output,GITHUB_STEP_SUMMARY:''}});
+ expect(await readCollectionControl(source)).toEqual(paused);
+ expect(await readCollectionSettings(source)).toMatchObject({targetPlugins:50,maxPlugins:25,maxRequests:800});
+ expect(await readFile(output,'utf8')).toContain('should_collect=true');
+ expect(await readFile(output,'utf8')).toContain('control_changed=false');
+});

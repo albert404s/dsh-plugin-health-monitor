@@ -15,8 +15,19 @@ const actions = [
 ] as const;
 type Action = typeof actions[number]['value'] | 'configure';
 const defaults = defaultCollectionSettings();
+const settingsFields = [
+  { key: 'targetPlugins', label: '收录目标', min: 1, max: 1000, workflow: 'target_plugins' },
+  { key: 'maxPlugins', label: '每轮最多采集', min: 1, max: 1000, workflow: 'max_plugins' },
+  { key: 'maxRequests', label: '每轮请求上限', min: 1, max: 10000, workflow: 'max_requests' },
+  { key: 'githubReserve', label: 'GitHub 预留额度', min: 0, max: 1000, workflow: 'github_reserve' },
+] as const;
+type SettingsDraft = Record<typeof settingsFields[number]['key'], string>;
+function settingsDraft(settings: typeof defaults): SettingsDraft {
+  return { targetPlugins: String(settings.targetPlugins), maxPlugins: String(settings.maxPlugins), maxRequests: String(settings.maxRequests), githubReserve: String(settings.githubReserve) };
+}
 function CollectionDialog({ onClose }: { onClose: () => void }): JSX.Element {
   const dialog = useRef<HTMLDialogElement>(null);
+  const dirtyDraft = useRef(false);
   const { data, loading, refresh, refreshedAt } = useData();
   const [action, setAction] = useState<Action>('refresh');
   const [control, setControl] = useState<CollectionControl | null>(null);
@@ -25,7 +36,11 @@ function CollectionDialog({ onClose }: { onClose: () => void }): JSX.Element {
   const [settingsError, setSettingsError] = useState(false);
   const [controlLoading, setControlLoading] = useState(true);
   const [reload, setReload] = useState(0);
-  const [draft, setDraft] = useState({maxPlugins:String(defaults.maxPlugins),maxRequests:String(defaults.maxRequests),githubReserve:String(defaults.githubReserve)});
+  const [draft, setDraft] = useState<SettingsDraft>(() => settingsDraft(defaults));
+  const updateDraft = (key: keyof SettingsDraft, value: string): void => {
+    dirtyDraft.current = true;
+    setDraft(previous => ({ ...previous, [key]: value }));
+  };
   useEffect(() => {
     const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const overflow = document.body.style.overflow;
@@ -54,7 +69,7 @@ function CollectionDialog({ onClose }: { onClose: () => void }): JSX.Element {
       try {
         if (results[1].status!=='fulfilled') throw new Error('Missing settings');
         const next = parseCollectionSettings(results[1].value);
-        setDraft({maxPlugins:String(next.maxPlugins),maxRequests:String(next.maxRequests),githubReserve:String(next.githubReserve)});
+        if (!dirtyDraft.current) setDraft(settingsDraft(next));
       } catch { setSettingsError(true); }
       setReport(results[2].status==='fulfilled' ? parseCollectionReport(results[2].value) : null);
       window.clearTimeout(timeout); setControlLoading(false);
@@ -65,7 +80,10 @@ function CollectionDialog({ onClose }: { onClose: () => void }): JSX.Element {
   const state = controlLoading ? '正在确认状态' : controlError || !control ? '自动采集状态待确认' : control.automaticPaused ? '自动采集已暂停' : '自动采集 · 每 6 小时';
   let validation = '';
   try { parseCollectionSettings({...defaults,...draft}); } catch (error) { validation = error instanceof Error ? error.message : '请检查采集设置'; }
-  const disabled = action === 'configure' && Boolean(validation);
+  const withSettings = action === 'refresh' || action === 'configure';
+  const disabled = withSettings && (controlLoading || Boolean(validation));
+  const collectedCount = data?.latest.plugins.length;
+  const targetCount = /^\d+$/.test(draft.targetPlugins) ? Number(draft.targetPlugins) : null;
   return createPortal(<dialog ref={dialog} className="orbit-collection-dialog" aria-labelledby="collection-title" onCancel={event=>{event.preventDefault();onClose();}}>
     <div className="orbit-collection-heading"><div><p className="eyebrow">DATA CONTROL</p><h2 id="collection-title">数据更新</h2></div><button type="button" className="orbit-icon-button" onClick={onClose} aria-label="关闭数据更新"><X size={18}/></button></div>
     <div className="orbit-collection-content">
@@ -73,16 +91,23 @@ function CollectionDialog({ onClose }: { onClose: () => void }): JSX.Element {
       <fieldset className="orbit-collection-options"><legend className="sr-only">选择维护操作</legend>
         {actions.map(({value,label,description,icon:Icon})=><label key={value} className={action===value?'is-selected':''}><input type="radio" name="collection-action" value={value} checked={action===value} onChange={()=>setAction(value)}/><Icon size={17} aria-hidden="true"/><span><b>{label}</b><small>{description}</small></span></label>)}
       </fieldset>
+      <div className="orbit-collection-target">
+        <label>收录目标<input type="number" inputMode="numeric" min="1" max="1000" step="1" disabled={!withSettings} value={draft.targetPlugins} onChange={event=>updateDraft('targetPlugins', event.target.value)}/><span>个插件</span></label>
+        <p>当前实际收录 <b>{collectedCount ?? '—'}</b> 个。{!withSettings ? '暂停或恢复只改变自动开关，不修改收录目标与预算。' : targetCount !== null && collectedCount !== undefined && targetCount > collectedCount
+          ? `本次目标 ${targetCount} 个，将查找并核验更多 DSH 插件；不足目标时显示实际数量和原因。`
+          : '修改目标后，需执行下方 GitHub 更新操作才会生效。'}</p>
+        {withSettings && targetCount !== null && collectedCount !== undefined && targetCount < collectedCount && <p>目标小于已有数量时保留已收录插件；如只想少看一些，请使用插件库的“展示数量”。</p>}
+      </div>
       <details className="orbit-collection-settings"><summary>采集范围与预算</summary>
-        <p>当前已收录 {data?.latest.plugins.length ?? '—'} 个插件。按最久未更新优先，分轮采集。</p>
+        <p>每轮上限控制本次采集多少个；收录目标控制插件库希望扩充到多少个。按最久未更新优先，分轮采集。</p>
         {settingsError && <p className="text-warning">未取得已保存的设置，以下为建议值。</p>}
         <div className="orbit-collection-fields">
-          {([{key:'maxPlugins',label:'每轮最多采集',min:1,max:1000},{key:'maxRequests',label:'每轮请求上限',min:1,max:10000},{key:'githubReserve',label:'GitHub 预留额度',min:0,max:1000}] as const).map(field=><label key={field.key}>{field.label}<input type="number" inputMode="numeric" min={field.min} max={field.max} step="1" value={draft[field.key]} onChange={event=>setDraft(previous=>({...previous,[field.key]:event.target.value}))}/></label>)}
+          {settingsFields.filter(field=>field.key!=='targetPlugins').map(field=><label key={field.key}>{field.label}<input type="number" inputMode="numeric" min={field.min} max={field.max} step="1" disabled={!withSettings} value={draft[field.key]} onChange={event=>updateDraft(field.key, event.target.value)}/></label>)}
         </div>
         <p>请求数包含分页和重试；达到上限或预留边界后保留整份旧数据。与榜单展示数量无关。</p>
         <button type="button" className="orbit-prepare-settings" aria-pressed={action==='configure'} onClick={()=>setAction('configure')}>准备保存采集设置 <ArrowUpRight size={13}/></button>
-        {action==='configure' && validation && <p role="alert" className="text-warning">{validation}</p>}
       </details>
+      {withSettings && validation && <p role="alert" className="orbit-collection-validation text-warning">{validation}</p>}
       {report && <details className="orbit-collection-settings"><summary>上次采集记录 · {report.requestsMade} 次请求</summary>
         <dl className="orbit-collection-report">
           <div><dt>请求数 / 上限</dt><dd>{report.requestsMade} / {report.maxRequests}</dd></div>
@@ -90,15 +115,18 @@ function CollectionDialog({ onClose }: { onClose: () => void }): JSX.Element {
           <div><dt>已完成 / 本轮范围</dt><dd>{report.completedPlugins} / {report.selectedPlugins}</dd></div>
           <div><dt>GitHub 主额度剩余</dt><dd>{report.githubRemaining ?? '未取得'}</dd></div>
           <div><dt>记录时间</dt><dd>{formatDateTime(report.completedAt)}</dd></div>
+          {report.discovery && <div><dt>核验收录 / 目标</dt><dd>{report.discovery.verified} / {report.discovery.target}</dd></div>}
+          {report.discovery && <div><dt>本次新增 / 检查候选</dt><dd>{report.discovery.added} / {report.discovery.candidatesChecked}</dd></div>}
         </dl>
         {report.stopped && <p className="text-warning">本轮触及预算或平台限制，已保留上次有效快照。</p>}
+        {report.discovery && report.discovery.verified < report.discovery.target && <p>未达到收录目标：已核验 {report.discovery.verified} 个，目标 {report.discovery.target} 个。{report.discovery.reason ?? '尚未找到足够的已核验 DSH 插件。'}</p>}
       </details>}
       <div className="orbit-collection-instructions">
-        <p>维护者登录 GitHub 后确认执行：</p>
-        <ol><li>点 <b>Run workflow</b>，分支选择 <b>main</b>。</li><li>操作选择 <code>{action}</code>{action==='configure'?'，填入下方数值':''}，再点绿色 <b>Run workflow</b>。</li></ol>
-        {action==='configure' && <dl className="orbit-collection-report"><div><dt>max_plugins</dt><dd>{draft.maxPlugins}</dd></div><div><dt>max_requests</dt><dd>{draft.maxRequests}</dd></div><div><dt>github_reserve</dt><dd>{draft.githubReserve}</dd></div></dl>}
-        <a className="btn-primary" href={disabled?undefined:WORKFLOW_URL} aria-disabled={disabled||undefined} tabIndex={disabled?-1:undefined} target="_blank" rel="noreferrer noopener">到 GitHub{action==='refresh'?'重新采集':action==='pause'?'暂停自动采集':action==='resume'?'恢复自动采集':'保存采集设置'} <ArrowUpRight size={15} aria-hidden="true"/></a>
-        <p className="text-content-muted">{action==='refresh'?'完成后会自动发布新数据，通常需要几分钟。':action==='configure'?'仅保存后续采集设置，不立即采集或改变自动开关。':'只更改后续定时计划，不取消正在运行的采集。'}</p>
+        <p>在 GitHub 确认执行（需要仓库写入权限）：</p>
+        <ol><li>点下方按钮，登录后点 <b>Run workflow</b>，分支选 <b>main</b>。</li><li>操作选 <code>{action}</code>{withSettings?'，照下表填入参数':''}，再点绿色 <b>Run workflow</b>。</li><li>等任务和发布完成，回到这里点“刷新已发布数据”。</li></ol>
+        {withSettings && <dl className="orbit-collection-report" aria-label="本次 GitHub 工作流参数">{settingsFields.map(field=><div key={field.key}><dt>{field.workflow}</dt><dd>{draft[field.key] || '未填写'}</dd></div>)}</dl>}
+        <a className="btn-primary" href={disabled?undefined:WORKFLOW_URL} aria-disabled={disabled||undefined} tabIndex={disabled?-1:undefined} target="_blank" rel="noreferrer noopener">到 GitHub{action==='refresh'?'更新数据':action==='pause'?'暂停自动采集':action==='resume'?'恢复自动采集':'保存采集设置'} <ArrowUpRight size={15} aria-hidden="true"/></a>
+        <p className="text-content-muted">{action==='refresh'?'保存本次设置并开始采集，完成后自动发布。填入目标不会立即改变已收录数量。':action==='configure'?'仅保存后续采集设置，不立即采集或改变自动开关。':'只更改后续定时计划，不取消正在运行的采集。'}</p>
       </div>
       <div className="orbit-collection-footer"><span>已在 GitHub 完成操作？</span><button type="button" onClick={()=>{refresh();setReload(value=>value+1);}} disabled={loading||controlLoading}><RefreshCw size={14} aria-hidden="true"/>刷新已发布数据</button></div>
       <p className="orbit-collection-note">普通访客可查看数据；重新采集和更改设置需要仓库写入权限。仅选择操作不会提交更改。</p>

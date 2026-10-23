@@ -23,7 +23,8 @@ test('ranking limit follows sorting, paginates only the shortlist and restores b
   await expect(explorer.locator('tbody tr')).toHaveCount(2);
   await explorer.getByLabel('展示数量', { exact: true }).selectOption('100');
   await expect(page).not.toHaveURL(/page=2/);
-  await expect(explorer).toContainText(`最多前 100 个，实际 ${snapshot.plugins.length} 个`);
+  await expect(explorer.getByRole('status', { name: '榜单数量' })).toContainText(`展示 ${snapshot.plugins.length} 个`);
+  await expect(explorer.getByTestId('ranking-shortfall')).toContainText(`全库已收录 ${snapshot.plugins.length} 个，目标前 100 个需先扩充收录。`);
   await page.goBack();
   await expect(explorer.getByLabel('展示数量', { exact: true })).toHaveValue('10');
   await expect(explorer.locator('tbody tr')).toHaveCount(2);
@@ -66,7 +67,8 @@ test('invalid top links recover to all results and a large valid top never inven
   const snapshot: LatestData = await (await page.request.get('/data/latest.json')).json();
   await expect(explorer.getByLabel('展示数量', { exact: true })).toHaveValue('custom');
   await expect(explorer.getByLabel('自定义展示数量')).toHaveValue('1000');
-  await expect(explorer).toContainText(`最多前 1000 个，实际 ${snapshot.plugins.length} 个`);
+  await expect(explorer.getByRole('status', { name: '榜单数量' })).toContainText(`展示 ${snapshot.plugins.length} 个`);
+  await expect(explorer.getByTestId('ranking-shortfall')).toContainText(`全库已收录 ${snapshot.plugins.length} 个，目标前 1000 个需先扩充收录。`);
   await explorer.getByRole('button', { name: '下一页' }).click();
   await explorer.getByRole('button', { name: '下一页' }).click();
   await expect(explorer.getByRole('button', { name: '下一页' })).toBeDisabled();

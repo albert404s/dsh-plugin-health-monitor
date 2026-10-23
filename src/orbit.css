@@ -133,11 +133,17 @@ button[class*="rounded-control"]:active,a[class*="rounded-control"]:active{trans
 .orbit-collection-trigger{width:auto;padding:0 11px;gap:7px;font-size:12px;white-space:nowrap}@media(max-width:767px){.orbit-collection-trigger{width:40px;padding:0}.orbit-collection-trigger>span{display:none}}
 
 .orbit-collection-settings{margin-top:15px;border:1px solid rgb(var(--line));border-radius:9px;padding:0 13px;font-size:12px;color:rgb(var(--fg-secondary))}
+.orbit-collection-target{margin-top:18px;padding:14px;border:1px solid rgb(var(--brand)/.25);border-radius:9px;background:rgb(var(--brand)/.035)}
+.orbit-collection-target label{display:flex;align-items:center;gap:10px;color:rgb(var(--fg-primary));font-size:13px;font-weight:500}
+.orbit-collection-target input{width:90px;min-height:42px;margin-left:auto;padding:7px 9px;border:1px solid rgb(var(--line-strong));border-radius:6px;background:rgb(var(--surface));color:rgb(var(--fg-primary));font-family:ui-monospace,monospace}
+.orbit-collection-target label>span{font-size:12px;font-weight:400;color:rgb(var(--fg-secondary))}
+.orbit-collection-target p,.orbit-collection-validation{margin-top:10px;font-size:12px;line-height:1.8}.orbit-collection-target p{color:rgb(var(--fg-secondary))}.orbit-collection-target b{color:rgb(var(--brand));font-family:ui-monospace,monospace}
 .orbit-collection-settings summary{min-height:42px;cursor:pointer;padding:12px 0;color:rgb(var(--fg-primary))}
 .orbit-collection-settings>p{font-size:12px;line-height:1.8;margin:0 0 12px}
 .orbit-collection-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:13px 0}
 .orbit-collection-fields label{display:grid;gap:7px;font-size:12px}
 .orbit-collection-fields input{min-width:0;max-width:100%;min-height:38px;padding:6px 9px;border:1px solid rgb(var(--line-strong));border-radius:6px;background:rgb(var(--surface));color:rgb(var(--fg-primary));font-family:ui-monospace,monospace}
+.orbit-collection-target input:disabled,.orbit-collection-fields input:disabled{opacity:.5;cursor:not-allowed}
 .orbit-prepare-settings{display:flex;align-items:center;gap:7px;min-height:40px;color:rgb(var(--brand));margin:5px 0 9px}
 .orbit-collection-report{font-size:12px;line-height:1.8;margin-bottom:13px}.orbit-collection-report>div{display:flex;justify-content:space-between;gap:15px;padding:4px 0}.orbit-collection-report dd{font-family:ui-monospace,monospace;color:rgb(var(--fg-primary))}
 .orbit-collection-instructions a[aria-disabled=true]{opacity:.4;pointer-events:none}

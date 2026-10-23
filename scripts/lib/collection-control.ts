@@ -120,6 +120,7 @@ export async function stageCollectionArtifact(dataDir: string, artifactDir: stri
   }
   await writeCollectionControl(artifactDir, control);
   await writeCollectionSettings(artifactDir, settings);
+  try { await copyFile(path.join(dataDir, 'catalog.json'), path.join(artifactDir, 'catalog.json')); } catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
   try { await copyFile(path.join(dataDir, 'collection-report.json'), path.join(artifactDir, 'collection-report.json')); } catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
 }
 

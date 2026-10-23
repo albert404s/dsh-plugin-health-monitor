@@ -17,7 +17,7 @@ export function PluginLibraryPage(): JSX.Element {
     <div className="orbit-page page-enter">
       <div className="orbit-page-head">
         <div><div className="orbit-kicker">LIBRARY</div><h1 className="mt-3"><QuietHint text="搜索与筛选插件，勾选两个候选即可对比。">插件库</QuietHint></h1></div>
-        <span className="orbit-chip"><Boxes size={14} aria-hidden="true" />{latest.plugins.length} 个已核验插件</span>
+        <span className="orbit-chip"><Boxes size={14} aria-hidden="true" />全库 {latest.plugins.length} 个插件</span>
       </div>
       <PluginExplorer plugins={latest.plugins} lastSuccessAt={latest.lastSuccessAt} comparedIds={selected} onToggleCompare={toggle} />
       {compared.length > 0 && (

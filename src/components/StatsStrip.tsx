@@ -27,22 +27,22 @@ export function StatsStrip({ data }: { data: LatestData }): JSX.Element {
         <div className="grid grid-cols-2 gap-px bg-line md:grid-cols-6 lg:grid-cols-5">
           <div className="col-span-1 min-h-[96px] bg-surface md:col-span-2 md:min-h-[112px] lg:col-span-1 lg:min-h-[128px]">
             <StatCell
-              label="已核验插件"
+              label="已收录插件"
               value={
                 <>
-                  {stats.pluginCount}
+                  <span data-testid="stats-plugin-count">{stats.pluginCount}</span>
                   <span className="ml-1 text-xs font-medium text-content-muted">个</span>
                 </>
               }
-              detail="人工核验的公开 GitHub 仓库"
+              detail="当前全库的有效记录；与榜单展示数量分开统计。"
               icon={<Boxes size={13} />}
             />
           </div>
           <div className="col-span-1 min-h-[96px] bg-surface md:col-span-2 md:min-h-[112px] lg:col-span-1 lg:min-h-[128px]">
             <StatCell
               label="总 Stars"
-              value={<span title={`${stats.totalStars} stars`}>{formatCompact(stats.totalStars)}</span>}
-              detail="GitHub REST API 当前值"
+              value={<span data-testid="stats-total-stars" title={`${stats.totalStars} stars`}>{formatCompact(stats.totalStars)}</span>}
+              detail="当前全库 Stars 合计，随最新快照更新。"
               icon={<Star size={13} />}
             />
           </div>
@@ -51,7 +51,7 @@ export function StatsStrip({ data }: { data: LatestData }): JSX.Element {
               label="npm 30 天下载"
               value={
                 <>
-                  {stats.totalDownloads === null ? '—' : formatCompact(stats.totalDownloads)}
+                  <span data-testid="stats-total-downloads" title={stats.totalDownloads === null ? '暂无可靠下载数据' : `${stats.totalDownloads} 次`}>{stats.totalDownloads === null ? '—' : formatCompact(stats.totalDownloads)}</span>
                   {stats.totalDownloads === null ? null : (
                     <span className="ml-1 text-xs font-medium text-content-muted">次</span>
                   )}
@@ -85,7 +85,7 @@ export function StatsStrip({ data }: { data: LatestData }): JSX.Element {
               label="数据完整"
               value={
                 <>
-                  {stats.completeDataCount}
+                  <span data-testid="stats-complete-count">{stats.completeDataCount}</span>
                   <span className="ml-1 text-xs font-medium text-content-muted">/ {stats.pluginCount}</span>
                 </>
               }

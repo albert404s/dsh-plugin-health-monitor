@@ -40,7 +40,7 @@ export function HomePage(): JSX.Element {
         <section className="panel orbit-hero-chart" aria-labelledby="home-map-title">
           <div className="orbit-chart-heading">
             <div><p className="orbit-kicker">ECOSYSTEM</p><h2 id="home-map-title"><QuietHint text="横轴关注度，纵轴维护活跃度；气泡大小表示 Stars。">生态分布</QuietHint></h2></div>
-            <span className="orbit-chart-count"><b>{positioned}</b> / {latest.plugins.length}<small>已定位插件</small></span>
+            <span className="orbit-chart-count" aria-label={`已定位 ${positioned} 个，全库 ${latest.plugins.length} 个`}><b>{positioned}</b> / {latest.plugins.length}<small>已定位 / 全库</small></span>
           </div>
           <QuadrantChart plugins={latest.plugins} height={326} showLabels={false} showLegend={false} showUnpositioned={false} />
           <div className="orbit-chart-footer"><span className="orbit-axis-caption">关注度 × 维护活跃度</span><Link to="/ecosystem">探索生态分布 <ArrowUpRight size={14} aria-hidden="true" /></Link></div>

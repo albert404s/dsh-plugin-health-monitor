@@ -162,7 +162,7 @@ export function MethodPage(): JSX.Element {
                   </div>
                 ))}
               </dl>
-              <p className="mt-3 text-xs leading-6 text-content-muted">先筛选、再排序、最后取前 N 项；展示数量与实际采集上限分开。只读取已发布数据，不会每点一次就请求 GitHub。没有数据的指标不当作 0 分。</p>
+              <p className="mt-3 text-xs leading-6 text-content-muted">先筛选、再排序、最后取前 N 项。展示数量只改变当前榜单；不足 N 个时显示实际数量。没有数据的指标不当作 0 分。</p>
             </MethodSection>
 
             <MethodSection id="sources" index="02" title="数据从哪来">
@@ -245,20 +245,21 @@ export function MethodPage(): JSX.Element {
             </MethodSection>
 
             <MethodSection id="pipeline" index="07" title="更新与暂停">
-              <p>默认每 6 小时采集一次。维护者可从网站的“数据更新”入口前往 GitHub Actions，登录有权限的 GitHub 账号后选择操作。</p>
-              <dl className="mt-4 divide-y divide-line-hairline rounded-panel border border-line bg-surface px-4">
+              <p>默认每 6 小时采集一次。网站会自动检查已发布的新数据；维护者也能手动采集。</p>
+              <ol className="mt-4 list-decimal space-y-2 pl-5">
+                <li>打开“数据更新”，填写收录目标，按需调整每轮上限和预算。</li>
+                <li>点“到 GitHub 更新数据”，登录有写入权限的账号，选择 main 和 refresh，照页面参数运行。</li>
+                <li>等任务和发布完成，回到网站点“刷新已发布数据”。</li>
+              </ol>
+              <dl className="mt-4 grid gap-3 sm:grid-cols-3">
                 {[
-                  ['手动采集 · refresh', '重新获取 API 数据，成功后发布新快照。暂停期间也能使用。'],
-                  ['暂停自动采集 · pause', '跳过后续每 6 小时的定时采集；不会取消已经开始的任务。'],
-                  ['恢复自动采集 · resume', '恢复后续每 6 小时的定时采集。'],
-                  ['采集设置 · configure', '设置每轮采集上限、请求预算和 GitHub 预留额度；不会立即采集。'],
-                ].map(([title, text]) => (
-                  <div key={title} className="py-3">
-                    <dt className="font-medium text-content-primary">{title}</dt>
-                    <dd className="mt-1 text-xs leading-6">{text}</dd>
-                  </div>
-                ))}
+                  ['展示数量', '这次榜单最多看多少个；不会增加收录。'],
+                  ['收录目标', '希望插件库扩充到多少个；会查找并核验候选。'],
+                  ['每轮上限', '这轮最多采集多少个；用于分批更新和控制请求。'],
+                ].map(([title,text])=><div key={title} className="rounded-panel border border-line bg-surface p-3"><dt className="font-medium text-content-primary">{title}</dt><dd className="mt-1 text-xs leading-6">{text}</dd></div>)}
               </dl>
+              <p className="mt-3 text-xs text-content-muted">目标设为 50 不代表已有 50 个。发现不足、核验未通过或预算不足时，显示实际收录数和原因，保留已有数据。</p>
+              <p className="mt-3 text-xs text-content-muted">暂停与恢复只影响后续自动采集，不取消正在运行的任务；暂停时仍可手动更新。“只保存设置”会等待下次采集。</p>
               <Link to="/#collection-controls" className="mt-4 inline-flex min-h-11 items-center gap-1 font-medium text-brand-text hover:text-content-primary">
                 打开数据更新入口 <ArrowUpRight size={14} aria-hidden="true" />
               </Link>
@@ -274,7 +275,7 @@ export function MethodPage(): JSX.Element {
               <p>先选功能，再参考数据。安装前请回到项目仓库确认文档、许可证和适用版本。</p>
               <MoreDetails title="还需要知道的几件事">
                 <ul className="list-disc space-y-2 pl-5">
-                  <li>当前是已收录的插件榜单，不能代表 GitHub 全部插件。更多项目需先核实用途与仓库，再加入采集名单。</li>
+                  <li>榜单只比较已核验、已发布的 DSH 插件，不能代表 GitHub 全部插件；搜索结果需经过用途与仓库核验才会收录。</li>
                   <li>npm 下载包含重复安装和自动构建等，不等于真实用户数；没有 npm 包也不代表插件没人使用。</li>
                   <li>不同时间或不同样本的综合分不宜直接比较。想看实际变化，请优先看 Stars、下载和提交等原始记录。</li>
                   <li>项目只展示兼容性声明，不进行代码审查、安装测试或安全审计。</li>

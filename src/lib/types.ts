@@ -359,6 +359,7 @@ export const CATEGORY_LABELS: Record<string, string> = {
   operations: '底层运维',
   remote: '远程访问',
   office: '办公文档',
+  other: '其他插件',
 };
 
 export function categoryLabel(category: string): string {
