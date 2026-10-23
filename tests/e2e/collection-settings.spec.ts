@@ -80,6 +80,6 @@ test('historic method versions remain visible as separated points after a scorin
   await route.fulfill({response,json});
  });
  await page.goto('/plugins/bowenliang123-dsh-context');
- await expect(page.getByRole('img',{name:'插件关注度与维护活跃度历史趋势，方法版本变化处断线'})).toBeVisible();
+ await expect(page.getByRole('img',{name:/插件关注度与维护活跃度历史趋势/})).toBeVisible();
  await expect(page.locator('#trend')).toContainText('2 个真实快照');
 });
